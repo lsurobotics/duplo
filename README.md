@@ -9,4 +9,4 @@ A prototype of a programming language for two-armed robots.
 - blockly: A fork of the blockly programming editor.
 
 ## :speech_balloon:	Slack
-https://join.slack.com/t/vcuse/shared_invite/zt-gv0w8h0n-YUWl1PlPPnkZRqAwk0IiKA
+https://vcuse.slack.com/
