@@ -1,4 +1,6 @@
-var toolbox = document.getElementById('toolbox');
+// Injects Blockly into the html page and manages events there, creating a mirroring effect.
+
+var toolbox = document.getElementById("toolbox");
 var leftWorkspace = Blockly.inject('leftdiv',
     {media: '../../media/',
      toolbox: toolbox,
@@ -10,8 +12,13 @@ var rightWorkspace = Blockly.inject('rightdiv',
     toolboxPosition: "end",
     trashcan: false});
 
+var workspaceBlocks = document.getElementById("workspaceBlocks");
+Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
+Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
+
 leftWorkspace.addChangeListener(mirrorEvent);
 rightWorkspace.addChangeListener(mirrorEvent);
+
 
 function mirrorEvent(primaryEvent) {
   console.log(primaryEvent.type);
@@ -35,7 +42,7 @@ function mirrorEvent(primaryEvent) {
   else if (primaryEvent instanceof Blockly.Events.BlockCreate || primaryEvent instanceof Blockly.Events.BlockMove) {
     var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
     var block = workspace.getBlockById(primaryEvent.blockId);
-    if (block.type != "text") {
+    if (block.type != "custom_close") {
       return; //only for synchronizing type
     }
     if (eventJustHappened(primaryEvent)) {
@@ -55,7 +62,7 @@ function mirrorEvent(primaryEvent) {
     if (block == null) {
       return; //no matching block
     }
-    if (block.type != "text") {
+    if (block.type != "custom_close") {
       return; //only for synchronizing type
     }
     //delete block
