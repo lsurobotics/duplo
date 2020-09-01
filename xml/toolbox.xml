@@ -1,6 +1,6 @@
 <!-- Toolbox - Only the close finger block will double mirror -->
 <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-  <category name="Robot Recipes" colour="#5ba58c"></category>
+  <category name="Robot Recipes" colour="#5ba58c" custom="PROCEDURE"></category>
   <category name="Move" colour="#a55b80">
     <block type="custom_move"></block>
     <block type="custom_movestraight"></block>
