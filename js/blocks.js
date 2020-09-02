@@ -23,18 +23,8 @@ Blockly.defineBlocksWithJsonArray([
     // Move somewhere
     {
         "type": "custom_move",
-        "message0": "Move %1 %2 to %3",
+        "message0": "Move arm %1 to %2",
         "args0": [
-            {
-                "type": "field_dropdown",
-                "name": "TARGET",
-                "options": [
-                [
-                    "Finger",
-                    "FINGER"
-                ]
-                ]
-            },
             {
                 "type": "field_dropdown",
                 "name": "SPEED",
@@ -56,52 +46,7 @@ Blockly.defineBlocksWithJsonArray([
             {
                 "type": "field_variable",
                 "name": "LOCATION",
-                "variable": "<somewhere>"
-            }
-        ],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 50,
-        "tooltip": "",
-        "helpUrl": ""
-    },
-    // Move somewhere in straight line
-    {
-        "type": "custom_movestraight",
-        "message0": "Move %1 %2 in a straight line to %3",
-        "args0": [
-            {
-                "type": "field_dropdown",
-                "name": "TARGET",
-                "options": [
-                [
-                    "Finger",
-                    "FINGER"
-                ]
-                ]
-            },
-            {
-                "type": "field_dropdown",
-                "name": "SPEED",
-                "options": [
-                [
-                    "quickly",
-                    "QUICK"
-                ],
-                [
-                    "at a normal speed",
-                    "NORMAL"
-                ],
-                [
-                    "slowly",
-                    "SLOW"
-                ]
-                ]
-            },
-            {
-                "type": "field_variable",
-                "name": "LOCATION",
-                "variable": "<somewhere>"
+                "variable": "starting point"
             }
         ],
         "previousStatement": null,
