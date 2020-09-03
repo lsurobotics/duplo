@@ -5,16 +5,28 @@ var leftWorkspace = Blockly.inject('leftdiv',
     {media: '../../media/',
      toolbox: toolbox,
      toolboxPosition: "start",
-     trashcan: false});
+     trashcan: false,
+     move:{
+        scrollbars: false,
+        drag: false,
+        wheel: false}
+     });
 var rightWorkspace = Blockly.inject('rightdiv',
     {media: '../../media/',
     toolbox: toolbox,
     toolboxPosition: "end",
-    trashcan: false});
+    trashcan: false,
+    move:{
+        scrollbars: false,
+        drag: false,
+        wheel: false}
+    });
 
 var workspaceBlocks = document.getElementById("workspaceBlocks");
 Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
 Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
+leftWorkspace.getAllBlocks().forEach(block => block.setMovable(false));
+rightWorkspace.getAllBlocks().forEach(block => block.setMovable(false));
 
 leftWorkspace.addChangeListener(mirrorEvent);
 rightWorkspace.addChangeListener(mirrorEvent);
