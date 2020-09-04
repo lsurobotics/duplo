@@ -2,20 +2,18 @@
 
 var toolbox = document.getElementById("toolbox");
 var leftWorkspace = Blockly.inject('leftdiv',
-    {media: '../../media/',
+    {media: 'blockly/media/',
      toolbox: toolbox,
      toolboxPosition: "start",
-     trashcan: false,
      move:{
         scrollbars: false,
         drag: false,
         wheel: false}
      });
 var rightWorkspace = Blockly.inject('rightdiv',
-    {media: '../../media/',
+    {media: 'blockly/media/',
     toolbox: toolbox,
     toolboxPosition: "end",
-    trashcan: false,
     move:{
         scrollbars: false,
         drag: false,
@@ -25,36 +23,31 @@ var rightWorkspace = Blockly.inject('rightdiv',
 var workspaceBlocks = document.getElementById("workspaceBlocks");
 Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
 Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
-leftWorkspace.getAllBlocks().forEach(block => block.setMovable(false));
-rightWorkspace.getAllBlocks().forEach(block => block.setMovable(false));
+leftWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
+rightWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
 
 leftWorkspace.addChangeListener(mirrorEvent);
 rightWorkspace.addChangeListener(mirrorEvent);
+leftWorkspace.addChangeListener(listenForDragging);
+rightWorkspace.addChangeListener(listenForDragging);
 
 
 function mirrorEvent(primaryEvent) {
-  console.log(primaryEvent.type);
   if (primaryEvent instanceof Blockly.Events.Ui) {
     //makes it so you can see dragging
     if (primaryEvent.element == "dragStart") {
-      if (primaryEvent.workspaceId == leftWorkspace.id) {
-        rightWorkspace.removeChangeListener(mirrorEvent);
-      } else {
-        leftWorkspace.removeChangeListener(mirrorEvent);
-      }
+      if (primaryEvent.workspaceId == leftWorkspace.id) rightWorkspace.removeChangeListener(mirrorEvent);
+      else leftWorkspace.removeChangeListener(mirrorEvent);
     }
     else if (primaryEvent.element == "dragStop") {
-      if (primaryEvent.workspaceId == leftWorkspace.id) {
-        rightWorkspace.addChangeListener(mirrorEvent);
-      } else {
-        leftWorkspace.addChangeListener(mirrorEvent);
-      }
+      if (primaryEvent.workspaceId == leftWorkspace.id) rightWorkspace.addChangeListener(mirrorEvent);
+      else leftWorkspace.addChangeListener(mirrorEvent);
     }
   }
   else if (primaryEvent instanceof Blockly.Events.BlockCreate || primaryEvent instanceof Blockly.Events.BlockMove) {
     var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
     var block = workspace.getBlockById(primaryEvent.blockId);
-    if (block.type != "custom_close") {
+    if (!block || block.type != "custom_close") {
       return; //only for synchronizing type
     }
     if (eventJustHappened(primaryEvent)) {
@@ -81,7 +74,7 @@ function mirrorEvent(primaryEvent) {
     var json = primaryEvent.toJson();
     var secondaryEvent = Blockly.Events.fromJson(json, otherWorkspace);
     secondaryEvent.run(true);
-  } //TODO: "move" event where block A connects to a block and block B mirrors its location (right now, block B has nothing to connect to)
+  }
 }
 
 var lastLeftCreateEvent, lastRightCreateEvent, lastLeftMoveEvent, lastRightMoveEvent;
