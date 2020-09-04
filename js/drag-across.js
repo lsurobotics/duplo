@@ -1,3 +1,5 @@
+// Manages events concerning the dragging of blocks, allowing blocks to travel from one side to another.
+
 var draggingId = null;
 
 function listenForDragging(event) {
