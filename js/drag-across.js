@@ -27,29 +27,47 @@ function transferBlock(event, fromLeft) {
 
   var fromWorkspace = fromLeft ? leftWorkspace : rightWorkspace;
   var toWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-  var block = fromWorkspace.getBlockById(draggingId);
+  var blocks = getAllConnections(fromWorkspace.getBlockById(draggingId));
+  var widest = 0;
 
-  if (!block || block.type == "custom_close") return; //no need to transfer mirroring blocks
+  //protect from transferring mirror blocks
+  if (!blocks) return;
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].type == "custom_close") return;
+    widest = Math.max(widest, blocks[i].width);
+  }
 
-  block.dispose(false);
-
-  var newBlock = toWorkspace.newBlock(block.type, draggingId);
-  newBlock.initSvg();
-  newBlock.render();
-  newBlock.select();
-  startX = fromLeft ? 100 : -300;
-  startY = 0;
-  offsetX = fromLeft ? 0 : -130 - newBlock.width; //get toolbox width instead of 130?
+  offsetX = fromLeft ? 0 : -130 - widest; //get toolbox width instead of 130?
   offsetY = -17;
-  newBlock.moveBy(event.offsetX + startX, event.offsetY + startY);
 
-  dragger = new Blockly.BlockDragger(newBlock, toWorkspace);
+  //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
+  var xml = Blockly.Xml.blockToDom(blocks[0], true);
+  xml.setAttribute('x', event.offsetX);
+  xml.setAttribute('y', event.offsetY);
+  xml.setAttribute("id", blocks[0].id);
+
+  //paste & start dragging
+  blocks.forEach((block) => block.dispose());
+  toWorkspace.paste(xml);
+  newTopBlock = toWorkspace.getBlockById(blocks[0].id);
+
+  dragger = new Blockly.BlockDragger(newTopBlock, toWorkspace);
   dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
-  startX += event.pageX;
-  startY += event.pageY;
+  startX = event.pageX;
+  startY = event.pageY;
 
   draggingId = null;
 }
+
+// Returns an array of all the blocks attached to this block, including the block itself.
+function getAllConnections(block) {
+  if (!block) return null;
+
+  var blocks = [block,];
+  block.getChildren().forEach((block) => { blocks = blocks.concat(getAllConnections(block)) });
+  return blocks;
+}
+
 
 Blockly.bindEvent_(leftDiv, "touchmove", null, (evt) => updateCoordinates(evt));
 Blockly.bindEvent_(leftDiv, "mousemove", null, (evt) => updateCoordinates(evt));
