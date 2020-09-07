@@ -33,17 +33,20 @@ rightWorkspace.addChangeListener(listenForDragging);
 
 
 function mirrorEvent(primaryEvent) {
+  var fromLeft = (primaryEvent.workspaceId == leftWorkspace.id);
+
   if (primaryEvent instanceof Blockly.Events.Ui) {
     //makes it so you can see dragging
     if (primaryEvent.element == "dragStart") {
-      if (primaryEvent.workspaceId == leftWorkspace.id) rightWorkspace.removeChangeListener(mirrorEvent);
+      if (fromLeft) rightWorkspace.removeChangeListener(mirrorEvent);
       else leftWorkspace.removeChangeListener(mirrorEvent);
     }
     else if (primaryEvent.element == "dragStop") {
-      if (primaryEvent.workspaceId == leftWorkspace.id) rightWorkspace.addChangeListener(mirrorEvent);
+      if (fromLeft) rightWorkspace.addChangeListener(mirrorEvent);
       else leftWorkspace.addChangeListener(mirrorEvent);
     }
   }
+
   else if (primaryEvent instanceof Blockly.Events.BlockCreate || primaryEvent instanceof Blockly.Events.BlockMove) {
     var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
     var block = workspace.getBlockById(primaryEvent.blockId);
@@ -53,16 +56,24 @@ function mirrorEvent(primaryEvent) {
     if (eventJustHappened(primaryEvent)) {
       return; //prevent infinite looping
     }
-    assignLastEventVariable(primaryEvent);
     //recreate event in other workspace
-    var otherWorkspace = (workspace == leftWorkspace) ? rightWorkspace : leftWorkspace;
+    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
+
+    //handle connecting on one side without a matching block
+    if (primaryEvent instanceof Blockly.Events.BlockMove && !primaryEvent.newCoordinate && !otherWorkspace.getBlockById(primaryEvent.newParentId)) {
+      primaryEvent.newParentId = null;
+      primaryEvent.newCoordinate = block.getRelativeToSurfaceXY();
+    }
+    assignLastEventVariable(primaryEvent);
+
     var json = primaryEvent.toJson();
     var secondaryEvent = Blockly.Events.fromJson(json, otherWorkspace);
     secondaryEvent.run(true);
   }
+
   else if (primaryEvent instanceof Blockly.Events.Delete) {
     var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
-    var otherWorkspace = (workspace == leftWorkspace) ? rightWorkspace : leftWorkspace;
+    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
     var block = otherWorkspace.getBlockById(primaryEvent.blockId); //block with same ID in other workspace
     if (block == null) {
       return; //no matching block
@@ -93,6 +104,18 @@ function eventJustHappened(event) {
   if (lastEvent != null) {
     if (event.group == lastEvent.group) {
       return true;
+    }
+    else if (event instanceof Blockly.Events.BlockMove) {
+      if (event.newCoordinate && lastEvent.newCoordinate) {
+        if (Math.round(event.newCoordinate.x) == Math.round(lastEvent.newCoordinate.x) && Math.round(event.newCoordinate.y) == Math.round(lastEvent.newCoordinate.y)) {
+          return true;
+        }
+      }
+      else if (event.newParent && lastEvent.newParent) {
+        if (event.newParent.id == lastEvent.newParent.id) {
+          return true;
+        }
+      }
     }
   }
   return false;

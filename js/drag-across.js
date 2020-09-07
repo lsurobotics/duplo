@@ -92,6 +92,5 @@ function stopDragging(event) {
     dragger.endBlockDrag(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
     dragger.dispose();
     dragger = null;
-    console.log("DONE");
   }
 }
