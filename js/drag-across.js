@@ -8,6 +8,8 @@ function listenForDragging(event) {
       draggingId = event.blockId;
     }
     else if (event.element == "dragStop") {
+      if (event.oldValue[0].workspace) event.oldValue[0].select();
+      unhighlightAll();
       draggingId = null;
     }
   }
@@ -37,7 +39,7 @@ function transferBlock(event, fromLeft) {
     widest = Math.max(widest, blocks[i].width);
   }
 
-  offsetX = fromLeft ? 0 : -130 - widest; //get toolbox width instead of 130?
+  offsetX = fromLeft ? 0 : -leftWorkspace.getToolbox().width - widest;
   offsetY = -17;
 
   //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
@@ -69,10 +71,8 @@ function getAllConnections(block) {
 }
 
 
-Blockly.bindEvent_(leftDiv, "touchmove", null, (evt) => updateCoordinates(evt));
-Blockly.bindEvent_(leftDiv, "mousemove", null, (evt) => updateCoordinates(evt));
-Blockly.bindEvent_(rightDiv, "touchmove", null, (evt) => updateCoordinates(evt));
-Blockly.bindEvent_(rightDiv, "mousemove", null, (evt) => updateCoordinates(evt));
+Blockly.bindEvent_(document.body, "touchmove", null, (evt) => updateCoordinates(evt));
+Blockly.bindEvent_(document.body, "mousemove", null, (evt) => updateCoordinates(evt));
 
 var pageX, pageY;
 function updateCoordinates(event) {
@@ -82,10 +82,8 @@ function updateCoordinates(event) {
   if (dragger) dragger.dragBlock(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
 }
 
-Blockly.bindEvent_(leftDiv, "touchup", null, (evt) => stopDragging(evt));
-Blockly.bindEvent_(leftDiv, "mouseup", null, (evt) => stopDragging(evt));
-Blockly.bindEvent_(rightDiv, "touchup", null, (evt) => stopDragging(evt));
-Blockly.bindEvent_(rightDiv, "mouseup", null, (evt) => stopDragging(evt));
+Blockly.bindEvent_(document.body, "touchup", null, (evt) => stopDragging(evt));
+Blockly.bindEvent_(document.body, "mouseup", null, (evt) => stopDragging(evt));
 
 function stopDragging(event) {
   if (dragger) {
@@ -93,4 +91,21 @@ function stopDragging(event) {
     dragger.dispose();
     dragger = null;
   }
+}
+
+
+// Blockly's default unhightlight function can't undo any more than the last highlight (acts more like a static method); this deals with strange leftover highlights.
+function unhighlight(node) {
+  node.childNodes.forEach((child) => {
+    if (Blockly.utils.dom.hasClass(child, "blocklyHighlightedConnectionPath")) Blockly.utils.dom.removeNode(child);
+  });
+}
+
+function unhighlightAll() {
+  leftWorkspace.getAllBlocks().forEach((block) => {
+    unhighlight(block.svgGroup_);
+  });
+  rightWorkspace.getAllBlocks().forEach((block) => {
+    unhighlight(block.svgGroup_);
+  });
 }
