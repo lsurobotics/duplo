@@ -1,5 +1,3 @@
-// Injects Blockly into the html page and manages events there, creating a mirroring effect.
-
 var toolbox = document.getElementById("toolbox");
 var leftWorkspace = Blockly.inject('leftdiv',
     {media: 'blockly/media/',
@@ -23,8 +21,6 @@ var rightWorkspace = Blockly.inject('rightdiv',
 var workspaceBlocks = document.getElementById("workspaceBlocks");
 Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
 Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
-leftWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
-rightWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
 
 /* Mirror blocks across workspaces (mirror.js) */
 // Since the toolbox will be available only in the left workspace,
