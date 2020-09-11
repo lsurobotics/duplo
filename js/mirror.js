@@ -1,117 +1,87 @@
-// Injects Blockly into the html page and manages events there, creating a mirroring effect.
+// Array of accepted blocks
+var mirroredBlocks = ['custom_close', 'custom_open'];
 
-var toolbox = document.getElementById("toolbox");
-var leftWorkspace = Blockly.inject('leftdiv',
-    {media: 'blockly/media/',
-     toolbox: toolbox,
-     toolboxPosition: "start",
-     move:{
-        scrollbars: false,
-        drag: false,
-        wheel: false}
-     });
-var rightWorkspace = Blockly.inject('rightdiv',
-    {media: 'blockly/media/',
-    toolbox: toolbox,
-    toolboxPosition: "end",
-    move:{
-        scrollbars: false,
-        drag: false,
-        wheel: false}
-    });
-
-var workspaceBlocks = document.getElementById("workspaceBlocks");
-Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
-Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
-leftWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
-rightWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
-
-leftWorkspace.addChangeListener(mirrorEvent);
-rightWorkspace.addChangeListener(mirrorEvent);
-leftWorkspace.addChangeListener(listenForDragging);
-rightWorkspace.addChangeListener(listenForDragging);
-
-
-function mirrorEvent(primaryEvent) {
-  var fromLeft = (primaryEvent.workspaceId == leftWorkspace.id);
-
-  if (primaryEvent instanceof Blockly.Events.Ui) {
-    //makes it so you can see dragging
-    if (primaryEvent.element == "dragStart") {
-      if (fromLeft) rightWorkspace.removeChangeListener(mirrorEvent);
-      else leftWorkspace.removeChangeListener(mirrorEvent);
-
-      //mirror dragging
-      var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-      var otherBlock = otherWorkspace.getBlockById(primaryEvent.blockId);
-      if (otherBlock && otherBlock.type == "custom_close") {
-        startX = pageX;
-        startY = pageY;
-        offsetX = 0;
-        offsetY = 0;
-        dragger = new Blockly.BlockDragger(otherBlock, otherWorkspace);
-        dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
-        //the rest of this is handled the same way dragging across is handled
-      }
+function createBlockEvent(leftWorkspaceEvent) {
+    if (leftWorkspaceEvent instanceof Blockly.Events.BlockCreate) {
+        var leftBlock = leftWorkspace.getBlockById(leftWorkspaceEvent.blockId);
+        // If the block does not exists or the block is not a mirrored type block, return.
+        if (!leftBlock || !mirroredBlocks.includes(leftBlock.type)) {
+            return;
+        } else {
+            // Otherwise, create the block on the right workspace.
+            var rightBlock = rightWorkspace.newBlock(leftBlock.type, leftBlock.id);
+            rightBlock.initSvg();
+            rightBlock.render();
+            rightBlock.moveTo(leftBlock.getRelativeToSurfaceXY());
+        }
     }
-    else if (primaryEvent.element == "dragStop") {
-      if (fromLeft) rightWorkspace.addChangeListener(mirrorEvent);
-      else leftWorkspace.addChangeListener(mirrorEvent);
-    }
-  }
+}
 
-  else if (primaryEvent instanceof Blockly.Events.BlockCreate) {
-    var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
-    var block = workspace.getBlockById(primaryEvent.blockId);
-    if (!block || block.type != "custom_close") {
-      return; //only for synchronizing type
-    }
-    //recreate event in other workspace
-    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-    var newBlock = otherWorkspace.newBlock(block.type, block.id);
-    newBlock.initSvg();
-    newBlock.render();
-    newBlock.moveTo(block.getRelativeToSurfaceXY());
-  }
+function moveBlockEvent(primaryWorkspaceEvent) {
+    if (primaryWorkspaceEvent instanceof Blockly.Events.BlockMove) {
+        /* Checks which workspace is moving blocks. We call as "primary"
+           the workspace where the block is being moved, and "secondary"
+           the workspace where the block is being mirrored. */
+        if (primaryWorkspaceEvent.workspaceId === leftWorkspace.id) {
+            var primaryWorkspace = leftWorkspace;
+            var secondaryWorkspace = rightWorkspace;
+        } else {
+            var primaryWorkspace = rightWorkspace;
+            var secondaryWorkspace = leftWorkspace;
+        }
 
-  else if (primaryEvent instanceof Blockly.Events.BlockMove) {
-    var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
-    var block = workspace.getBlockById(primaryEvent.blockId);
-    if (!block || block.type != "custom_close") {
-      return; //only for synchronizing type
-    }
-    //recreate event in other workspace
-    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-    var otherBlock = otherWorkspace.getBlockById(primaryEvent.blockId);
+        var primaryBlock = primaryWorkspace.getBlockById(primaryWorkspaceEvent.blockId);
 
-    Blockly.Events.disable();
-
-    //handle connecting on one side without a matching block
-    if (!primaryEvent.newCoordinate && !otherWorkspace.getBlockById(primaryEvent.newParentId)) {
-      primaryEvent.newParentId = null;
-      primaryEvent.newCoordinate = block.getRelativeToSurfaceXY();
+        // If the block does not exists or the block is not a mirrored type block, return.
+        if (!primaryBlock || !mirroredBlocks.includes(primaryBlock.type)) {
+            return;
+        } else {
+            Blockly.Events.disable();
+            var primaryWorkspaceJSON = primaryWorkspaceEvent.toJson();
+            var secondaryEvent = Blockly.Events.fromJson(primaryWorkspaceJSON, secondaryWorkspace);
+            secondaryEvent.run(true);
+            Blockly.Events.enable();
+        }
     }
+}
 
-    if (primaryEvent.newCoordinate) {
-      console.log(fromLeft);
-      console.log(primaryEvent);
-      otherBlock.moveTo(primaryEvent.newCoordinate);
-    }
+function dragFromStartEvent(leftWorkspaceEvent) {
+    if (leftWorkspaceEvent instanceof Blockly.Events.Ui) {
+        // If the block is being dragged from the toolbox
+        if (leftWorkspaceEvent.element == "dragStart") {
+            var leftBlock = rightWorkspace.getBlockById(leftWorkspaceEvent.blockId);
 
-    Blockly.Events.enable();
-  }
+            // If the block does not exists or the block is not a mirrored type block, return.
+            if (!leftBlock || !mirroredBlocks.includes(leftBlock.type)) {
+                return;
+            } else {
+                startX = pageX;
+                startY = pageY;
+                offsetX = 0;
+                offsetY = 0;
+                dragger = new Blockly.BlockDragger(leftBlock, rightWorkspace);
+                dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
+            }
+        }
+       return;
+    }
+}
 
-  else if (primaryEvent instanceof Blockly.Events.Delete) {
-    var workspace = Blockly.Workspace.getById(primaryEvent.workspaceId);
-    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-    var otherBlock = otherWorkspace.getBlockById(primaryEvent.blockId); //block with same ID in other workspace
-    if (!otherBlock) {
-      return; //no matching block
+function deleteBlockEvent(rightWorkspaceEvent) {
+     if (rightWorkspaceEvent instanceof Blockly.Events.Delete) {
+        var leftBlock = leftWorkspace.getBlockById(rightWorkspaceEvent.blockId);
+
+        // If the block does not exists, ignore the delete event.
+        if (!leftBlock) {
+            return;
+        }
+
+        // If the block is not a mirrored type block, return.
+        if (!mirroredBlocks.includes(leftBlock.type)) {
+            return; 
+        } else {
+            // Otherwise, delete the block on the left workspace.
+            leftBlock.dispose();
+        }
     }
-    if (otherBlock.type != "custom_close") {
-      return; //only for synchronizing type
-    }
-    //delete block
-    otherBlock.dispose();
-  }
 }
