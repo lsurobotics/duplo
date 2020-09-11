@@ -37,8 +37,6 @@ rightWorkspace.addChangeListener(deleteBlockEvent);
 leftWorkspace.addChangeListener(moveBlockEvent);
 rightWorkspace.addChangeListener(moveBlockEvent);
 
-
-/* Drag blocks across workspaces (drag-across.js) 
+/* Drag blocks across workspaces (drag-across.js) */
 leftWorkspace.addChangeListener(listenForDragging);
 rightWorkspace.addChangeListener(listenForDragging);
-*/

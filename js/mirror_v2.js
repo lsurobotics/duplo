@@ -55,10 +55,10 @@ function dragFromStartEvent(leftWorkspaceEvent) {
             if (!leftBlock || !mirroredBlocks.includes(leftBlock.type)) {
                 return;
             } else {
-                //startX = pageX;
-                //startY = pageY;
-                //offsetX = 0;
-                //offsetY = 0;
+                startX = pageX;
+                startY = pageY;
+                offsetX = 0;
+                offsetY = 0;
                 dragger = new Blockly.BlockDragger(leftBlock, rightWorkspace);
                 dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
             }
