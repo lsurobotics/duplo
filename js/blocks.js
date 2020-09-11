@@ -73,6 +73,6 @@ Blockly.defineBlocksWithJsonArray([
         "nextStatement": null,
         "colour": 210,
         "tooltip": "",
-        "helpUrl": ""
+        "helpUrl": "",
     }
 ]);
