@@ -4,6 +4,7 @@ var toolbox = document.getElementById("toolbox");
 var leftWorkspace = Blockly.inject('leftdiv',
     {media: 'blockly/media/',
      toolbox: toolbox,
+     trashcan: false,
      toolboxPosition: "start",
      move:{
         scrollbars: false,
@@ -12,8 +13,7 @@ var leftWorkspace = Blockly.inject('leftdiv',
      });
 var rightWorkspace = Blockly.inject('rightdiv',
     {media: 'blockly/media/',
-    toolbox: toolbox,
-    toolboxPosition: "end",
+    trashcan: true,
     move:{
         scrollbars: false,
         drag: false,
