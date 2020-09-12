@@ -1,7 +1,7 @@
 // Manages events on certain block types, creating a mirroring effect.
 
 // Array of accepted block types
-var mirroredBlocks = ['custom_close', 'custom_open'];
+var mirroredBlocks = ['custom_wait'];
 
 // Redirects an event to event handlers that mirror that event.
 function mirrorEvent(event) {

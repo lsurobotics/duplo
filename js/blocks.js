@@ -55,6 +55,26 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
+    // Follow movement
+    {
+        "type": "custom_follow",
+        "message0": "Follow movement",
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 50,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    // Mirror movement
+    {
+        "type": "custom_mirror",
+        "message0": "Mirror movement",
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 50,
+        "tooltip": "",
+        "helpUrl": ""
+    },
     // Open hand
     {
         "type": "custom_open",
@@ -72,6 +92,16 @@ Blockly.defineBlocksWithJsonArray([
         "previousStatement": null,
         "nextStatement": null,
         "colour": 210,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    // Wait for the other
+    {
+        "type": "custom_wait",
+        "message0": "Wait for each other",
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#888",
         "tooltip": "",
         "helpUrl": ""
     }
