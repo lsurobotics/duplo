@@ -55,24 +55,24 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
-    // Open finger
+    // Open hand
     {
         "type": "custom_open",
-        "message0": "Open finger",
+        "message0": "Open hand",
         "previousStatement": null,
         "nextStatement": null,
         "colour": 210,
         "tooltip": "",
         "helpUrl": ""
     },
-    // Close finger
+    // Close hand
     {
         "type": "custom_close",
-        "message0": "Close finger",
+        "message0": "Close hand",
         "previousStatement": null,
         "nextStatement": null,
         "colour": 210,
         "tooltip": "",
-        "helpUrl": "",
+        "helpUrl": ""
     }
 ]);
