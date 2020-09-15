@@ -9,7 +9,7 @@ function mirrorEvent(event) {
 
   //redirect
   if (event instanceof Blockly.Events.BlockCreate) mirrorCreateEvent_(event, fromLeft);
-  // else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
+  else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Delete) mirrorDeleteEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart" || event.element == "dragStop") mirrorDragEvent_(event, fromLeft);
@@ -19,14 +19,12 @@ function mirrorEvent(event) {
 
 // BlockCreate event
 function mirrorCreateEvent_(event, fromLeft) {
-  var workspace = Blockly.Workspace.getById(event.workspaceId);
-  var block = workspace.getBlockById(event.blockId);
+  var block = workspace(fromLeft).getBlockById(event.blockId);
   if (!block || !mirroredBlocks.includes(block.type)) {
     return; //only for synchronizing type
   }
   //recreate event in other workspace
-  var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-  var newBlock = otherWorkspace.newBlock(block.type, block.id);
+  var newBlock = workspace(!fromLeft).newBlock(block.type, block.id);
   newBlock.initSvg();
   newBlock.render();
   newBlock.moveTo(block.getRelativeToSurfaceXY());
@@ -34,38 +32,38 @@ function mirrorCreateEvent_(event, fromLeft) {
 
 // BlockMove event
 function mirrorMoveEvent_(event, fromLeft) {
-  // console.log("hi!");
-  // var workspace = Blockly.Workspace.getById(event.workspaceId);
-  // var block = workspace.getBlockById(event.blockId);
-  // if (!block || !mirroredBlocks.includes(block.type)) {
-  //   return; //only for synchronizing type
-  // }
-  // //recreate event in other workspace
-  // var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-  // var otherBlock = otherWorkspace.getBlockById(event.blockId);
+  //check block & all next children
+  var block = workspace(fromLeft).getBlockById(event.blockId);
+  var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
+  while (block) {
+    otherBlock = workspace(!fromLeft).getBlockById(block.id);
+    if (otherBlock) {
+      resolveBlocks(block, otherBlock);
+    }
 
-  // Blockly.Events.disable();
+    block = block.getNextBlock();
+  }
+}
 
-  // //handle connecting on one side without a matching block
-  // if (!event.newCoordinate && !otherWorkspace.getBlockById(event.newParentId)) {
-  //   event.newParentId = null;
-  //   event.newCoordinate = block.getRelativeToSurfaceXY();
-  // }
+//if the blocks have attached to something, put them into the aesthetically correct position
+function resolveBlocks(block, otherBlock) {
+  if (block && otherBlock && (block.parentBlock_ || otherBlock.parentBlock_)) { //if parent on either side
+    if (block.parentBlock_ && otherBlock.parentBlock_) { //they both have parents -> move the higher one down
+      if (block.getRelativeToSurfaceXY().y == otherBlock.getRelativeToSurfaceXY().y) return;
 
-  // if (event.newCoordinate) {
-  //   console.log(fromLeft);
-  //   console.log(event);
-  //   // otherBlock.moveTo(event.newCoordinate);
-  // }
-
-  // Blockly.Events.enable();
+      var moveOtherBlock = block.getRelativeToSurfaceXY().y > otherBlock.getRelativeToSurfaceXY().y;
+      ((moveOtherBlock) ? otherBlock : block).previousConnection.disconnect();
+    }
+    else { //one of them doesn't have a parent -> move that one
+      var moveOtherBlock = otherBlock.parentBlock_ == null;
+      ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
+    }
+  }
 }
 
 // Delete event
 function mirrorDeleteEvent_(event, fromLeft) {
-  var workspace = Blockly.Workspace.getById(event.workspaceId);
-  var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-  var otherBlock = otherWorkspace.getBlockById(event.blockId); //block with same ID in other workspace
+  var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
   if (!otherBlock) {
     return; //no matching block
   }
@@ -83,10 +81,9 @@ function mirrorDragEvent_(event, fromLeft) {
     else leftWorkspace.removeChangeListener(mirrorEvent);
 
     //mirror dragging
-    var otherWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
-    var otherBlock = otherWorkspace.getBlockById(event.blockId);
+    var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
     if (otherBlock && mirroredBlocks.includes(otherBlock.type)) {
-      var gesture = ((fromLeft) ? leftWorkspace : rightWorkspace).getGesture(event);
+      var gesture = workspace(fromLeft).getGesture(event);
 
       //move other block to be aligned
       if (otherBlock.previousConnection.isConnected()) otherBlock.previousConnection.disconnect();
@@ -97,7 +94,7 @@ function mirrorDragEvent_(event, fromLeft) {
       startY = gesture.mouseDownXY_.y;
       offsetX = 0;
       offsetY = 0;
-      dragger = new Blockly.BlockDragger(otherBlock, otherWorkspace);
+      dragger = new Blockly.BlockDragger(otherBlock, workspace(!fromLeft));
       dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
       //the rest of this is handled the same way dragging across is handled (see drag-across.js)
     }

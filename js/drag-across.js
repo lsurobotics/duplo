@@ -32,8 +32,8 @@ var offsetX, offsetY;   // The offset the block should appear right & down from 
 function transferBlock(event, fromLeft) {
   if (!draggingId) return;
 
-  var fromWorkspace = fromLeft ? leftWorkspace : rightWorkspace;
-  var toWorkspace = fromLeft ? rightWorkspace : leftWorkspace;
+  var fromWorkspace = workspace(fromLeft);
+  var toWorkspace = workspace(!fromLeft);
   var blocks = getAllConnections(fromWorkspace.getBlockById(draggingId));
   var widest = 0;
 

@@ -20,6 +20,11 @@ var rightWorkspace = Blockly.inject('rightdiv',
         wheel: false}
     });
 
+//Generally, workspace(fromLeft) chooses the workspace that the event originated from, while workspace(!fromLeft) chooses the workspace on the other side.
+function workspace(chooseLeft) {
+    return chooseLeft ? leftWorkspace : rightWorkspace;
+}
+
 var workspaceBlocks = document.getElementById("workspaceBlocks");
 Blockly.Xml.domToWorkspace(workspaceBlocks, leftWorkspace);
 Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
