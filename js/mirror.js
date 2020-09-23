@@ -23,6 +23,9 @@ function mirrorCreateEvent_(event, fromLeft) {
   if (!block || !mirroredBlocks.includes(block.type)) {
     return; //only for synchronizing type
   }
+  if (workspace(!fromLeft).getBlockById(event.blockId)) {
+    return; //already matching block on other side
+  }
   //recreate event in other workspace
   var newBlock = workspace(!fromLeft).newBlock(block.type, block.id);
   newBlock.initSvg();
@@ -71,6 +74,7 @@ function mirrorDeleteEvent_(event, fromLeft) {
     return; //only for synchronizing type
   }
   //delete block
+  otherBlock.unplug(true);
   otherBlock.dispose();
 }
 
