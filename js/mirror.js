@@ -1,7 +1,7 @@
 // Manages events on certain block types, creating a mirroring effect.
 
 // Array of accepted block types
-var mirroredBlocks = ['custom_wait'];
+var mirroredBlocks = ['custom_wait', 'controls_repeat'];
 
 // Redirects an event to event handlers that mirror that event.
 function mirrorEvent(event) {
@@ -10,6 +10,7 @@ function mirrorEvent(event) {
   //redirect
   if (event instanceof Blockly.Events.BlockCreate) mirrorCreateEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
+  else if (event instanceof Blockly.Events.Change) mirrorChangeEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Delete) mirrorDeleteEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart" || event.element == "dragStop") mirrorDragEvent_(event, fromLeft);
@@ -61,6 +62,24 @@ function resolveBlocks(block, otherBlock) {
       var moveOtherBlock = otherBlock.parentBlock_ == null;
       ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
     }
+  }
+}
+
+// Change event
+function mirrorChangeEvent_(event, fromLeft) {
+  var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
+  if (!otherBlock) {
+    return; //no matching block
+  }
+  if (!mirroredBlocks.includes(otherBlock.type)) {
+    return; //only for synchronizing type
+  }
+  if (event.element == "field") {
+    //change other block's old value to new value
+    otherBlock.setFieldValue(event.newValue, event.name);
+  }
+  else if (event.element == "collapsed") {
+    otherBlock.setCollapsed(event.newValue);
   }
 }
 

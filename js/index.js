@@ -2,27 +2,27 @@
 
 var toolbox = document.getElementById("toolbox");
 var leftWorkspace = Blockly.inject('leftdiv',
-    {media: 'blockly/media/',
-     toolbox: toolbox,
-     trashcan: false,
-     toolboxPosition: "start",
-     move:{
-        scrollbars: false,
-        drag: false,
-        wheel: false}
-     });
+  { media: 'blockly/media/',
+    toolbox: toolbox,
+    trashcan: false,
+    toolboxPosition: "start",
+    move:{
+      scrollbars: false,
+      drag: false,
+      wheel: false}
+});
 var rightWorkspace = Blockly.inject('rightdiv',
-    {media: 'blockly/media/',
+  { media: 'blockly/media/',
     trashcan: true,
     move:{
-        scrollbars: false,
-        drag: false,
-        wheel: false}
-    });
+      scrollbars: false,
+      drag: false,
+      wheel: false}
+});
 
 //Generally, workspace(fromLeft) chooses the workspace that the event originated from, while workspace(!fromLeft) chooses the workspace on the other side.
 function workspace(chooseLeft) {
-    return chooseLeft ? leftWorkspace : rightWorkspace;
+  return chooseLeft ? leftWorkspace : rightWorkspace;
 }
 
 var workspaceBlocks = document.getElementById("workspaceBlocks");
