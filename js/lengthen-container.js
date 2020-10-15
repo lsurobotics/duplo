@@ -1,4 +1,4 @@
-// Makes it so that mirrored container blocks, such as loop blocks, have the same length.
+// Makes it so that mirrored container blocks, such as loop blocks, expand to be each other's length.
 
 // Overrides the default RenderInfo.computeBounds_ function to change the height of matching loop blocks.
 var originalComputeBounds = Blockly.blockRendering.RenderInfo.prototype.computeBounds_;

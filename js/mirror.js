@@ -1,7 +1,7 @@
 // Manages events on certain block types, creating a mirroring effect.
 
 // Array of accepted block types
-var mirroredBlocks = ['custom_wait', 'controls_repeat'];
+var mirroredBlocks = ['custom_wait', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
 
 // Redirects an event to event handlers that mirror that event.
 function mirrorEvent(event) {
@@ -24,11 +24,23 @@ function mirrorCreateEvent_(event, fromLeft) {
   if (!block || !mirroredBlocks.includes(block.type)) {
     return; //only for synchronizing type
   }
+  if (block.type == 'custom_move') {
+    return;
+  }
   if (workspace(!fromLeft).getBlockById(event.blockId)) {
     return; //already matching block on other side
   }
   //recreate event in other workspace
-  var newBlock = workspace(!fromLeft).newBlock(block.type, block.id);
+  var type = block.type;
+  if (block.type == 'custom_toolbox_move') {
+    //replace this block with a regular move block
+    // var b = workspace(fromLeft).newBlock('custom_move', block.id);
+    // b.initSvg();
+    // b.render();
+    // b.moveTo(block.getRelativeToSurfaceXY());
+    type = 'custom_follow'
+  }
+  var newBlock = workspace(!fromLeft).newBlock(type, block.id);
   newBlock.initSvg();
   newBlock.render();
   newBlock.moveTo(block.getRelativeToSurfaceXY());

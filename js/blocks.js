@@ -23,42 +23,17 @@ Blockly.defineBlocksWithJsonArray([
     // Move somewhere
     {
         "type": "custom_move",
-        "message0": "Move arm %1 to %2",
-        "args0": [
-            {
-                "type": "field_dropdown",
-                "name": "SPEED",
-                "options": [
-                [
-                    "quickly",
-                    "QUICK"
-                ],
-                [
-                    "moderately",
-                    "MODERATE"
-                ],
-                [
-                    "slowly",
-                    "SLOW"
-                ]
-                ]
-            },
-            {
-                "type": "field_variable",
-                "name": "LOCATION",
-                "variable": "starting point"
-            }
-        ],
         "previousStatement": null,
         "nextStatement": null,
         "colour": 50,
         "tooltip": "",
-        "helpUrl": ""
+        "helpUrl": "",
+        "mutator": "move_mutator"
     },
     // Follow movement
     {
         "type": "custom_follow",
-        "message0": "Follow movement",
+        "message0": "Follow other arm",
         "previousStatement": null,
         "nextStatement": null,
         "colour": 50,
@@ -68,9 +43,29 @@ Blockly.defineBlocksWithJsonArray([
     // Mirror movement
     {
         "type": "custom_mirror",
-        "message0": "Mirror movement",
+        "message0": "Mirror other arm",
         "previousStatement": null,
         "nextStatement": null,
+        "colour": 50,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    // Follow movement (toolbox version for connecting to move)
+    {
+        "type": "custom_toolbox_follow",
+        "message0": "Follow other arm",
+        "inputsInline": false,
+        "output": null,
+        "colour": 50,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    // Follow movement (toolbox version for connecting to move)
+    {
+        "type": "custom_toolbox_mirror",
+        "message0": "Mirror other arm",
+        "inputsInline": false,
+        "output": null,
         "colour": 50,
         "tooltip": "",
         "helpUrl": ""
@@ -106,3 +101,40 @@ Blockly.defineBlocksWithJsonArray([
         "helpUrl": ""
     }
 ]);
+
+var moveMixin = {
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        var toolbox = this.isInFlyout && this.getInput('CONNECTION');
+        container.setAttribute('toolbox', toolbox);
+        return container;
+    },
+
+    domToMutation: function(xmlElement) {
+        var toolbox = (xmlElement.getAttribute('toolbox') == 'true');
+        this.updateShape_(toolbox);
+    },
+
+    updateShape_: function(toolbox) {
+        var speed = new Blockly.FieldDropdown([["quickly","QUICK"], ["moderately","MODERATE"], ["slowly","SLOW"]]);
+        var location = new Blockly.FieldVariable("[location]");
+
+        console.log(this.inputList[0]);
+
+        if (toolbox) {
+            this.appendValueInput('CONNECTION')
+                .appendField("Move arm ")
+                .appendField(speed, 'SPEED')
+                .appendField(" to ")
+                .appendField(location, 'LOCATION');
+        } else {
+            this.appendDummyInput('')
+                .appendField("Move arm ")
+                .appendField(speed, 'SPEED')
+                .appendField(" to ")
+                .appendField(location, 'LOCATION');
+        }
+    }
+}
+
+Blockly.Extensions.registerMutator("move_mutator", moveMixin);
