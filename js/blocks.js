@@ -23,6 +23,33 @@ Blockly.defineBlocksWithJsonArray([
     // Move somewhere
     {
         "type": "custom_move",
+        "message0": "Move arm %1 to %2",
+        "args0": [
+            {
+                "type": "field_dropdown",
+                "name": "SPEED",
+                "options": [
+                [
+                    "quickly",
+                    "QUICK"
+                ],
+                [
+                    "moderately",
+                    "MODERATE"
+                ],
+                [
+                    "slowly",
+                    "SLOW"
+                ]
+                ]
+            },
+            {
+                "type": "field_variable",
+                "name": "LOCATION",
+                "variable": "[location]"
+            }
+        ],
+        "inputsInline": false,
         "previousStatement": null,
         "nextStatement": null,
         "colour": 50,
@@ -102,10 +129,13 @@ Blockly.defineBlocksWithJsonArray([
     }
 ]);
 
+
+// Controls whether move blocks have a value input at the end.
+
 var moveMixin = {
     mutationToDom: function() {
         var container = document.createElement('mutation');
-        var toolbox = this.isInFlyout && this.getInput('CONNECTION');
+        var toolbox = (this.getInputTargetBlock('CONNECTION') != null);
         container.setAttribute('toolbox', toolbox);
         return container;
     },
@@ -119,15 +149,17 @@ var moveMixin = {
         var speed = new Blockly.FieldDropdown([["quickly","QUICK"], ["moderately","MODERATE"], ["slowly","SLOW"]]);
         var location = new Blockly.FieldVariable("[location]");
 
-        console.log(this.inputList[0]);
-
         if (toolbox) {
+            this.removeInput('', true);
+            if (!this.getInput('CONNECTION'))
             this.appendValueInput('CONNECTION')
                 .appendField("Move arm ")
                 .appendField(speed, 'SPEED')
                 .appendField(" to ")
                 .appendField(location, 'LOCATION');
         } else {
+            this.removeInput('CONNECTION', true);
+            if (!this.getInput(''))
             this.appendDummyInput('')
                 .appendField("Move arm ")
                 .appendField(speed, 'SPEED')

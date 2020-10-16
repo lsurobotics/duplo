@@ -3,6 +3,16 @@
 // Array of accepted block types
 var mirroredBlocks = ['custom_wait', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
 
+function isMirrored(block) {
+  if (!mirroredBlocks.includes(block.type)) return false;
+  if (block.type == "custom_move") {
+    var fromLeft = (block.workspace == leftWorkspace);
+    if (block.getInput('CONNECTION') || workspace(!fromLeft).getBlockById(block.id)) return true;
+    else return false;
+  }
+  return true;
+}
+
 // Redirects an event to event handlers that mirror that event.
 function mirrorEvent(event) {
   var fromLeft = (event.workspaceId == leftWorkspace.id); //true if triggered from the left workspace
@@ -21,25 +31,29 @@ function mirrorEvent(event) {
 // BlockCreate event
 function mirrorCreateEvent_(event, fromLeft) {
   var block = workspace(fromLeft).getBlockById(event.blockId);
-  if (!block || !mirroredBlocks.includes(block.type)) {
+  if (!block || !isMirrored(block)) {
     return; //only for synchronizing type
-  }
-  if (block.type == 'custom_move') {
-    return;
   }
   if (workspace(!fromLeft).getBlockById(event.blockId)) {
     return; //already matching block on other side
   }
-  //recreate event in other workspace
+
+  // Get proper block type to recreate
   var type = block.type;
-  if (block.type == 'custom_toolbox_move') {
-    //replace this block with a regular move block
-    // var b = workspace(fromLeft).newBlock('custom_move', block.id);
-    // b.initSvg();
-    // b.render();
-    // b.moveTo(block.getRelativeToSurfaceXY());
-    type = 'custom_follow'
+  if (block.type == 'custom_move') {
+    //right out of toolbox - disconnect toolbox block & record type
+    if (block.getInputTargetBlock('CONNECTION')) {
+      var badBlock = block.getInputTargetBlock('CONNECTION')
+      type = badBlock.type.replace("_toolbox", "");
+      badBlock.dispose();
+      block.updateShape_(false);
+    }
+    //matching block on other side
+    else type = workspace(!fromLeft).getBlockById(event.blockId).type;
   }
+  else if (block.type == 'custom_follow' || block.type == 'custom_mirror') type = 'custom_move';
+
+  // Recreate event in other workspace
   var newBlock = workspace(!fromLeft).newBlock(type, block.id);
   newBlock.initSvg();
   newBlock.render();
@@ -83,10 +97,10 @@ function mirrorChangeEvent_(event, fromLeft) {
   if (!otherBlock) {
     return; //no matching block
   }
-  if (!mirroredBlocks.includes(otherBlock.type)) {
+  if (!isMirrored(otherBlock)) {
     return; //only for synchronizing type
   }
-  if (event.element == "field") {
+  if (event.element == "field" && otherBlock.getField(event.name)) {
     //change other block's old value to new value
     otherBlock.setFieldValue(event.newValue, event.name);
   }
@@ -101,7 +115,7 @@ function mirrorDeleteEvent_(event, fromLeft) {
   if (!otherBlock) {
     return; //no matching block
   }
-  if (!mirroredBlocks.includes(otherBlock.type)) {
+  if (!isMirrored(otherBlock)) {
     return; //only for synchronizing type
   }
   //delete block
@@ -117,7 +131,7 @@ function mirrorDragEvent_(event, fromLeft) {
 
     //mirror dragging
     var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
-    if (otherBlock && mirroredBlocks.includes(otherBlock.type)) {
+    if (otherBlock && isMirrored(otherBlock)) {
       var gesture = workspace(fromLeft).getGesture(event);
 
       //move other block to be aligned
