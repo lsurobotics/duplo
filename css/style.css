@@ -6,6 +6,7 @@ html {
 .container {
     width: 100%;
     display: grid;
+    grid-template-columns: calc(50vw+50px) calc(50vw-50px);
 }
 
 .header {
@@ -18,6 +19,13 @@ html {
 
 .workspace {
     height: 480px;
-    width: 100%;
     grid-row: 2 / 3;
+}
+
+#leftdiv {
+    width: calc(50vw + 63px - 8px);
+}
+
+#rightdiv {
+    width: calc(50vw - 63px - 8px);
 }

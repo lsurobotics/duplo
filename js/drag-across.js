@@ -40,7 +40,7 @@ function transferBlock(event, fromLeft) {
   //protect from transferring mirror blocks
   if (!blocks) return;
   for (var i = 0; i < blocks.length; i++) {
-    if (mirroredBlocks.includes(blocks[i].type)) return;
+    if (isMirrored(blocks[i])) return;
     widest = Math.max(widest, blocks[i].width);
   }
 

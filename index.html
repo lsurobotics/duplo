@@ -22,9 +22,21 @@
   <!-- Toolbox - Only the close finger block will double mirror -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Move" colour="#968e4f">
-      <block type="custom_move"></block>
-      <!-- <block type="custom_follow"></block>
-      <block type="custom_mirror"></block> -->
+      <block type="custom_move">
+        <mutation toolbox="false"></mutation>
+      </block>
+      <block type="custom_move">
+        <mutation toolbox="true"></mutation>
+        <value name="CONNECTION">
+          <block type="custom_toolbox_follow"></block>
+        </value>
+      </block>
+      <block type="custom_move">
+        <mutation toolbox="true"></mutation>
+        <value name="CONNECTION">
+          <block type="custom_toolbox_mirror"></block>
+        </value>
+      </block>
     </category>
     <category name="Grip" colour="#5b67a5">
       <block type="custom_open"></block>
@@ -36,13 +48,7 @@
     <sep></sep>
     <category name="Functions" colour="#8f5ea1" custom="PROCEDURE"></category>
     <category name="Loops" colour="#5ba55b">
-      <block type="controls_repeat_ext">
-        <value name="TIMES">
-          <shadow type="math_number">
-            <field name="NUM">10</field>
-          </shadow>
-        </value>
-      </block>
+      <block type="controls_repeat"></block>
     </category>
   </xml>
 
@@ -53,6 +59,7 @@
   <script src="js/blocks.js"></script>
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
+  <script src="js/lengthen-container.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>
