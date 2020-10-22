@@ -77,26 +77,6 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
-    // Follow movement (toolbox version for connecting to move)
-    {
-        "type": "custom_toolbox_follow",
-        "message0": "Follow other arm",
-        "inputsInline": false,
-        "output": null,
-        "colour": 50,
-        "tooltip": "",
-        "helpUrl": ""
-    },
-    // Follow movement (toolbox version for connecting to move)
-    {
-        "type": "custom_toolbox_mirror",
-        "message0": "Mirror other arm",
-        "inputsInline": false,
-        "output": null,
-        "colour": 50,
-        "tooltip": "",
-        "helpUrl": ""
-    },
     // Open hand
     {
         "type": "custom_open",
@@ -135,36 +115,26 @@ Blockly.defineBlocksWithJsonArray([
 var moveMixin = {
     mutationToDom: function() {
         var container = document.createElement('mutation');
-        var toolbox = (this.getInputTargetBlock('CONNECTION') != null);
-        container.setAttribute('toolbox', toolbox);
+        console.log(this.getField('END'));
+        var type = this.getField('END') ? this.getFieldValue('END') : 'null';
+        container.setAttribute('type', type);
         return container;
     },
 
     domToMutation: function(xmlElement) {
-        var toolbox = (xmlElement.getAttribute('toolbox') == 'true');
-        this.updateShape_(toolbox);
+        var type = xmlElement.getAttribute('type');
+        this.updateShape_(type);
     },
 
-    updateShape_: function(toolbox) {
+    updateShape_: function(type) {
         var speed = new Blockly.FieldDropdown([["quickly","QUICK"], ["moderately","MODERATE"], ["slowly","SLOW"]]);
         var location = new Blockly.FieldVariable("[location]");
 
-        if (toolbox) {
-            this.removeInput('', true);
-            if (!this.getInput('CONNECTION'))
-            this.appendValueInput('CONNECTION')
-                .appendField("Move arm ")
-                .appendField(speed, 'SPEED')
-                .appendField(" to ")
-                .appendField(location, 'LOCATION');
-        } else {
-            this.removeInput('CONNECTION', true);
-            if (!this.getInput(''))
-            this.appendDummyInput('')
-                .appendField("Move arm ")
-                .appendField(speed, 'SPEED')
-                .appendField(" to ")
-                .appendField(location, 'LOCATION');
+        if (type == 'null' && this.getField('END')) {
+            this.getInput('').removeField('END');
+        } else if (type != 'null') {
+            this.getInput('').removeField('END', true);
+            this.getInput('').appendField(type, 'END');
         }
     }
 }

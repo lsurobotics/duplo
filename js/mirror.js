@@ -7,7 +7,7 @@ function isMirrored(block) {
   if (!mirroredBlocks.includes(block.type)) return false;
   if (block.type == "custom_move") {
     var fromLeft = (block.workspace == leftWorkspace);
-    if (block.getInput('CONNECTION') || workspace(!fromLeft).getBlockById(block.id)) return true;
+    if (block.getField('END') || workspace(!fromLeft).getBlockById(block.id)) return true;
     else return false;
   }
   return true;
@@ -42,11 +42,9 @@ function mirrorCreateEvent_(event, fromLeft) {
   var type = block.type;
   if (block.type == 'custom_move') {
     //right out of toolbox - disconnect toolbox block & record type
-    if (block.getInputTargetBlock('CONNECTION')) {
-      var badBlock = block.getInputTargetBlock('CONNECTION')
-      type = badBlock.type.replace("_toolbox", "");
-      badBlock.dispose();
-      block.updateShape_(false);
+    if (block.getField('END')) {
+      type = block.getFieldValue('END').includes('ollow') ? 'custom_follow' : 'custom_mirror';
+      block.updateShape_('null');
     }
     //matching block on other side
     else type = workspace(!fromLeft).getBlockById(event.blockId).type;
