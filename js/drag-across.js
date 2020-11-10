@@ -94,6 +94,17 @@ function stopDragging(event) {
     dragger.endBlockDrag(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
     dragger.dispose();
     dragger = null;
+
+    // //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
+    // var blocks = getAllConnections(leftWorkspace.getBlockById(draggingId));
+    // var xml = Blockly.Xml.blockToDom(blocks[0], true);
+    // xml.setAttribute('x', event.offsetX);
+    // xml.setAttribute('y', event.offsetY);
+    // // xml.setAttribute("id", blocks[0].id);
+
+    // //paste
+    // // blocks.forEach((block) => block.dispose());
+    // leftWorkspace.paste(xml);
   }
 }
 
