@@ -31,4 +31,10 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
       }
     }
   }
+
+
+
+
+  // Visual correction for insertion markers of mutating move blocks (originally look too long)
+  if (this.block_.type == 'custom_move' && this.isInsertionMarker) this.block_.updateShape_('null');
 };

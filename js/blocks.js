@@ -115,7 +115,6 @@ Blockly.defineBlocksWithJsonArray([
 var moveMixin = {
     mutationToDom: function() {
         var container = document.createElement('mutation');
-        console.log(this.getField('END'));
         var type = this.getField('END') ? this.getFieldValue('END') : 'null';
         container.setAttribute('type', type);
         return container;
