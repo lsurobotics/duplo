@@ -60,16 +60,15 @@ function mirrorCreateEvent_(event, fromLeft) {
 
 // BlockMove event
 function mirrorMoveEvent_(event, fromLeft) {
-  //check block & all next children
   var block = workspace(fromLeft).getBlockById(event.blockId);
   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
-  while (block) {
-    otherBlock = workspace(!fromLeft).getBlockById(block.id);
-    if (otherBlock) {
-      resolveBlocks(block, otherBlock);
-    }
+  if (block && otherBlock) {
+    //move to parent's html hierarchy, if not already
+    if (!block.getPreviousBlock() && otherBlock.getPreviousBlock()) if (attachToParent(block, otherBlock, fromLeft)) return;
+    else if (block.getPreviousBlock() && !otherBlock.getPreviousBlock()) if (attachToParent(otherBlock, block, !fromLeft)) return;
 
-    block = block.getNextBlock();
+    //correct position
+    resolveBlocks(block, otherBlock);
   }
 }
 
@@ -87,6 +86,31 @@ function resolveBlocks(block, otherBlock) {
       ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
     }
   }
+}
+
+// Attempt to move block html if the hierarchy looks something like
+// mirrored1 -------- mirrored2
+// non-mirrored
+// otherBlock ------- block
+// In this case, block would be moved under mirrored2 so that they would drag together.
+// Returns whether the operation succeeded.
+function attachToParent(block, otherBlock, blockOnLeft) {
+  var loc = otherBlock.getRelativeToSurfaceXY();
+  //find first mirrored parent of otherBlock
+  while (otherBlock.getPreviousBlock()) {
+    otherBlock = otherBlock.getPreviousBlock();
+
+    var mirroredToOtherBlock = workspace(blockOnLeft).getBlockById(otherBlock.id);
+    if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
+      //attach!
+      mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
+      var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
+      block.pathObject.svgRoot.setAttribute("transform", "translate(" + (loc.x - mirrorLoc.x) + ", " + (loc.y - mirrorLoc.y) + ")");
+      // mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+      return true;
+    }
+  }
+  return false;
 }
 
 // Change event
