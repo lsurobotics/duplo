@@ -1,9 +1,15 @@
 html {
-    background-color: #f8f8f8;
+    background-color: #d1d1d1;
+    font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-#header {
-    font-size: larger;
+#workspace-header {
+    background-color: #f1f1f1;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
 }
 
 #left-workspace, #right-workspace {
