@@ -15,3 +15,13 @@ html {
 #left-workspace, #right-workspace {
     height: 480px;
 }
+
+#compile-button {
+    color: white;
+    background-color: rgb(211, 9, 9);
+}
+
+#compile-button-dropdown {
+    color: white;
+    background-color: #c40808;
+}
