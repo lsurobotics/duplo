@@ -3,22 +3,56 @@
 <head>
   <meta charset="utf-8">
   <title>Programming language for two-armed robots.</title>
+  <!-- CSS -->
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+  <!-- Source -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- HTML Elements -->
-  <div class="container">
-    <div class="header">Left Arm</div>
-    <div class="header">Right Arm</div>
-    <div id="leftdiv" class="workspace"></div>
-    <div id="rightdiv" class="workspace"></div>
+  <!-- HTML elements -->
+  <div class="container-fluid">
+    <div class="row text-center" id="workspace-header">
+      <div class="col-6">
+        <div>Left Arm</div>
+      </div>
+      <div class="col-6">
+        <div >Right Arm</div>  
+      </div>
+    </div>
+    <div class="row" id="workspace">
+      <div class="col-6">
+        <div id="left-workspace"></div>
+      </div>
+      <div class="col-6">
+        <div id="right-workspace"></div>
+      </div>
+    </div>
+    <br>
+    <div class="row" id="compile">
+      <div class="col-12 text-center">
+        <div class="btn-group">
+          <button type="button" id="compile-button" class="btn btn-lg">Compile</button>
+          <button type="button" id="compile-button-dropdown" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only">Compiler Options</span>
+            <img src="https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true" height="30">
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#">Compile Left Arm</a>
+            <a class="dropdown-item" href="#">Compile Right Arm</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Show RAPID Code</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
   </div>
-
   <!-- Starting configuration -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="workspaceBlocks" style="display: none">
     <block type="custom_start" id="START" x="38" y="38"></block>
   </xml>
-
+  
   <!-- Toolbox - Only the close finger block will double mirror -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Move" colour="#968e4f">
@@ -45,11 +79,28 @@
       <block type="controls_repeat"></block>
     </category>
   </xml>
-
-  <!-- Javascript Code -->
+  
+  <script>
+    document.getElementById('compile-button').onclick = function() {
+      console.log('Submitting code to WebView...')
+      var rapid_code = `MODULE MainModule
+      PROC main()
+      MoveJ [[-9.58,-182.61,198.63],[0.0660107,-0.842421,-0.111215,-0.523069],[0,0,0,4],[-101.964,9E+9,9E+9,9E+9,9E+9,9E+9]], v1000, z50, tool0;
+      ENDPROC
+      ENDMODULE`
+      window.chrome.webview.postMessage(rapid_code);
+    };
+  </script>
+  
+  <!-- Javascript -->
+  <!-- Bootstrap -->
+  <script src="bootstrap/jquery.min.js"></script>
+  <script src="bootstrap/bootstrap.bundle.min.js"></script>
+  <!-- Blockly -->
   <script src="blockly/blockly_compressed.js"></script>
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
+  <!-- Source -->
   <script src="js/blocks.js"></script>
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>

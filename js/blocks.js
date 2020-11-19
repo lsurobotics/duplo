@@ -1,22 +1,24 @@
 // Defines the custom blocks used in our toolbox.
+Blockly.HSV_SATURATION = 0.6 // 0 (inclusive) to 1 (exclusive), defaulting to 0.45
+Blockly.HSV_VALUE = 0.7 // 0 (inclusive) to 1 (exclusive), defaulting to 0.65
 
 Blockly.defineBlocksWithJsonArray([
     // Start
     {
         "type": "custom_start",
-        "message0": "When %1 pressed, robot does this:",
+        "message0": "When %1 is pressed, robot does this:",
         "args0": [
           {
             "type": "field_image",
-            "src": "https://www.gstatic.com/codesite/ph/images/star_on.gif", //change to own image
-            "width": 15,
-            "height": 15,
-            "alt": "play button",
+            "src": "https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true", //change to own image
+            "width": 25,
+            "height": 25,
+            "alt": "Compile Button",
             "flipRtl": false
           }
         ],
         "nextStatement": null,
-        "colour": 15,
+        "colour": 0,
         "tooltip": "",
         "helpUrl": ""
     },

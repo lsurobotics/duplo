@@ -1,31 +1,31 @@
 html {
-    background-color: #f8f8f8;
-    font-family: sans-serif;
+    background-color: #d1d1d1;
+    font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.container {
-    width: 100%;
-    display: grid;
-    grid-template-columns: calc(50vw+50px) calc(50vw-50px);
-}
-
-.header {
-    font-size: 25px;
+#workspace-header {
+    background-color: #f1f1f1;
+    padding: 10px;
+    margin-bottom: 10px;
     font-weight: bold;
-    height: 50px;
-    text-align: center;
-    grid-row: 1 / 2;
+    font-size: 20px;
+    color: black;
 }
 
-.workspace {
+#left-workspace, #right-workspace {
     height: 480px;
-    grid-row: 2 / 3;
 }
 
-#leftdiv {
-    width: calc(50vw + 63px - 8px);
+#compile-button {
+    color: white;
+    background-color: rgb(179, 50, 50);
 }
 
-#rightdiv {
-    width: calc(50vw - 63px - 8px);
+#compile-button-dropdown {
+    color: white;
+    background-color: #9e1b1b;
+}
+
+.dropdown-toggle::after {
+    display: none;
 }
