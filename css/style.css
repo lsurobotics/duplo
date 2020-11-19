@@ -23,5 +23,9 @@ html {
 
 #compile-button-dropdown {
     color: white;
-    background-color: #a72a2a;
+    background-color: #9e1b1b;
+}
+
+.dropdown-toggle::after {
+    display: none;
 }
