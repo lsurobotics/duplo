@@ -8,9 +8,9 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "field_image",
-            "src": "https://www.gstatic.com/codesite/ph/images/star_on.gif", //change to own image
-            "width": 15,
-            "height": 15,
+            "src": "https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true", //change to own image
+            "width": 25,
+            "height": 25,
             "alt": "play button",
             "flipRtl": false
           }
