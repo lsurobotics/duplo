@@ -1,7 +1,7 @@
 // Manages events concerning the dragging of blocks, allowing blocks to travel from one side to another.
 
-var leftDiv = document.getElementById("leftdiv");
-var rightDiv = document.getElementById("rightdiv");
+var leftDiv = document.getElementById("left-workspace");
+var rightDiv = document.getElementById("right-workspace");
 
 var draggingId = null; //the ID of the block being dragged, or null if there is no such block
 

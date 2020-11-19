@@ -1,31 +1,11 @@
 html {
     background-color: #f8f8f8;
-    font-family: sans-serif;
 }
 
-.container {
-    width: 100%;
-    display: grid;
-    grid-template-columns: calc(50vw+50px) calc(50vw-50px);
+#header {
+    font-size: larger;
 }
 
-.header {
-    font-size: 25px;
-    font-weight: bold;
-    height: 50px;
-    text-align: center;
-    grid-row: 1 / 2;
-}
-
-.workspace {
+#left-workspace, #right-workspace {
     height: 480px;
-    grid-row: 2 / 3;
-}
-
-#leftdiv {
-    width: calc(50vw + 63px - 8px);
-}
-
-#rightdiv {
-    width: calc(50vw - 63px - 8px);
 }

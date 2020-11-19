@@ -1,7 +1,7 @@
 // Injects Blockly into the html page and adds event handlers.
 
 var toolbox = document.getElementById("toolbox");
-var leftWorkspace = Blockly.inject('leftdiv',
+var leftWorkspace = Blockly.inject('left-workspace',
   { media: 'blockly/media/',
     toolbox: toolbox,
     trashcan: false,
@@ -11,7 +11,7 @@ var leftWorkspace = Blockly.inject('leftdiv',
       drag: false,
       wheel: false}
 });
-var rightWorkspace = Blockly.inject('rightdiv',
+var rightWorkspace = Blockly.inject('right-workspace',
   { media: 'blockly/media/',
     trashcan: true,
     move:{
