@@ -7,7 +7,6 @@ html {
     background-color: #f1f1f1;
     padding: 10px;
     margin-bottom: 10px;
-    font-weight: bold;
     font-size: 20px;
     color: black;
 }
@@ -16,14 +15,26 @@ html {
     height: 480px;
 }
 
-#compile-button {
+#save-button {
     color: white;
-    background-color: rgb(179, 50, 50);
+    width: 120px;
+    background-color: rgb(50, 132, 179);
 }
 
-#compile-button-dropdown {
+#save-button-dropdown {
     color: white;
-    background-color: #9e1b1b;
+    background-color: #1b639e;
+}
+
+#execute-button {
+    color: white;
+    width: 120px;
+    background-color: rgb(50, 179, 82);
+}
+
+#execute-button-dropdown {
+    color: white;
+    background-color: #1b9e31;
 }
 
 .dropdown-toggle::after {

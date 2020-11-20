@@ -14,11 +14,11 @@ Blockly.defineBlocksWithJsonArray([
             "width": 25,
             "height": 25,
             "alt": "Compile Button",
-            "flipRtl": false
+            "flipRtl": true
           }
         ],
         "nextStatement": null,
-        "colour": 0,
+        "colour": 110,
         "tooltip": "",
         "helpUrl": ""
     },
