@@ -97,16 +97,19 @@ function resolveBlocks(block, otherBlock) {
 function attachToParent(block, otherBlock, blockOnLeft) {
   var loc = otherBlock.getRelativeToSurfaceXY();
   //find first mirrored parent of otherBlock
+  var diff = -1; //num of spaces between block & mirrored2
   while (otherBlock.getPreviousBlock()) {
     otherBlock = otherBlock.getPreviousBlock();
+    diff++;
 
     var mirroredToOtherBlock = workspace(blockOnLeft).getBlockById(otherBlock.id);
     if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
       //attach!
-      mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
+      if (diff == 1) mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
+      else mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+
       var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
-      block.pathObject.svgRoot.setAttribute("transform", "translate(" + (loc.x - mirrorLoc.x) + ", " + (loc.y - mirrorLoc.y) + ")");
-      // mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+      block.translate(loc.x - mirrorLoc.x, loc.y - mirrorLoc.y);
       return true;
     }
   }
