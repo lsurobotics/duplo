@@ -106,7 +106,10 @@ function attachToParent(block, otherBlock, blockOnLeft) {
     if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
       //attach!
       if (diff == 1) mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
-      else mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+      else {
+        mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+        mirroredToOtherBlock.childBlocks_.push(block);
+      }
 
       var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
       block.translate(loc.x - mirrorLoc.x, loc.y - mirrorLoc.y);
@@ -154,20 +157,30 @@ function mirrorDragEvent_(event, fromLeft) {
     if (fromLeft) rightWorkspace.removeChangeListener(mirrorEvent);
     else leftWorkspace.removeChangeListener(mirrorEvent);
 
-    //mirror dragging
+    //find top block to mirror dragging
+    var block = workspace(fromLeft).getBlockById(event.blockId);
+    var initialBlockPos = block.getRelativeToSurfaceXY();
     var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
-    if (otherBlock && isMirrored(otherBlock)) {
+    while(!otherBlock && block.getNextBlock()) {
+      block = block.getNextBlock();
+      otherBlock = workspace(!fromLeft).getBlockById(block.id);
+    }
+
+    //if found, mirror!
+    if (otherBlock) {
       var gesture = workspace(fromLeft).getGesture(event);
 
       //move other block to be aligned
       if (otherBlock.previousConnection.isConnected()) otherBlock.previousConnection.disconnect();
-      otherBlock.moveTo(gesture.blockDragger_.startXY_);
+      //starting point + the distance the other block is shifted
+      otherBlock.moveTo(Blockly.utils.Coordinate.sum(gesture.blockDragger_.startXY_, Blockly.utils.Coordinate.difference(block.getRelativeToSurfaceXY(), initialBlockPos)));
 
       //set up initial dragging coords
       startX = gesture.mouseDownXY_.x;
       startY = gesture.mouseDownXY_.y;
       offsetX = 0;
       offsetY = 0;
+      otherBlock.isMirroring = true;
       dragger = new Blockly.BlockDragger(otherBlock, workspace(!fromLeft));
       dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
       //the rest of this is handled the same way dragging across is handled (see drag-across.js)

@@ -14,6 +14,8 @@ function listenForDragging(event) {
     else if (event.element == "dragStop") {
       if (event.oldValue[0].workspace) event.oldValue[0].select();
       unhighlightAll();
+      var otherBlock = workspace(event.workspaceId != leftWorkspace.id).getBlockById(draggingId);
+      if (otherBlock) otherBlock.isMirroring = false;
       draggingId = null;
     }
   }
@@ -94,17 +96,6 @@ function stopDragging(event) {
     dragger.endBlockDrag(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
     dragger.dispose();
     dragger = null;
-
-    // //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
-    // var blocks = getAllConnections(leftWorkspace.getBlockById(draggingId));
-    // var xml = Blockly.Xml.blockToDom(blocks[0], true);
-    // xml.setAttribute('x', event.offsetX);
-    // xml.setAttribute('y', event.offsetY);
-    // // xml.setAttribute("id", blocks[0].id);
-
-    // //paste
-    // // blocks.forEach((block) => block.dispose());
-    // leftWorkspace.paste(xml);
   }
 }
 
@@ -124,3 +115,26 @@ function unhighlightAll() {
     unhighlight(block.svgGroup_);
   });
 }
+
+
+
+// This is part of the Blockly library. The line change fixes freezing on end block drag when a mirrored stack is dragged immediately around itself.
+Blockly.BlockSvg.prototype.setDragging = function(adding) {
+  if (adding) {
+    var group = this.getSvgRoot();
+    group.translate_ = '';
+    group.skew_ = '';
+    Blockly.draggingConnections =
+        Blockly.draggingConnections.concat(this.getConnections_(true));
+    Blockly.utils.dom.addClass(
+        /** @type {!Element} */ (this.svgGroup_), 'blocklyDragging');
+  } else {
+    if (!this.isMirroring) Blockly.draggingConnections = []; // Only change is here
+    Blockly.utils.dom.removeClass(
+        /** @type {!Element} */ (this.svgGroup_), 'blocklyDragging');
+  }
+  // Recurse through all blocks attached under this one.
+  for (var i = 0; i < this.childBlocks_.length; i++) {
+    this.childBlocks_[i].setDragging(adding);
+  }
+};
