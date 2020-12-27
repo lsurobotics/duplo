@@ -19,11 +19,12 @@ function mirrorEvent(event) {
 
   //redirect
   if (event instanceof Blockly.Events.BlockCreate) mirrorCreateEvent_(event, fromLeft);
-  else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
+  // else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Change) mirrorChangeEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Delete) mirrorDeleteEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart" || event.element == "dragStop") mirrorDragEvent_(event, fromLeft);
+    else if (event.element == "selected" && event.newValue) setupOnSelectEvent_(event.newValue, fromLeft);
   }
 }
 
@@ -59,65 +60,79 @@ function mirrorCreateEvent_(event, fromLeft) {
 }
 
 // BlockMove event
-function mirrorMoveEvent_(event, fromLeft) {
-  var block = workspace(fromLeft).getBlockById(event.blockId);
-  var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
-  if (block && otherBlock) {
+// function mirrorMoveEvent_(event, fromLeft) {
+//   var block = workspace(fromLeft).getBlockById(event.blockId);
+//   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
+//   if (block && otherBlock) {
     //move to parent's html hierarchy, if not already
-    if (!block.getPreviousBlock() && otherBlock.getPreviousBlock()) if (attachToParent(block, otherBlock, fromLeft)) return;
-    else if (block.getPreviousBlock() && !otherBlock.getPreviousBlock()) if (attachToParent(otherBlock, block, !fromLeft)) return;
+    // if (!block.getPreviousBlock() && otherBlock.getPreviousBlock()) if (attachToParent(block, otherBlock, fromLeft)) return;
+    // else if (block.getPreviousBlock() && !otherBlock.getPreviousBlock()) if (attachToParent(otherBlock, block, !fromLeft)) return;
 
     //correct position
-    resolveBlocks(block, otherBlock);
-  }
-}
+    // resolveBlocks(block, otherBlock);
+//   }
+// }
 
-//if the blocks have attached to something, put them into the aesthetically correct position
-function resolveBlocks(block, otherBlock) {
-  if (block && otherBlock && (block.parentBlock_ || otherBlock.parentBlock_)) { //if parent on either side
-    if (block.parentBlock_ && otherBlock.parentBlock_) { //they both have parents -> move the higher one down
-      if (block.getRelativeToSurfaceXY().y == otherBlock.getRelativeToSurfaceXY().y) return;
+// //if the blocks have attached to something, put them into the aesthetically correct position
+// function resolveBlocks(block, otherBlock) {
+//   if (block && otherBlock && (block.parentBlock_ || otherBlock.parentBlock_)) { //if parent on either side
+//     if (block.parentBlock_ && otherBlock.parentBlock_) { //they both have parents -> move the higher one down
+//       if (block.getRelativeToSurfaceXY().y == otherBlock.getRelativeToSurfaceXY().y) return;
 
-      var moveOtherBlock = block.getRelativeToSurfaceXY().y > otherBlock.getRelativeToSurfaceXY().y;
-      ((moveOtherBlock) ? otherBlock : block).previousConnection.disconnect();
-    }
-    else { //one of them doesn't have a parent -> move that one
-      var moveOtherBlock = otherBlock.parentBlock_ == null;
-      ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
-    }
-  }
-}
+//       var moveOtherBlock = block.getRelativeToSurfaceXY().y > otherBlock.getRelativeToSurfaceXY().y;
+//       ((moveOtherBlock) ? otherBlock : block).previousConnection.disconnect();
+//     }
+//     else { //one of them doesn't have a parent -> move that one
+//       var moveOtherBlock = otherBlock.parentBlock_ == null;
+//       ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
+//     }
+//   }
+// }
 
-// Attempt to move block html if the hierarchy looks something like
-// mirrored1 -------- mirrored2
-// non-mirrored
-// otherBlock ------- block
-// In this case, block would be moved under mirrored2 so that they would drag together.
-// Returns whether the operation succeeded.
-function attachToParent(block, otherBlock, blockOnLeft) {
-  var loc = otherBlock.getRelativeToSurfaceXY();
-  //find first mirrored parent of otherBlock
-  var diff = -1; //num of spaces between block & mirrored2
-  while (otherBlock.getPreviousBlock()) {
-    otherBlock = otherBlock.getPreviousBlock();
-    diff++;
+// // Attempt to move block html if the hierarchy looks something like
+// // mirrored1 -------- mirrored2
+// // non-mirrored
+// // otherBlock ------- block
+// // In this case, block would be moved under mirrored2 so that they would drag together.
+// // Returns whether the operation succeeded.
+// function attachToParent(block, otherBlock, blockOnLeft) {
+//   var loc = otherBlock.getRelativeToSurfaceXY();
+//   //find first mirrored parent of otherBlock
+//   var diff = -1; //num of spaces between block & mirrored2
+//   while (otherBlock.getPreviousBlock()) {
+//     otherBlock = otherBlock.getPreviousBlock();
+//     diff++;
 
-    var mirroredToOtherBlock = workspace(blockOnLeft).getBlockById(otherBlock.id);
-    if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
-      //attach!
-      if (diff == 1) mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
-      else {
-        mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
-        mirroredToOtherBlock.childBlocks_.push(block);
-      }
+//     var mirroredToOtherBlock = workspace(blockOnLeft).getBlockById(otherBlock.id);
+//     if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
+//       //attach!
+//       // if (diff == 1) mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
+//       // else {
+//         block.translate(0, 0);
+//         mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
+//         mirroredToOtherBlock.childBlocks_.push(block);
+//       // }
 
-      var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
-      block.translate(loc.x - mirrorLoc.x, loc.y - mirrorLoc.y);
-      return true;
-    }
-  }
-  return false;
-}
+//       var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
+//       console.log(mirrorLoc);
+//       console.log(loc);
+//       block.translate(loc.x - mirrorLoc.x, loc.y - mirrorLoc.y);
+//       return true;
+//     }
+//   }
+//   return false;
+// }
+
+
+
+
+
+
+
+
+
+
+
 
 // Change event
 function mirrorChangeEvent_(event, fromLeft) {
@@ -187,7 +202,87 @@ function mirrorDragEvent_(event, fromLeft) {
     }
   }
   else { //event.element == "dragStop"
+    // If split stack:
+    // - Disconnect stack below connection point and reconnect to bottom of lowest stack
+    // - Take out of dragging divs/remake into top block
+
+
+
+    // Go down stack again, on both sides where applicable. Keep track of the number of blocks since the last mirrored pair, or something else if there is no mirrored ancestor.
+    // Where uneven mirrored pairs are found:
+    // - If there is no mirrored ancestor (no #), move them and their relatives to you.
+    // - Else if # is uneven, consolidate larger side if split, and move other side (bottom if split, or disconnect mirrored bottom only if not split)
+    // - Else (# is even) consolidate both sides if either is split.
+
     if (fromLeft) rightWorkspace.addChangeListener(mirrorEvent);
     else leftWorkspace.addChangeListener(mirrorEvent);
   }
+}
+
+/* UI event -> -> element = "selected" and is selecting (i.e. not deselecting)
+   This doesn't mirror, but rather sets up divs for mirrored dragging, on both sides.
+   For variable naming reference, where 'block' triggered the event and --- represents a mirrored connection:
+
+   block
+   x0 ---------- otherBlock
+   x1            x5
+   x2
+   x3            highest
+   x4 ---------- x6
+
+   In this case, highest is attached beneath x5.
+   'block' changes to x0 so that otherBlock can be found.
+   Then, 'block' is assigned to x1, then x2, then x3, then x4. Meanwhile, otherBlock is assigned to x5.
+   Since exactly 1 of block and otherBlock (x4 and x5) is mirrored, x6 (x4's mirror) is identified as highest, then highest.
+   */
+function setupOnSelectEvent_(blockId, fromLeft) {
+  //find top mirroring otherBlock
+  var block = workspace(fromLeft).getBlockById(blockId);
+  var otherBlock = workspace(!fromLeft).getBlockById(blockId);
+  while(!otherBlock && block.getNextBlock()) {
+    block = block.getNextBlock();
+    otherBlock = workspace(!fromLeft).getBlockById(block.id);
+  }
+
+  if (!otherBlock) return;
+
+  blockId = block.id;
+  var highest;
+
+  while(!highest && block.getNextBlock()) {
+    block = block.getNextBlock();
+    highest = workspace(!fromLeft).getBlockById(block.id);
+  }
+
+  var connectYours = !highest;
+
+  if (highest) {
+    while(otherBlock.getNextBlock()) {
+      otherBlock = otherBlock.getNextBlock();
+      if (otherBlock == highest) {
+        setupOnSelectEvent_(otherBlock.id, !fromLeft);
+        return;
+      }
+    }
+  } else {
+    while(!highest && otherBlock.getNextBlock()) {
+      otherBlock = otherBlock.getNextBlock();
+      highest = workspace(fromLeft).getBlockById(otherBlock.id);
+    }
+    if (!highest) return;
+  }
+
+  highest = highest.getTopStackBlock();
+
+  var connecting = connectYours ? block : otherBlock;
+  var notConnecting = connectYours ? otherBlock : block;
+
+  if (!connecting.pathObject.svgRoot.contains(highest.pathObject.svgRoot)) {
+    var low = connecting.getRelativeToSurfaceXY();
+    var high = highest.getRelativeToSurfaceXY();
+    highest.translate(high.x - low.x, high.y - low.y);
+    connecting.pathObject.svgRoot.appendChild(highest.pathObject.svgRoot);
+    connecting.childBlocks_.push(highest);
+  }
+  setupOnSelectEvent_(notConnecting.id, !connectYours == fromLeft);
 }
