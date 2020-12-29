@@ -19,7 +19,6 @@ function mirrorEvent(event) {
 
   //redirect
   if (event instanceof Blockly.Events.BlockCreate) mirrorCreateEvent_(event, fromLeft);
-  // else if (event instanceof Blockly.Events.BlockMove) mirrorMoveEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Change) mirrorChangeEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Delete) mirrorDeleteEvent_(event, fromLeft);
   else if (event instanceof Blockly.Events.Ui) {
@@ -62,81 +61,6 @@ function mirrorCreateEvent_(event, fromLeft) {
   newBlock.moveTo(block.getRelativeToSurfaceXY());
 }
 
-// BlockMove event
-// function mirrorMoveEvent_(event, fromLeft) {
-//   var block = workspace(fromLeft).getBlockById(event.blockId);
-//   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
-//   if (block && otherBlock) {
-    //move to parent's html hierarchy, if not already
-    // if (!block.getPreviousBlock() && otherBlock.getPreviousBlock()) if (attachToParent(block, otherBlock, fromLeft)) return;
-    // else if (block.getPreviousBlock() && !otherBlock.getPreviousBlock()) if (attachToParent(otherBlock, block, !fromLeft)) return;
-
-    //correct position
-    // resolveBlocks(block, otherBlock);
-//   }
-// }
-
-// //if the blocks have attached to something, put them into the aesthetically correct position
-// function resolveBlocks(block, otherBlock) {
-//   if (block && otherBlock && (block.parentBlock_ || otherBlock.parentBlock_)) { //if parent on either side
-//     if (block.parentBlock_ && otherBlock.parentBlock_) { //they both have parents -> move the higher one down
-//       if (block.getRelativeToSurfaceXY().y == otherBlock.getRelativeToSurfaceXY().y) return;
-
-//       var moveOtherBlock = block.getRelativeToSurfaceXY().y > otherBlock.getRelativeToSurfaceXY().y;
-//       ((moveOtherBlock) ? otherBlock : block).previousConnection.disconnect();
-//     }
-//     else { //one of them doesn't have a parent -> move that one
-//       var moveOtherBlock = otherBlock.parentBlock_ == null;
-//       ((moveOtherBlock) ? otherBlock : block).moveTo(((moveOtherBlock) ? block : otherBlock).getRelativeToSurfaceXY());
-//     }
-//   }
-// }
-
-// // Attempt to move block html if the hierarchy looks something like
-// // mirrored1 -------- mirrored2
-// // non-mirrored
-// // otherBlock ------- block
-// // In this case, block would be moved under mirrored2 so that they would drag together.
-// // Returns whether the operation succeeded.
-// function attachToParent(block, otherBlock, blockOnLeft) {
-//   var loc = otherBlock.getRelativeToSurfaceXY();
-//   //find first mirrored parent of otherBlock
-//   var diff = -1; //num of spaces between block & mirrored2
-//   while (otherBlock.getPreviousBlock()) {
-//     otherBlock = otherBlock.getPreviousBlock();
-//     diff++;
-
-//     var mirroredToOtherBlock = workspace(blockOnLeft).getBlockById(otherBlock.id);
-//     if (mirroredToOtherBlock && !mirroredToOtherBlock.pathObject.svgRoot.contains(block.pathObject.svgRoot)) {
-//       //attach!
-//       // if (diff == 1) mirroredToOtherBlock.nextConnection.connect(block.previousConnection);
-//       // else {
-//         block.translate(0, 0);
-//         mirroredToOtherBlock.pathObject.svgRoot.appendChild(block.pathObject.svgRoot);
-//         mirroredToOtherBlock.childBlocks_.push(block);
-//       // }
-
-//       var mirrorLoc = mirroredToOtherBlock.getRelativeToSurfaceXY();
-//       console.log(mirrorLoc);
-//       console.log(loc);
-//       block.translate(loc.x - mirrorLoc.x, loc.y - mirrorLoc.y);
-//       return true;
-//     }
-//   }
-//   return false;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
 // Change event
 function mirrorChangeEvent_(event, fromLeft) {
   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
@@ -159,14 +83,20 @@ function mirrorChangeEvent_(event, fromLeft) {
 function mirrorDeleteEvent_(event, fromLeft) {
   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
   if (!otherBlock) {
+    //resolve everything on your side without worrying about mirroring
+    workspace(fromLeft).getTopBlocks().forEach(block => {
+      var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
+      if (otherBlock && otherBlock.getPreviousBlock()) return; //in split stack
+      else resolveBlocks(block.id, fromLeft);
+    });
+
     return; //no matching block
   }
   if (!isMirrored(otherBlock)) {
-    return; //only for synchronizing type
+    return; //this was a transfer from one side to another
   }
   //delete block
-  otherBlock.unplug(true);
-  otherBlock.dispose();
+  otherBlock.dispose(true, true);
 }
 
 // UI event -> element = "dragStart" or "dragStop"
@@ -294,48 +224,50 @@ function setupSplitStacks_(blockId, fromLeft, joining) {
 
 // Recursively aligns mirrored blocks. Returns whether a mirrored descendant was found to align.
 function resolveBlocks(blockId, fromLeft) {
+  // The blocks on your side & the other side are identified by these indices.
+  var your = 0;
+  var other = 1;
+
   //find top mirroring otherBlock
-  var block = workspace(fromLeft).getBlockById(blockId);
-  if (!block) return;
-  var otherBlock = workspace(!fromLeft).getBlockById(blockId);
-  while(!otherBlock && block.getNextBlock()) {
-    block = block.getNextBlock();
-    otherBlock = workspace(!fromLeft).getBlockById(block.id);
+  var block = [workspace(fromLeft).getBlockById(blockId), workspace(!fromLeft).getBlockById(blockId)];
+  if (!block[your]) return;
+  while(!block[other] && block[your].getNextBlock()) {
+    block[your] = block[your].getNextBlock();
+    block[other] = workspace(!fromLeft).getBlockById(block[your].id);
   }
 
-  if (!otherBlock) return false;
+  if (!block[other]) return false;
 
-  var yourHeight = 0;
-  var otherHeight = 0;
+  var height = [0, 0];
   var connected = 0; //1st binary digit for connected on your side (connected > 1), 2nd for the other side (connected % 2 == 1)
 
-  var high = [block, otherBlock];
-  while(high[0].getPreviousBlock() && connected < 2) {
-    high[0] = high[0].getPreviousBlock();
-    yourHeight++;
-    if (workspace(!fromLeft).getBlockById(high[0].id)) connected += 2;
+  var stack = [block[your], block[other]];
+  while(stack[your].getPreviousBlock() && connected < 2) {
+    stack[your] = stack[your].getPreviousBlock();
+    height[your]++;
+    if (workspace(!fromLeft).getBlockById(stack[your].id)) connected += 2;
   }
-  while(high[1].getPreviousBlock() && connected % 2 == 0) {
-    high[1] = high[1].getPreviousBlock();
-    otherHeight++;
-    if (workspace(fromLeft).getBlockById(high[1].id)) connected++;
+  while(stack[other].getPreviousBlock() && connected % 2 == 0) {
+    stack[other] = stack[other].getPreviousBlock();
+    height[other]++;
+    if (workspace(fromLeft).getBlockById(stack[other].id)) connected++;
   }
 
   var low;
   if (connected == 1) {
     //you've missed some on a split stack!
-    yourHeight++;
-    low = workspace(fromLeft).getBlockById(high[1].id);
+    height[your]++;
+    low = workspace(fromLeft).getBlockById(stack[other].id);
     while(low.getNextBlock()) {
-      yourHeight++;
+      height[your]++;
       low = low.getNextBlock();
     }
   }
   else if (connected == 2) {
-    otherHeight++;
-    low = workspace(!fromLeft).getBlockById(high[0].id);
+    height[other]++;
+    low = workspace(!fromLeft).getBlockById(stack[your].id);
     while(low.getNextBlock()) {
-      otherHeight++;
+      height[other]++;
       low = low.getNextBlock();
     }
   }
@@ -351,51 +283,53 @@ function resolveBlocks(blockId, fromLeft) {
   */
 
   if (connected == 3) {
-    if (yourHeight != otherHeight) {
-      var moveBlock = (yourHeight > otherHeight) ? otherBlock : block;
-      moveBlock.unplug();
-      var loc = ((yourHeight > otherHeight) ? block : otherBlock).getRelativeToSurfaceXY();
-      moveBlock.moveTo(loc);
+    if (height[your] != height[other]) {
+      // The blocks on the side you're primarily moving & that other side are identified by these indices.
+      var move = (height[your] < height[other]) ? 0 : 1;
+      var base = (height[your] < height[other]) ? 1 : 0;
+      block[move].unplug();
+      block[move].moveTo(block[base].getRelativeToSurfaceXY());
       pauseBump();
     }
   }
   else if (connected == 0) {
-    var diff = block.getRelativeToSurfaceXY().y - otherBlock.getRelativeToSurfaceXY().y;
+    var diff = block[your].getRelativeToSurfaceXY().y - block[other].getRelativeToSurfaceXY().y;
     if (diff != 0) {
 
-      var moveStack = (diff > 0) ? high[0] : high[1];
+      var move = (diff > 0) ? 0 : 1;
+      var base = (diff > 0) ? 1 : 0;
       if (diff < 0) diff *= -1;
 
-      if (diff < moveStack.getRelativeToSurfaceXY().y) moveStack.moveBy(0, -diff);
+      if (diff < stack[move].getRelativeToSurfaceXY().y) stack[move].moveBy(stack[base].getRelativeToSurfaceXY().x - stack[move].getRelativeToSurfaceXY().x, -diff);
       else {
-        var otherStack = (diff > 0) ? high[1] : high[0];
-        moveStack.moveTo(moveStack.getRelativeToSurfaceXY().x, 0);
-        otherStack.moveBy(0, Math.abs(block.getRelativeToSurfaceXY().y - otherBlock.getRelativeToSurfaceXY().y));
+        stack[move].moveTo(stack[move].getRelativeToSurfaceXY().x, 0);
+        stack[base].moveBy(stack[base].getRelativeToSurfaceXY().x - stack[move].getRelativeToSurfaceXY().x, Math.abs(block[your].getRelativeToSurfaceXY().y - block[other].getRelativeToSurfaceXY().y));
       }
 
     }
   }
   else {
-    if (yourHeight == otherHeight) {
-      low.nextConnection.connect_(high[connected-1].previousConnection);
+    // Index of connected & disconnected side.
+    var conn = connected % 2;
+    var disconn = connected-1;
+    if (height[conn] == height[disconn]) {
+      low.nextConnection.connect_(stack[disconn].previousConnection);
     }
-    else if (yourHeight > otherHeight == (connected == 2)) {
-      var diff = (block.getRelativeToSurfaceXY().y - otherBlock.getRelativeToSurfaceXY().y) * ((connected == 1) ? -1 : 1);
-      high[connected-1].moveBy((block.getRelativeToSurfaceXY().x - otherBlock.getRelativeToSurfaceXY().x) * ((connected == 1) ? -1 : 1), diff);
+    else if (height[conn] > height[disconn]) {
+      var diff = block[conn].getRelativeToSurfaceXY().y - block[disconn].getRelativeToSurfaceXY().y;
+      stack[disconn].moveBy(block[conn].getRelativeToSurfaceXY().x - block[disconn].getRelativeToSurfaceXY().x, diff);
       pauseBump();
     }
     else {
-      low.nextConnection.connect_(high[connected-1].previousConnection);
-      var moveBlock = (connected == 1) ? otherBlock : block;
-      moveBlock.unplug();
-      var loc = ((connected == 1) ? block : otherBlock).getRelativeToSurfaceXY();
-      moveBlock.moveTo(loc);
+      low.nextConnection.connect_(stack[disconn].previousConnection);
+      block[conn].unplug();
+      block[conn].moveTo(block[disconn].getRelativeToSurfaceXY());
       pauseBump();
     }
   }
 
-  if (block.getNextBlock() && resolveBlocks(block.getNextBlock().id, fromLeft)) ;
-  else if (otherBlock.getNextBlock()) resolveBlocks(otherBlock.getNextBlock().id, !fromLeft);
+  if (block[your].getNextBlock() && resolveBlocks(block[your].getNextBlock().id, fromLeft)) ;
+  else if (block[other].getNextBlock()) resolveBlocks(block[other].getNextBlock().id, !fromLeft);
   return true;
 }
 
@@ -419,4 +353,22 @@ Blockly.BlockSvg.prototype.snapToGrid = function() {
 Blockly.BlockSvg.prototype.bumpNeighbours = function() {
   if (pauseBump_) return;
   originalBump.apply(this);
+};
+
+// Overrides the default BlockSvg.dispose function to seperate split stacks.
+var originalDispose = Blockly.BlockSvg.prototype.dispose;
+
+Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
+  if (!this.isInsertionMarker_) {
+    for(var i = 0; i < this.childBlocks_.length; i++) {
+      if (this.workspace.getTopBlocks().includes(this.childBlocks_[i])) {
+        var splitBlock = this.childBlocks_[i];
+        var loc = splitBlock.getRelativeToSurfaceXY();
+        splitBlock.translate(loc.x, loc.y);
+        this.childBlocks_.splice(i, 1);
+        this.workspace.getBlockById("START").pathObject.svgRoot.parentElement.appendChild(splitBlock.pathObject.svgRoot);
+      }
+    }
+  }
+  originalDispose.apply(this, [healStack, animate]);
 };
