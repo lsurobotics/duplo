@@ -4,19 +4,20 @@ var leftDiv = document.getElementById("left-workspace");
 var rightDiv = document.getElementById("right-workspace");
 
 var draggingId = null; //the ID of the block being dragged, or null if there is no such block
+var draggingWorkspace = null; //the ID of the workspace dragged in
 
 // Keeps track of which block is being dragged & cleans up afterwards.
 function listenForDragging(event) {
   if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart") {
       draggingId = event.blockId;
+      draggingWorkspace = event.workspace;
     }
     else if (event.element == "dragStop") {
       if (event.oldValue[0].workspace) event.oldValue[0].select();
       unhighlightAll();
-      var otherBlock = workspace(event.workspaceId != leftWorkspace.id).getBlockById(draggingId);
-      if (otherBlock) otherBlock.isMirroring = false;
       draggingId = null;
+      draggingWorkspace = null;
     }
   }
 }
@@ -96,6 +97,7 @@ function stopDragging(event) {
     dragger.endBlockDrag(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
     dragger.dispose();
     dragger = null;
+    pauseBump();
   }
 }
 
@@ -129,7 +131,11 @@ Blockly.BlockSvg.prototype.setDragging = function(adding) {
     Blockly.utils.dom.addClass(
         /** @type {!Element} */ (this.svgGroup_), 'blocklyDragging');
   } else {
-    if (!this.isMirroring) Blockly.draggingConnections = []; // Only change is here
+    if (this.id == draggingId && (this.workspace == draggingWorkspace || draggingWorkspace == null)) { // Only change is putting this in an if statement + timeout
+      setTimeout(function() {
+        Blockly.draggingConnections = [];
+      }, 10);
+    }
     Blockly.utils.dom.removeClass(
         /** @type {!Element} */ (this.svgGroup_), 'blocklyDragging');
   }
