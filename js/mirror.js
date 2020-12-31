@@ -48,6 +48,10 @@ function mirrorCreateEvent_(event, fromLeft) {
     if (block.getField('END')) {
       type = block.getFieldValue('END').includes('ollow') ? 'custom_follow' : 'custom_mirror';
       block.updateShape_('null');
+      if (workspace(fromLeft).getGesture(event)) {
+        var start = workspace(fromLeft).getGesture(event).mouseDownXY_;
+        block.moveConnections(start.x - pageX, start.y - pageY);
+      }
     }
     //matching block on other side
     else type = workspace(!fromLeft).getBlockById(event.blockId).type;
