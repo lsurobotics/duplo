@@ -120,7 +120,7 @@ function unhighlightAll() {
 
 
 
-// This is part of the Blockly library. The line change fixes freezing on end block drag when a mirrored stack is dragged immediately around itself.
+// This is part of the Blockly library. The line changes fix freezing on end block drag when a mirrored stack is dragged immediately around itself.
 Blockly.BlockSvg.prototype.setDragging = function(adding) {
   if (adding) {
     var group = this.getSvgRoot();
@@ -144,3 +144,47 @@ Blockly.BlockSvg.prototype.setDragging = function(adding) {
     this.childBlocks_[i].setDragging(adding);
   }
 };
+
+
+// This is also part of the Blockly library. The function change for lastOnStack chooses the last connection on a split stack for dragging.
+Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ = function() {
+  var available = this.topBlock_.getConnections_(false);
+  // Also check the last connection on this stack
+  var lastOnStack = lastConnectionInSplitStack(this.topBlock_, this.topBlock_.workspace == leftWorkspace); // Function changed from this.topBlock_.lastConnectionInStack()
+  if (lastOnStack && lastOnStack != this.topBlock_.nextConnection) {
+    available.push(lastOnStack);
+    if (!this.topBlock_.nextConnection.targetBlock()) available.splice(available.indexOf(this.topBlock_.nextConnection), 1); // Removes extra connection
+    this.lastOnStack_ = lastOnStack;
+    this.lastMarker_ = this.createMarkerBlock_(lastOnStack.getSourceBlock());
+  }
+  return available;
+};
+
+function lastConnectionInSplitStack(topBlock, fromLeft) {
+  var lowestMirror = null;
+  var block = topBlock;
+  if (workspace(!fromLeft).getBlockById(block.id)) lowestMirror = workspace(!fromLeft).getBlockById(block.id);
+  while (block.nextConnection) {
+    if (!block.nextConnection.targetBlock() && !lowestMirror) {
+      // Found a next connection with nothing on the other side, where there are no mirrored blocks to turn to.
+      return block.nextConnection;
+    }
+    else if (!block.nextConnection.targetBlock()) {
+      // You ran out of connections, but this could be a split stack.
+      break;
+    }
+    block = block.nextConnection.targetBlock();
+    if (workspace(!fromLeft).getBlockById(block.id)) lowestMirror = workspace(!fromLeft).getBlockById(block.id);
+  }
+  if (lowestMirror) {
+    var otherBlock = lowestMirror;
+    while(otherBlock.getNextBlock()) {
+      otherBlock = otherBlock.getNextBlock();
+      if (workspace(fromLeft).getBlockById(otherBlock.id)) return lastConnectionInSplitStack(workspace(fromLeft).getBlockById(otherBlock.id), fromLeft);
+    }
+    return block.nextConnection;
+  }
+
+  // Ran out of next connections.
+  return null;
+}
