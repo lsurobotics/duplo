@@ -1,19 +1,42 @@
 // Manages events on certain block types, creating a mirroring effect.
 
-// Array of accepted block types
-var mirroredBlocks = ['custom_wait', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
+/* To manage which blocks are mirrored and how, review the following functions:
+    For all blocks -
+    mirror.js: mirroredBlocks, isMirrored, mirrorCreateEvent_
 
+    For container blocks -
+    lengthen-container.js: Blockly.blockRendering.RenderInfo.prototype.computeBounds_
+*/
+
+/**
+ * Array of accepted block types.
+ * If a block is only mirrored under certain conditions, it is included here, and the conditions is stated in `isMirrored`.
+ */
+const mirroredBlocks = ['custom_wait', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
+
+/**
+ * Returns whether this block is or should be mirrored.
+ * @param {Blockly.Block} block
+*/
 function isMirrored(block) {
   if (!mirroredBlocks.includes(block.type)) return false;
   if (block.type == "custom_move") {
-    var fromLeft = (block.workspace == leftWorkspace);
-    if (block.getField('END') || workspace(!fromLeft).getBlockById(block.id)) return true;
-    else return false;
+    return block.getField('END') || getMirror(block);
   }
   return true;
 }
 
-// Redirects an event to event handlers that mirror that event.
+/**
+ * Returns the block mirrored to this block, or null if there is no such match.
+ */
+function getMirror(block) {
+  if (!block) return null;
+  return workspace(block.workspace == rightWorkspace).getBlockById(block.id);
+}
+
+/**
+ * Redirects an event to event handlers that mirror that event.
+ */
 function mirrorEvent(event) {
   var fromLeft = (event.workspaceId == leftWorkspace.id); //true if triggered from the left workspace
 
@@ -24,37 +47,36 @@ function mirrorEvent(event) {
   else if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart" || event.element == "dragStop") mirrorDragEvent_(event, fromLeft);
     else if (event.element == "selected") {
-      if (event.oldValue) setupSplitStacks_(event.oldValue, !!workspace(true).getBlockById(event.oldValue), false);
-      if (event.newValue) setupSplitStacks_(event.newValue, fromLeft, true);
+      if (event.oldValue) setupSplitStacks(event.oldValue, !!workspace(true).getBlockById(event.oldValue), false);
+      if (event.newValue) setupSplitStacks(event.newValue, fromLeft, true);
     }
   }
 }
 
 
-// BlockCreate event
+/**
+ * Called on BlockCreate event
+ */
 function mirrorCreateEvent_(event, fromLeft) {
   var block = workspace(fromLeft).getBlockById(event.blockId);
   if (!block || !isMirrored(block)) {
     return; //only for synchronizing type
   }
-  if (workspace(!fromLeft).getBlockById(event.blockId)) {
+  if (getMirror(block)) {
     return; //already matching block on other side
   }
 
   // Get proper block type to recreate
   var type = block.type;
   if (block.type == 'custom_move') {
-    //right out of toolbox - disconnect toolbox block & record type
-    if (block.getField('END')) {
-      type = block.getFieldValue('END').includes('ollow') ? 'custom_follow' : 'custom_mirror';
-      block.updateShape_('null');
-      if (workspace(fromLeft).getGesture(event)) {
-        var start = workspace(fromLeft).getGesture(event).mouseDownXY_;
-        block.moveConnections(start.x - pageX, start.y - pageY);
-      }
+    //right out of toolbox (we've already verified that this block still needs to mutate) - mutate to correct shape & record type
+    type = block.getFieldValue('END').includes('ollow') ? 'custom_follow' : 'custom_mirror';
+    block.updateShape_('null');
+    var gesture = workspace(fromLeft).getGesture(event);
+    if (gesture) {
+      var start = gesture.mouseDownXY_;
+      block.moveConnections(start.x - pageX, start.y - pageY);
     }
-    //matching block on other side
-    else type = workspace(!fromLeft).getBlockById(event.blockId).type;
   }
   else if (block.type == 'custom_follow' || block.type == 'custom_mirror') type = 'custom_move';
 
@@ -65,13 +87,12 @@ function mirrorCreateEvent_(event, fromLeft) {
   newBlock.moveTo(block.getRelativeToSurfaceXY());
 }
 
-// Change event
+/**
+ * Called on Change event
+ */
 function mirrorChangeEvent_(event, fromLeft) {
   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
-  if (!otherBlock) {
-    return; //no matching block
-  }
-  if (!isMirrored(otherBlock)) {
+  if (!otherBlock || !isMirrored(otherBlock)) {
     return; //only for synchronizing type
   }
   if (event.element == "field" && otherBlock.getField(event.name)) {
@@ -83,13 +104,15 @@ function mirrorChangeEvent_(event, fromLeft) {
   }
 }
 
-// Delete event
+/**
+ * Called on Delete event
+ */
 function mirrorDeleteEvent_(event, fromLeft) {
   var otherBlock = workspace(!fromLeft).getBlockById(event.blockId); //block with same ID in other workspace
   if (!otherBlock) {
-    //resolve everything on your side without worrying about mirroring
+    //you've deleted a non-mirrored block; resolve everything on your side without worrying about mirroring
     workspace(fromLeft).getTopBlocks().forEach(block => {
-      var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
+      var otherBlock = getMirror(block);
       if (otherBlock && otherBlock.getPreviousBlock()) return; //in split stack
       else resolveBlocks(block.id, fromLeft);
     });
@@ -103,7 +126,9 @@ function mirrorDeleteEvent_(event, fromLeft) {
   otherBlock.dispose(true, true);
 }
 
-// UI event -> element = "dragStart" or "dragStop"
+/**
+ * Called on UI event when element is `"dragStart"` or `"dragStop"`
+ */
 function mirrorDragEvent_(event, fromLeft) {
   if (event.element == "dragStart") {
     if (fromLeft) rightWorkspace.removeChangeListener(mirrorEvent);
@@ -112,10 +137,10 @@ function mirrorDragEvent_(event, fromLeft) {
     //find top block to mirror dragging
     var block = workspace(fromLeft).getBlockById(event.blockId);
     var initialBlockPos = block.getRelativeToSurfaceXY();
-    var otherBlock = workspace(!fromLeft).getBlockById(event.blockId);
+    var otherBlock = getMirror(block);
     while(!otherBlock && block.getNextBlock()) {
       block = block.getNextBlock();
-      otherBlock = workspace(!fromLeft).getBlockById(block.id);
+      otherBlock = getMirror(block);
     }
 
     //if found, mirror!
@@ -138,7 +163,7 @@ function mirrorDragEvent_(event, fromLeft) {
     }
   }
   else { //event.element == "dragStop"
-    setupSplitStacks_(event.blockId, fromLeft, false);
+    setupSplitStacks(event.blockId, fromLeft, false);
 
     var block = workspace(fromLeft).getBlockById(event.blockId);
     if (block) resolveBlocks(block.getTopStackBlock().id, fromLeft);

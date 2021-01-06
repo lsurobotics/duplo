@@ -1,130 +1,168 @@
 // Deals with resolving/aligning mirrored blocks so that mirrored stacks are cleanly connected and drag together.
 
 
-/* UI event -> element = "selected" (select/deselect) or "dragStop"
-  This doesn't mirror, but instead recursively sets up divs for mirrored dragging, on both sides.
-  For variable naming reference, where block triggered the event and --- represents a mirrored connection:
-
-  block
-  x0 ---------- otherBlock
-  x1            x5
-  x2
-  x3            highest
-  x4 ---------- x6
-
-  In this case, highest is attached beneath x5 if joining or disconnecting from x5 if !joining.
-  'block' changes to x0 so that otherBlock can be found.
-  Then, 'block' is assigned to x1, then x2, then x3, then x4. Meanwhile, 'otherBlock' is assigned to x5.
-  Since exactly 1 of 'block' and 'otherBlock' (x4 and x5) is mirrored, x6 (x4's mirror) is identified as 'highest', then highest.
-  */
-function setupSplitStacks_(blockId, fromLeft, joining) {
-  //find top mirroring otherBlock
-  var block = workspace(fromLeft).getBlockById(blockId);
-  if (!block) return;
-  var otherBlock = workspace(!fromLeft).getBlockById(blockId);
-  while(!otherBlock && block.getNextBlock()) {
-    block = block.getNextBlock();
-    otherBlock = workspace(!fromLeft).getBlockById(block.id);
-  }
-
-  if (!otherBlock) return;
-
-  blockId = block.id;
-  var highest;
-
-  while(!highest && block.getNextBlock()) {
-    block = block.getNextBlock();
-    highest = workspace(!fromLeft).getBlockById(block.id);
-  }
-
-  var connectYours = !highest;
-
-  if (highest) {
-    while(otherBlock.getNextBlock()) {
-      otherBlock = otherBlock.getNextBlock();
-      if (otherBlock == highest) {
-        setupSplitStacks_(otherBlock.id, !fromLeft, joining);
-        return;
-      }
-    }
-  } else {
-    while(!highest && otherBlock.getNextBlock()) {
-      otherBlock = otherBlock.getNextBlock();
-      highest = workspace(fromLeft).getBlockById(otherBlock.id);
-    }
-    if (!highest) return;
-  }
-
-  highest = highest.getTopStackBlock();
-
-  var connecting = connectYours ? block : otherBlock;
-  var notConnecting = connectYours ? otherBlock : block;
-
-  if (!connecting.pathObject.svgRoot.contains(highest.pathObject.svgRoot) && joining) {
-    var low = connecting.getRelativeToSurfaceXY();
-    var high = highest.getRelativeToSurfaceXY();
-    highest.translate(high.x - low.x, high.y - low.y);
-    connecting.pathObject.svgRoot.appendChild(highest.pathObject.svgRoot);
-    connecting.childBlocks_.push(highest);
-  }
-  else if (connecting.pathObject.svgRoot.contains(highest.pathObject.svgRoot) && !joining) {
-    disconnectSplitStack(connecting, highest);
-  }
-
-  setupSplitStacks_(notConnecting.id, !connectYours == fromLeft, joining);
-}
-  
-// Recursively aligns mirrored blocks. Returns whether a mirrored descendant was found to align.
-function resolveBlocks(blockId, fromLeft) {
+/**
+ * This function recursively sets up stacks for mirrored dragging, on both sides if found.
+ * 
+ * For variable naming reference, where `block[your]` triggered the function and `---` represents a mirrored connection:
+ * 
+ * ```
+ * block[your]
+ * x0 ---------- block[other]
+ * x1            x5
+ * x2
+ * x3            highest
+ * x4 ---------- x6
+ * ```
+ * 
+ * In this case, `highest` is attached beneath `x5` if `joining` or disconnecting from `x5` if `!joining`.
+ * 
+ * `'block[your]'` changes to `x0` so that `block[other]` can be found.
+ * At that point, if either of `'block'` contain other blocks, those are connected/disconnected.
+ * 
+ * Then, `'block[your]'` is assigned to `x1`, then `x2`, then `x3`, then `x4`. Meanwhile, `'block[other]'` is assigned to `x5`.
+ * Since exactly 1 of `'block'` (`x4` and `x5`) is mirrored, `x6` (`x4`'s mirror) is identified as `'highest'`, then `highest`.
+ * 
+ * @param {string} blockId The ID of the block in whose stack you will search for split stacks.
+ * @param {boolean} fromLeft Workspace of above block.
+ * @param {boolean} joining Whether you are connecting (`true`) or disconnecting (`false`) any split stacks found.
+ */
+function setupSplitStacks(blockId, fromLeft, joining) {
   // The blocks on your side & the other side are identified by these indices.
-  var your = 0;
-  var other = 1;
+  const your = 0;
+  const other = 1;
 
   //find top mirroring otherBlock
   var block = [workspace(fromLeft).getBlockById(blockId), workspace(!fromLeft).getBlockById(blockId)];
   if (!block[your]) return;
   while(!block[other] && block[your].getNextBlock()) {
     block[your] = block[your].getNextBlock();
-    block[other] = workspace(!fromLeft).getBlockById(block[your].id);
+    block[other] = getMirror(block[your]);
+  }
+
+  if (!block[other]) return;
+
+  // If block contains blocks in inputs, dis/connect those off the bat
+  block[your].inputList.forEach(input => {
+    if (!input.connection) return;
+
+    //split between container & first block of input?
+    if (!!block[your].getInputTargetBlock(input.name) != !!block[other].getInputTargetBlock(input.name)) {
+      // Index of the connected & disconnected containers
+      const conn = block[your].getInputTargetBlock(input.name) ? 0 : 1;
+      const disconn = block[your].getInputTargetBlock(input.name) ? 1 : 0;
+
+      let otherBlock = block[conn].getInputTargetBlock(input.name);
+      while(otherBlock.getNextBlock()) {
+        otherBlock = otherBlock.getNextBlock();
+        if (getMirror(otherBlock)) break;
+      }
+      let highest = getMirror(otherBlock);
+      if (!highest) return;
+      highest = highest.getTopStackBlock();
+
+      if (!block[disconn].pathObject.svgRoot.contains(highest.pathObject.svgRoot) && joining) {
+        connectSplitStack_(block[disconn], highest);
+      }
+      else if (block[disconn].pathObject.svgRoot.contains(highest.pathObject.svgRoot) && !joining) {
+        disconnectSplitStack_(block[disconn], highest);
+      }
+    }
+
+    //internal split stacks
+    if (block[your].getInputTargetBlock(input.name)) setupSplitStacks(block[your].getInputTargetBlock(input.name).id, fromLeft, joining);
+    if (block[other].getInputTargetBlock(input.name)) setupSplitStacks(block[other].getInputTargetBlock(input.name).id, !fromLeft, joining);
+  });
+
+  blockId = block[your].id;
+  var highest;
+
+  while(!highest && block[your].getNextBlock()) {
+    block[your] = block[your].getNextBlock();
+    highest = getMirror(block[your]);
+  }
+
+  var connectYours = !highest;
+
+  if (highest) {
+    while(block[other].getNextBlock()) {
+      block[other] = block[other].getNextBlock();
+      if (block[other] == highest) {
+        setupSplitStacks(block[other].id, !fromLeft, joining);
+        return;
+      }
+    }
+  } else {
+    while(!highest && block[other].getNextBlock()) {
+      block[other] = block[other].getNextBlock();
+      highest = workspace(fromLeft).getBlockById(block[other].id);
+    }
+    if (!highest) return;
+  }
+
+  highest = highest.getTopStackBlock();
+
+  // Indices of the block you're dis/connecting in a split stack, and the lowest block on the other side.
+  const connecting = connectYours ? 0 : 1;
+  const notConnecting = connectYours ? 1 : 0;
+
+  if (!block[connecting].pathObject.svgRoot.contains(highest.pathObject.svgRoot) && joining) {
+    connectSplitStack_(block[connecting], highest);
+  }
+  else if (block[connecting].pathObject.svgRoot.contains(highest.pathObject.svgRoot) && !joining) {
+    disconnectSplitStack_(block[connecting], highest);
+  }
+
+  setupSplitStacks(block[notConnecting].id, !connectYours == fromLeft, joining);
+}
+
+  
+/**
+ * Recursively aligns mirrored blocks & their relatives.
+ * @param {string} blockId The ID of the block in whose stack you will search for mirrored blocks to align.
+ * @param {boolean} fromLeft Workspace of above block.
+ * @returns {boolean} Whether a mirrored descendant was found to align.
+ */
+function resolveBlocks(blockId, fromLeft) {
+  // The blocks on your side & the other side are identified by these indices.
+  const your = 0;
+  const other = 1;
+
+  //find top mirroring otherBlock
+  var block = [workspace(fromLeft).getBlockById(blockId), workspace(!fromLeft).getBlockById(blockId)];
+  if (!block[your]) return false;
+  while(!block[other] && block[your].getNextBlock()) {
+    block[your] = block[your].getNextBlock();
+    block[other] = getMirror(block[your]);
   }
 
   if (!block[other]) return false;
+
+  // If block contains blocks in inputs, resolve those
+  block[your].inputList.forEach(input => {
+    if (input.connection && block[your].getInputTargetBlock(input.name)) resolveBlocks(block[your].getInputTargetBlock(input.name).id, fromLeft);
+    if (input.connection && block[other].getInputTargetBlock(input.name)) resolveBlocks(block[other].getInputTargetBlock(input.name).id, !fromLeft);
+  });
 
   var height = [0, 0];
   var connected = 0; //1st binary digit for connected on your side (connected > 1), 2nd for the other side (connected % 2 == 1)
 
   var stack = [block[your], block[other]];
-  while(stack[your].getPreviousBlock() && connected < 2) {
-    stack[your] = stack[your].getPreviousBlock();
+  var secondBlock = [null, null]; //2nd in stack
+  while(stack[your].getParent() && connected < 2) {
+    secondBlock[your] = stack[your];
+    stack[your] = stack[your].getParent();
     height[your]++;
-    if (workspace(!fromLeft).getBlockById(stack[your].id)) connected += 2;
+    if (getMirror(stack[your])) connected += 2;
   }
-  while(stack[other].getPreviousBlock() && connected % 2 == 0) {
-    stack[other] = stack[other].getPreviousBlock();
+  while(stack[other].getParent() && connected % 2 == 0) {
+    secondBlock[other] = stack[other];
+    stack[other] = stack[other].getParent();
     height[other]++;
-    if (workspace(fromLeft).getBlockById(stack[other].id)) connected++;
+    if (getMirror(stack[other])) connected++;
   }
 
-  var low;
-  if (connected == 1) {
-    //you've missed some on a split stack!
-    height[your]++;
-    low = workspace(fromLeft).getBlockById(stack[other].id);
-    while(low.getNextBlock()) {
-      height[your]++;
-      low = low.getNextBlock();
-    }
-  }
-  else if (connected == 2) {
-    height[other]++;
-    low = workspace(!fromLeft).getBlockById(stack[your].id);
-    while(low.getNextBlock()) {
-      height[other]++;
-      low = low.getNextBlock();
-    }
-  }
-
-  /* There are a few possible situations here.
+  /* There are a few possible situations here. Evenness refers to the number of blocks in a stack being equal or unequal.
       - Both sides are connected (connected = 3). If they are even, move on. If they are uneven, disconnect the higher one & move down.
       - There is no mirrored ancestor (connected = 0). In this case, move the lower mirrored stack up to the higher one all the way up to where the
         stack would reach y = 0. From then on, move the higher mirrored stack down.
@@ -137,19 +175,18 @@ function resolveBlocks(blockId, fromLeft) {
   if (connected == 3) {
     if (height[your] != height[other]) {
       // The blocks on the side you're primarily moving & that other side are identified by these indices.
-      var move = (height[your] < height[other]) ? 0 : 1;
-      var base = (height[your] < height[other]) ? 1 : 0;
+      const move = (height[your] < height[other]) ? 0 : 1;
+      const base = (height[your] < height[other]) ? 1 : 0;
       block[move].unplug();
       block[move].moveTo(block[base].getRelativeToSurfaceXY());
-      pauseBump();
     }
   }
   else if (connected == 0) {
     var diff = block[your].getRelativeToSurfaceXY().y - block[other].getRelativeToSurfaceXY().y;
     if (diff != 0) {
 
-      var move = (diff > 0) ? 0 : 1;
-      var base = (diff > 0) ? 1 : 0;
+      const move = (diff > 0) ? 0 : 1;
+      const base = (diff > 0) ? 1 : 0;
       if (diff < 0) diff *= -1;
 
       if (diff < stack[move].getRelativeToSurfaceXY().y) stack[move].moveBy(stack[base].getRelativeToSurfaceXY().x - stack[move].getRelativeToSurfaceXY().x, -diff);
@@ -162,21 +199,34 @@ function resolveBlocks(blockId, fromLeft) {
   }
   else {
     // Index of connected & disconnected side.
-    var conn = connected % 2;
-    var disconn = connected-1;
+    const conn = connected % 2;
+    const disconn = connected-1;
+
+    //you've missed some height on a split stack!
+    height[disconn]++;
+    var targetConnection;
+    if (stack[conn].getInputWithBlock(secondBlock[conn])) {
+      targetConnection = getMirror(stack[conn]).getMatchingConnection(stack[conn], stack[conn].getInputWithBlock(secondBlock[conn]).connection);
+    } else {
+      targetConnection = getMirror(stack[conn]).nextConnection;
+    }
+    while(targetConnection.targetBlock()) {
+      height[disconn]++;
+      targetConnection = targetConnection.targetBlock().nextConnection;
+    }
+
+    //decide what to do based on height
     if (height[conn] == height[disconn]) {
-      low.nextConnection.connect_(stack[disconn].previousConnection);
+      targetConnection.connect_(stack[disconn].previousConnection);
     }
     else if (height[conn] > height[disconn]) {
       var diff = block[conn].getRelativeToSurfaceXY().y - block[disconn].getRelativeToSurfaceXY().y;
       stack[disconn].moveBy(block[conn].getRelativeToSurfaceXY().x - block[disconn].getRelativeToSurfaceXY().x, diff);
-      pauseBump();
     }
     else {
-      low.nextConnection.connect_(stack[disconn].previousConnection);
+      targetConnection.connect_(stack[disconn].previousConnection);
       block[conn].unplug();
       block[conn].moveTo(block[disconn].getRelativeToSurfaceXY());
-      pauseBump();
     }
   }
 
@@ -185,14 +235,42 @@ function resolveBlocks(blockId, fromLeft) {
   return true;
 }
 
-// Disconnects two blocks previously connected in a split stack.
-function disconnectSplitStack(top, bottom) {
+
+/**
+ * Connects two blocks into a split stack.
+ */
+function connectSplitStack_(top, bottom) {
+  if (top.pathObject.svgRoot.contains(bottom.pathObject.svgRoot)) {
+    if (top.childBlocks_.includes(bottom)) top.childBlocks_.push(bottom);
+    console.error("The top block already contains the bottom block.");
+    return;
+  }
+  else if ((top.getNextBlock() && top.inputList.length == 0) || bottom.getParent()) {
+    console.error("These blocks are not the ends of their stacks.");
+    return;
+  }
+
+  var topLoc = top.getRelativeToSurfaceXY();
+  var bottomLoc = bottom.getRelativeToSurfaceXY();
+  bottom.translate(bottomLoc.x - topLoc.x, bottomLoc.y - topLoc.y);
+  top.pathObject.svgRoot.appendChild(bottom.pathObject.svgRoot);
+  if (!top.childBlocks_.includes(bottom)) {
+    top.childBlocks_.push(bottom);
+  } else {
+    console.warn("Something has been set up incorrectly, as the bottom block is already the top's child block. Continuing to connect in the DOM.");
+  }
+}
+
+/**
+ * Disconnects two blocks previously connected in a split stack.
+ */
+function disconnectSplitStack_(top, bottom) {
   if (!top.pathObject.svgRoot.contains(bottom.pathObject.svgRoot)) {
-    if (top.childBlocks_.contains(bottom)) top.childBlocks_.splice(top.childBlocks_.indexOf(bottom), 1);
+    if (top.childBlocks_.includes(bottom)) top.childBlocks_.splice(top.childBlocks_.indexOf(bottom), 1);
     console.error("The top block does not contain the bottom block.");
     return;
   }
-  else if (top.getNextBlock() || bottom.getPreviousBlock()) {
+  else if ((top.getNextBlock() && top.inputList.length == 0) || bottom.getParent()) {
     console.error("These blocks are not the ends of their stacks.");
     return;
   }
@@ -211,40 +289,37 @@ function disconnectSplitStack(top, bottom) {
 
 
 
-// Overrides the default BlockSvg.snapToGrid and BlockSvg.bumpNeighbours functions to not snap/bump if requested.
-var originalSnap = Blockly.BlockSvg.prototype.snapToGrid;
-var originalBump = Blockly.BlockSvg.prototype.bumpNeighbours;
-var pauseBump_ = false;
-
-function pauseBump() {
-  if (!pauseBump_) {
-    pauseBump_ = true;
-    setTimeout(function() {
-      pauseBump_ = false;
-    }, Blockly.BUMP_DELAY * 1.1);
-  }
-}
-Blockly.BlockSvg.prototype.snapToGrid = function() {
-  if (pauseBump_) return;
-  originalSnap.apply(this);
-};
-Blockly.BlockSvg.prototype.bumpNeighbours = function() {
-  if (pauseBump_) return;
-  originalBump.apply(this);
-};
+// Disables snapping & bumping; it messes with the alignment system. Maybe there's a way to make mirrored stacks not apply?
+Blockly.BlockSvg.prototype.snapToGrid = function() {};
+Blockly.BlockSvg.prototype.bumpNeighbours = function() {};
 
 // Overrides the default BlockSvg.dispose function to seperate split stacks.
-var originalDispose = Blockly.BlockSvg.prototype.dispose;
+let originalDispose = Blockly.BlockSvg.prototype.dispose;
 
 Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
+  setupSplitStacks(this.id, this.workspace == leftWorkspace);
   if (!this.isInsertionMarker_) {
     for(var i = 0; i < this.childBlocks_.length; i++) {
       if (this.workspace.getTopBlocks().includes(this.childBlocks_[i])) {
-        disconnectSplitStack(this, this.childBlocks_[i]);
+        disconnectSplitStack_(this, this.childBlocks_[i]);
       }
     }
   }
   originalDispose.apply(this, [healStack, animate]);
+};
+
+// Overrides the default InsertionMarkerManager.showInsertionMarker_ function to resolve blocks on marker insertion.
+let originalShowInsert = Blockly.InsertionMarkerManager.prototype.showInsertionMarker_;
+let originalHideInsert = Blockly.InsertionMarkerManager.prototype.hideInsertionMarker_;
+
+Blockly.InsertionMarkerManager.prototype.showInsertionMarker_ = function() {
+  originalShowInsert.apply(this);
+  resolveBlocks(this.markerConnection_.sourceBlock_.id, this.markerConnection_.sourceBlock_.workspace == leftWorkspace);
+};
+Blockly.InsertionMarkerManager.prototype.hideInsertionMarker_ = function() {
+  let connectedBlock = this.markerConnection_.targetBlock();
+  originalHideInsert.apply(this);
+  if (connectedBlock) resolveBlocks(connectedBlock.id, connectedBlock.workspace == leftWorkspace);
 };
 
 
@@ -262,7 +337,7 @@ Blockly.BlockSvg.prototype.setDragging = function(adding) {
     Blockly.utils.dom.addClass(
         /** @type {!Element} */ (this.svgGroup_), 'blocklyDragging');
   } else {
-    if (this.id == draggingId && (this.workspace == draggingWorkspace || draggingWorkspace == null)) { // Only change is putting this in an if statement + timeout
+    if (this.id == draggingId) { // Only change is putting this in an if statement + timeout
       setTimeout(function() {
         Blockly.draggingConnections = [];
       }, 10);
@@ -281,7 +356,7 @@ Blockly.BlockSvg.prototype.setDragging = function(adding) {
 Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ = function() {
   var available = this.topBlock_.getConnections_(false);
   // Also check the last connection on this stack
-  var lastOnStack = lastConnectionInSplitStack(this.topBlock_, this.topBlock_.workspace == leftWorkspace); // Function changed from this.topBlock_.lastConnectionInStack()
+  var lastOnStack = lastConnectionInSplitStack(this.topBlock_); // Function changed from this.topBlock_.lastConnectionInStack()
   if (lastOnStack && lastOnStack != this.topBlock_.nextConnection) {
     available.push(lastOnStack);
     if (!this.topBlock_.nextConnection.targetBlock()) available.splice(available.indexOf(this.topBlock_.nextConnection), 1); // Removes extra connection
@@ -291,13 +366,16 @@ Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ = function() 
   return available;
 };
 
-function lastConnectionInSplitStack(topBlock, fromLeft) {
+/**
+ * Returns the last connection in the very last split stack connecting beneath this block, or null if it ends without a next connection.
+ */
+function lastConnectionInSplitStack(topBlock) {
   var lowestMirror = null;
   var block = topBlock;
-  if (workspace(!fromLeft).getBlockById(block.id)) lowestMirror = workspace(!fromLeft).getBlockById(block.id);
+  if (getMirror(block)) lowestMirror = getMirror(block);
   while (block.nextConnection) {
     if (!block.nextConnection.targetBlock() && !lowestMirror) {
-      // Found a next connection with nothing on the other side, where there are no mirrored blocks to turn to.
+      // Found a next connection with nothing on the other side, and there are no mirrored blocks to turn to.
       return block.nextConnection;
     }
     else if (!block.nextConnection.targetBlock()) {
@@ -305,13 +383,13 @@ function lastConnectionInSplitStack(topBlock, fromLeft) {
       break;
     }
     block = block.nextConnection.targetBlock();
-    if (workspace(!fromLeft).getBlockById(block.id)) lowestMirror = workspace(!fromLeft).getBlockById(block.id);
+    if (getMirror(block)) lowestMirror = getMirror(block);
   }
   if (lowestMirror) {
     var otherBlock = lowestMirror;
     while(otherBlock.getNextBlock()) {
       otherBlock = otherBlock.getNextBlock();
-      if (workspace(fromLeft).getBlockById(otherBlock.id)) return lastConnectionInSplitStack(workspace(fromLeft).getBlockById(otherBlock.id), fromLeft);
+      if (getMirror(otherBlock)) return lastConnectionInSplitStack(getMirror(otherBlock));
     }
     return block.nextConnection;
   }
@@ -319,3 +397,32 @@ function lastConnectionInSplitStack(topBlock, fromLeft) {
   // Ran out of next connections.
   return null;
 }
+
+
+// Also part of the Blockly library; change makes select events in the flyout trigger in the left workspace so that our event listeners are triggered.
+Blockly.BlockSvg.prototype.select = function() {
+  if (this.isShadow() && this.getParent()) {
+    // Shadow blocks should not be selected.
+    this.getParent().select();
+    return;
+  }
+  if (Blockly.selected == this) {
+    return;
+  }
+  var oldId = null;
+  if (Blockly.selected) {
+    oldId = Blockly.selected.id;
+    // Unselect any previously selected block.
+    Blockly.Events.disable();
+    try {
+      Blockly.selected.unselect();
+    } finally {
+      Blockly.Events.enable();
+    }
+  }
+  var event = new Blockly.Events.Ui(null, 'selected', oldId, this.id);
+  event.workspaceId = this.workspace.isFlyout ? leftWorkspace.id : this.workspace.id; // Only change.
+  Blockly.Events.fire(event);
+  Blockly.selected = this;
+  this.addSelect();
+};

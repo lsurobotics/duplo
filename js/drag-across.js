@@ -1,48 +1,54 @@
 // Manages events concerning the dragging of blocks, allowing blocks to travel from one side to another.
 
-var leftDiv = document.getElementById("left-workspace");
-var rightDiv = document.getElementById("right-workspace");
+const leftDiv = document.getElementById("left-workspace");
+const rightDiv = document.getElementById("right-workspace");
 
-var draggingId = null; //the ID of the block being dragged, or null if there is no such block
-var draggingWorkspace = null; //the ID of the workspace dragged in
+/**
+ * The ID of the block being dragged, or null if there is no such block.
+ */
+var draggingId = null;
 
-// Keeps track of which block is being dragged & cleans up afterwards.
+/**
+ * Keeps track of which block is being dragged & cleans up on drag end.
+ */
 function listenForDragging(event) {
   if (event instanceof Blockly.Events.Ui) {
     if (event.element == "dragStart") {
       draggingId = event.blockId;
-      draggingWorkspace = event.workspace;
     }
     else if (event.element == "dragStop") {
       if (event.oldValue[0].workspace) event.oldValue[0].select();
       unhighlightAll();
       draggingId = null;
-      draggingWorkspace = null;
     }
   }
 }
 
 // Enable transferring block from one side to another
-Blockly.bindEvent_(leftDiv, "touchenter", null, (evt) => transferBlock(evt, false));
-Blockly.bindEvent_(leftDiv, "mouseenter", null, (evt) => transferBlock(evt, false)); //simulate for computer mice
-Blockly.bindEvent_(rightDiv, "touchenter", null, (evt) => transferBlock(evt, true));
-Blockly.bindEvent_(rightDiv, "mouseenter", null, (evt) => transferBlock(evt, true));
+Blockly.bindEvent_(leftDiv, "touchenter", null, (evt) => transferBlock_(evt, false));
+Blockly.bindEvent_(leftDiv, "mouseenter", null, (evt) => transferBlock_(evt, false)); //simulate for computer mice
+Blockly.bindEvent_(rightDiv, "touchenter", null, (evt) => transferBlock_(evt, true));
+Blockly.bindEvent_(rightDiv, "mouseenter", null, (evt) => transferBlock_(evt, true));
 
 var dragger;            // The object managing a manually manipulated drag.
 var startX, startY;     // The coordinates of the block before it's dragged (the old pageX/pageY coords)
 var offsetX, offsetY;   // The offset the block should appear right & down from its original coords when dragged, e.g. -17 to shift it up 17
 
-function transferBlock(event, fromLeft) {
+/**
+ * Transfers the block currently being dragged from one side to the other if it should be.
+ * @param {Event} event The normal (non-Blockly wrapped) mouse/touch event to base the coordinates upon.
+ */
+function transferBlock_(event, fromLeft) {
   if (!draggingId) return;
 
   var fromWorkspace = workspace(fromLeft);
   var toWorkspace = workspace(!fromLeft);
-  var blocks = getAllConnections(fromWorkspace.getBlockById(draggingId));
+  var blocks = getAllFamily(fromWorkspace.getBlockById(draggingId));
   var widest = 0;
 
   //protect from transferring mirror blocks
   if (!blocks) return;
-  for (var i = 0; i < blocks.length; i++) {
+  for (let i = 0; i < blocks.length; i++) {
     if (isMirrored(blocks[i])) return;
     widest = Math.max(widest, blocks[i].width);
   }
@@ -65,50 +71,56 @@ function transferBlock(event, fromLeft) {
   dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
   startX = event.pageX;
   startY = event.pageY;
-
-  draggingId = null;
 }
 
-// Returns an array of all the blocks attached to this block, including the block itself.
-function getAllConnections(block) {
+/**
+ * Returns an array of all the blocks attached to this block, including the block itself while not including its ancestors.
+ */
+function getAllFamily(block) {
   if (!block) return null;
 
-  var blocks = [block,];
-  block.getChildren().forEach((block) => { blocks = blocks.concat(getAllConnections(block)) });
+  var blocks = [block];
+  block.getChildren().forEach((block) => { blocks = blocks.concat(getAllFamily(block)) });
   return blocks;
 }
 
-Blockly.bindEvent_(document.body, "touchmove", null, (evt) => updateCoordinates(evt));
-Blockly.bindEvent_(document.body, "mousemove", null, (evt) => updateCoordinates(evt));
+Blockly.bindEvent_(document.body, "touchmove", null, (evt) => updateCoordinates_(evt));
+Blockly.bindEvent_(document.body, "mousemove", null, (evt) => updateCoordinates_(evt));
 
 var pageX, pageY;
-function updateCoordinates(event) {
+function updateCoordinates_(event) {
   pageX = event.pageX;
   pageY = event.pageY;
 
   if (dragger) dragger.dragBlock(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
 }
 
-Blockly.bindEvent_(document.body, "touchup", null, (evt) => stopDragging(evt));
-Blockly.bindEvent_(document.body, "mouseup", null, (evt) => stopDragging(evt));
+Blockly.bindEvent_(document.body, "touchup", null, (evt) => stopDragging_(evt));
+Blockly.bindEvent_(document.body, "mouseup", null, (evt) => stopDragging_(evt));
 
-function stopDragging(event) {
+function stopDragging_(event) {
   if (dragger) {
     dragger.endBlockDrag(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
     dragger.dispose();
     dragger = null;
-    pauseBump();
   }
 }
 
 
-// Blockly's default unhightlight function can't undo any more than the last highlight (acts more like a static method); this deals with strange leftover highlights.
+/**
+ * Physically removes highlights from the DOM on this node.
+ * @param {SVGGElement} node
+ */
 function unhighlight(node) {
   node.childNodes.forEach((child) => {
     if (Blockly.utils.dom.hasClass(child, "blocklyHighlightedConnectionPath")) Blockly.utils.dom.removeNode(child);
   });
 }
 
+/**
+ * Blockly's default unhightlight function can't undo any more than the last highlight (acts more like a static method).
+ * This deals with strange leftover highlights on all blocks.
+ */
 function unhighlightAll() {
   leftWorkspace.getAllBlocks().forEach((block) => {
     unhighlight(block.svgGroup_);

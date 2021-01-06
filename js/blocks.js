@@ -1,4 +1,5 @@
 // Defines the custom blocks used in our toolbox.
+
 Blockly.HSV_SATURATION = 0.6 // 0 (inclusive) to 1 (exclusive), defaulting to 0.45
 Blockly.HSV_VALUE = 0.7 // 0 (inclusive) to 1 (exclusive), defaulting to 0.65
 
@@ -10,7 +11,7 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "field_image",
-            "src": "https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true", //change to own image
+            "src": "https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true", //hand icon
             "width": 25,
             "height": 25,
             "alt": "Compile Button",
@@ -112,7 +113,7 @@ Blockly.defineBlocksWithJsonArray([
 ]);
 
 
-// Controls whether move blocks have a value input at the end.
+// Controls whether move blocks are mutated (i.e. their forms in the toolbox).
 
 var moveMixin = {
     mutationToDom: function() {
@@ -128,9 +129,6 @@ var moveMixin = {
     },
 
     updateShape_: function(type) {
-        var speed = new Blockly.FieldDropdown([["quickly","QUICK"], ["moderately","MODERATE"], ["slowly","SLOW"]]);
-        var location = new Blockly.FieldVariable("[location]");
-
         if (type == 'null' && this.getField('END')) {
             this.getInput('').removeField('END');
         } else if (type != 'null') {

@@ -1,7 +1,7 @@
 // Injects Blockly into the html page and adds event handlers.
 
-var toolbox = document.getElementById("toolbox");
-var leftWorkspace = Blockly.inject('left-workspace',
+const toolbox = document.getElementById("toolbox");
+const leftWorkspace = Blockly.inject('left-workspace',
   { media: 'blockly/media/',
     toolbox: toolbox,
     trashcan: false,
@@ -11,7 +11,7 @@ var leftWorkspace = Blockly.inject('left-workspace',
       drag: false,
       wheel: false}
 });
-var rightWorkspace = Blockly.inject('right-workspace',
+const rightWorkspace = Blockly.inject('right-workspace',
   { media: 'blockly/media/',
     trashcan: true,
     move:{
@@ -20,7 +20,10 @@ var rightWorkspace = Blockly.inject('right-workspace',
       wheel: false}
 });
 
-//Generally, workspace(fromLeft) chooses the workspace that the event originated from, while workspace(!fromLeft) chooses the workspace on the other side.
+/**
+ * Generally, `workspace(fromLeft)` chooses the workspace that the event originated from, while `workspace(!fromLeft)` chooses the workspace on the other side.
+ * @param {boolean} chooseLeft Whether you want the left (`true`) or right (`false`) workspace.
+ */
 function workspace(chooseLeft) {
   return chooseLeft ? leftWorkspace : rightWorkspace;
 }
