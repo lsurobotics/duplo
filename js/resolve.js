@@ -138,12 +138,6 @@ function resolveBlocks(blockId, fromLeft) {
 
   if (!block[other]) return false;
 
-  // If block contains blocks in inputs, resolve those
-  block[your].inputList.forEach(input => {
-    if (input.connection && block[your].getInputTargetBlock(input.name)) resolveBlocks(block[your].getInputTargetBlock(input.name).id, fromLeft);
-    if (input.connection && block[other].getInputTargetBlock(input.name)) resolveBlocks(block[other].getInputTargetBlock(input.name).id, !fromLeft);
-  });
-
   var height = [0, 0];
   var connected = 0; //1st binary digit for connected on your side (connected > 1), 2nd for the other side (connected % 2 == 1)
 
@@ -230,6 +224,13 @@ function resolveBlocks(blockId, fromLeft) {
     }
   }
 
+  // If block contains blocks in inputs, resolve those now
+  block[your].inputList.forEach(input => {
+    if (input.connection && block[your].getInputTargetBlock(input.name)) resolveBlocks(block[your].getInputTargetBlock(input.name).id, fromLeft);
+    if (input.connection && block[other].getInputTargetBlock(input.name)) resolveBlocks(block[other].getInputTargetBlock(input.name).id, !fromLeft);
+  });
+
+  // Next blocks
   if (block[your].getNextBlock() && resolveBlocks(block[your].getNextBlock().id, fromLeft)) ;
   else if (block[other].getNextBlock()) resolveBlocks(block[other].getNextBlock().id, !fromLeft);
   return true;
@@ -350,53 +351,6 @@ Blockly.BlockSvg.prototype.setDragging = function(adding) {
     this.childBlocks_[i].setDragging(adding);
   }
 };
-  
-  
-// This is also part of the Blockly library. The function change for lastOnStack chooses the last connection on a split stack for dragging.
-Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ = function() {
-  var available = this.topBlock_.getConnections_(false);
-  // Also check the last connection on this stack
-  var lastOnStack = lastConnectionInSplitStack(this.topBlock_); // Function changed from this.topBlock_.lastConnectionInStack()
-  if (lastOnStack && lastOnStack != this.topBlock_.nextConnection) {
-    available.push(lastOnStack);
-    if (!this.topBlock_.nextConnection.targetBlock()) available.splice(available.indexOf(this.topBlock_.nextConnection), 1); // Removes extra connection
-    this.lastOnStack_ = lastOnStack;
-    this.lastMarker_ = this.createMarkerBlock_(lastOnStack.getSourceBlock());
-  }
-  return available;
-};
-
-/**
- * Returns the last connection in the very last split stack connecting beneath this block, or null if it ends without a next connection.
- */
-function lastConnectionInSplitStack(topBlock) {
-  var lowestMirror = null;
-  var block = topBlock;
-  if (getMirror(block)) lowestMirror = getMirror(block);
-  while (block.nextConnection) {
-    if (!block.nextConnection.targetBlock() && !lowestMirror) {
-      // Found a next connection with nothing on the other side, and there are no mirrored blocks to turn to.
-      return block.nextConnection;
-    }
-    else if (!block.nextConnection.targetBlock()) {
-      // You ran out of connections, but this could be a split stack.
-      break;
-    }
-    block = block.nextConnection.targetBlock();
-    if (getMirror(block)) lowestMirror = getMirror(block);
-  }
-  if (lowestMirror) {
-    var otherBlock = lowestMirror;
-    while(otherBlock.getNextBlock()) {
-      otherBlock = otherBlock.getNextBlock();
-      if (getMirror(otherBlock)) return lastConnectionInSplitStack(getMirror(otherBlock));
-    }
-    return block.nextConnection;
-  }
-
-  // Ran out of next connections.
-  return null;
-}
 
 
 // Also part of the Blockly library; change makes select events in the flyout trigger in the left workspace so that our event listeners are triggered.

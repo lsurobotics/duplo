@@ -3,9 +3,6 @@
 // Overrides the default RenderInfo.computeBounds_ function to change the height of matching loop blocks.
 var originalComputeBounds = Blockly.blockRendering.RenderInfo.prototype.computeBounds_;
 
-// A map of loop block ids to their natural statement input heights (i.e. without unnatural stretching).
-var naturalHeights = [];
-
 Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
   originalComputeBounds.apply(this);
 
@@ -17,11 +14,36 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
     var fromLeft = (this.block_.workspace == leftWorkspace);
     var otherBlock = getMirror(this.block_);
     if (otherBlock && this.inputRows[1]) {
-      if (!naturalHeights[this.block_.id]) naturalHeights[this.block_.id] = { left: this.constants_.MIN_BLOCK_HEIGHT, right: this.constants_.MIN_BLOCK_HEIGHT };
-      if (fromLeft) naturalHeights[this.block_.id].left = this.inputRows[1].height;
-      else naturalHeights[this.block_.id].right = this.inputRows[1].height;
+      // Indices for the blocks on your side and the other side, respectively.
+      const your = 0;
+      const other = 1;
 
-      this.inputRows[1].height = Math.max(naturalHeights[this.block_.id].left, naturalHeights[this.block_.id].right);
+      // The height this input statement should be on each side WITHOUT mirroring
+      var height = [this.constants_.MIN_BLOCK_HEIGHT, this.constants_.MIN_BLOCK_HEIGHT];
+      
+      // Add the heights of each side's blocks
+      var firstInputs = [inputInSplitStack(this.block_, "DO"), inputInSplitStack(otherBlock, "DO")];
+      [your, other].forEach(index => {
+        var block = firstInputs[index];
+        //no input -> just min height
+        if (!block) return;
+        //connected directly to loop -> add normal height
+        if (block.getParent()) height[index] = block.getHeightWidth().height;
+        //split stack at top -> add normal height + extra visual space gap above
+        else {
+          //or more specifically... normal height - (distance to highest mirror block on this side) + (distance to top on other side)
+          //                      = normal height - (normal height - highest mirror block height) + (other side height - matching mirror block height)
+          //                      = highest mirror block height - matching mirror block height + other side height
+          var highestMirror = block;
+          do {
+            if (getMirror(highestMirror)) break;
+            else highestMirror = highestMirror.getNextBlock();
+          } while (highestMirror);
+          height[index] = highestMirror.getHeightWidth().height - getMirror(highestMirror).getHeightWidth().height + firstInputs[(index+1)%2].getHeightWidth().height;
+        }
+      });
+
+      this.inputRows[1].height = Math.max(height[your], height[other]);
 
       //wait an instant for this block to render before rendering the other block - it will grow
       if (this.inputRows[1].height != otherBlock.height - BASE_HEIGHT) {
@@ -81,41 +103,4 @@ Blockly.BlockSvg.prototype.getHeightWidth = function() {
   }
 
   return {height: heightToMirror + heightSinceMirror + (endsInConnection ? tabHeight : 0), width: width};
-};
-
-
-// Again, part of the Blockly library. Allows split stacks to render ancestors in the same way that normal stacks do.
-Blockly.BlockSvg.prototype.render = function(opt_bubble) {
-  if (this.renderIsInProgress_) {
-    return;  // Don't allow recursive renders.
-  }
-  this.renderIsInProgress_ = true;
-  try {
-    this.rendered = true;
-    Blockly.utils.dom.startTextWidthCache();
-
-    if (this.isCollapsed()) {
-      this.updateCollapsed_();
-    }
-    this.workspace.getRenderer().render(this);
-    this.updateConnectionLocations_();
-
-    if (opt_bubble !== false) {
-      var parentBlock = this.getParent();
-      if (parentBlock) {
-        parentBlock.render(true);
-      } else {
-        // Top-most block. Fire an event to allow scrollbars to resize.
-        this.workspace.resizeContents();
-      }
-
-      // var mirror = workspace(!(this.workspace == leftWorkspace)).getBlockById(this.id); // Added these
-      // if (mirror) mirror.render(false);
-    }
-
-    Blockly.utils.dom.stopTextWidthCache();
-    this.updateMarkers_();
-  } finally {
-    this.renderIsInProgress_ = false;
-  }
 };

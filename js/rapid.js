@@ -90,7 +90,7 @@ Blockly.Rapid.scrub_ = function(block, code) {
   if (block.type != "run") {
     // The run block generates the code for any attached statements itself.
     // For any other block types we do it here.
-    var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+    var nextBlock = nextInSplitStack(block);
     var nextCode = Blockly.Rapid.blockToCode(nextBlock);
     code += nextCode;
   }

@@ -4,7 +4,7 @@
     For all blocks -
     mirror.js: mirroredBlocks, isMirrored, mirrorCreateEvent_
 
-    For container blocks -
+    For container blocks (should always be mirrored, as well) -
     lengthen-container.js: Blockly.blockRendering.RenderInfo.prototype.computeBounds_
 */
 
