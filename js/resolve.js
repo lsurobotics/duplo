@@ -214,8 +214,8 @@ function resolveBlocks(blockId, fromLeft) {
       targetConnection.connect_(stack[disconn].previousConnection);
     }
     else if (height[conn] > height[disconn]) {
-      var diff = block[conn].getRelativeToSurfaceXY().y - block[disconn].getRelativeToSurfaceXY().y;
-      stack[disconn].moveBy(block[conn].getRelativeToSurfaceXY().x - block[disconn].getRelativeToSurfaceXY().x, diff);
+      var diff = Blockly.utils.Coordinate.difference(block[conn].getRelativeToSurfaceXY(), block[disconn].getRelativeToSurfaceXY());
+      translateBy(stack[disconn], diff.x, diff.y);
     }
     else {
       targetConnection.connect_(stack[disconn].previousConnection);
