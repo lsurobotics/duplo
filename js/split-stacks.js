@@ -146,29 +146,6 @@ function lastConnectionInSplitStack(topBlock) {
   return null;
 }
 
-/**
- * Translates a block by the specified amounts, taking into account the current transformation value.
- * Useful in cases where the transformation may not be the same as the block's coordinates, such as in split stacks.
- */
-function translateBy(block, dx, dy) {
-  if (this.parentBlock_) {
-    throw Error('Block has parent.');
-  }
-
-  //check that a translate value exists; just assume everything is valid after that
-  var translate = block.getSvgRoot().getAttribute("transform"); //"translate(x,y)"
-  if (!translate || !translate.startsWith("translate(")) {
-    throw Error('Block does not have a valid transform attribute ("' + translate + '").');
-  }
-
-  //add dx & dy
-  var pair = translate.split("(")[1].split(")")[0].split(","); //["x", "y"]
-  pair[0] = parseFloat(pair[0]) + dx;
-  pair[1] = parseFloat(pair[1]) + dy;
-  block.translate(pair[0], pair[1]);
-
-  block.xy_.translate(dx, dy);
-}
 
 
 

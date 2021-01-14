@@ -164,7 +164,8 @@ function mirrorDragEvent_(event, fromLeft) {
   }
   else { //event.element == "dragStop"
     setupSplitStacks(event.blockId, fromLeft, false);
-
+    console.log("split!");
+  
     var block = workspace(fromLeft).getBlockById(event.blockId);
     if (block) resolveBlocks(block.getTopStackBlock().id, fromLeft);
 

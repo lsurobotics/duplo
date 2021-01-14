@@ -215,7 +215,7 @@ function resolveBlocks(blockId, fromLeft) {
     }
     else if (height[conn] > height[disconn]) {
       var diff = Blockly.utils.Coordinate.difference(block[conn].getRelativeToSurfaceXY(), block[disconn].getRelativeToSurfaceXY());
-      translateBy(stack[disconn], diff.x, diff.y);
+      stack[disconn].moveBy(diff.x, diff.y);
     }
     else {
       targetConnection.connect_(stack[disconn].previousConnection);
@@ -320,7 +320,10 @@ Blockly.InsertionMarkerManager.prototype.showInsertionMarker_ = function() {
 Blockly.InsertionMarkerManager.prototype.hideInsertionMarker_ = function() {
   let connectedBlock = this.markerConnection_.targetBlock();
   originalHideInsert.apply(this);
-  if (connectedBlock) resolveBlocks(connectedBlock.id, connectedBlock.workspace == leftWorkspace);
+  if (connectedBlock) {
+    setupSplitStacks(connectedBlock.id, connectedBlock.workspace == leftWorkspace, false);
+    resolveBlocks(connectedBlock.id, connectedBlock.workspace == leftWorkspace);
+  }
 };
 
 
