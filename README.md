@@ -1,4 +1,4 @@
-# Robots :mechanical_arm:	
+# Duplo :mechanical_arm:	
 A prototype of a programming language for two-armed robots.
 
 ## :card_index_dividers:	 Code Structure
