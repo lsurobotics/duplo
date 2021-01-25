@@ -3,6 +3,10 @@ html {
     font-family: sans-serif;
 }
 
+#workspace {
+    padding-bottom: 10px;
+}
+
 #left-workspace, #right-workspace {
     height: 480px;
 }

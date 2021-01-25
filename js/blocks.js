@@ -7,7 +7,7 @@ Blockly.defineBlocksWithJsonArray([
     // Start
     {
         "type": "custom_start",
-        "message0": "When ᴇxᴇᴄᴜᴛᴇ is pressed, arm does this:",
+        "message0": "When sᴛᴀʀᴛ is pressed, arm does this:",
         "nextStatement": null,
         "colour": 110,
         "tooltip": "",
