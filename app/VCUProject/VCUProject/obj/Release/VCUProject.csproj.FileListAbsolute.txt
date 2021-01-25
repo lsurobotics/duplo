@@ -1,0 +1,4 @@
+C:\Users\fronchettl\source\repos\VCUProject\VCUProject\obj\Release\MainWindow.g.cs
+C:\Users\fronchettl\source\repos\VCUProject\VCUProject\obj\Release\VCUProject_Content.g.cs
+C:\Users\fronchettl\source\repos\VCUProject\VCUProject\obj\Release\VCUProject_MarkupCompile.cache
+C:\Users\fronchettl\source\repos\VCUProject\VCUProject\obj\Release\VCUProject_MarkupCompile.lref
