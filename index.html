@@ -66,19 +66,19 @@
   
   <!-- Javascript -->
   <script>
-
+    document.getElementById('execute-button').onclick = function() {
       console.log('Submitting code to application...')
       var left_arm_code = `MODULE LeftModuleExample
         PROC main()
           ! Fill this string with a RAPID module for the left arm.
         ENDPROC
-      ENDMODULE`
+ENDMODULE`
 
       var right_arm_code = `MODULE RightModuleExample
         PROC main()
           ! Fill this string with a RAPID module for the right arm.
         ENDPROC
-      ENDMODULE`
+ENDMODULE`
       
       /* Submitting the code for the left arm */
       window.chrome.webview.postMessage('T_ROB_L');
@@ -86,6 +86,7 @@
       /* Submitting the code for the right arm */
       window.chrome.webview.postMessage('T_ROB_R');
       window.chrome.webview.postMessage(right_arm_code);
+    };
   </script>
   <!-- Bootstrap -->
   <script src="bootstrap/jquery.min.js"></script>
