@@ -7,12 +7,16 @@ html {
     height: 480px;
 }
 
-#execute-button {
-    border-radius: 2px;
-    width: 150px;
-    margin: 10px;
+#workspace-identifier {
+    color: black;
+    font-weight: bold;
+    font-size: 25px;
 }
 
-#execute-button-icon {
-    width: 15px;
+#execute-button {
+    border-radius: 7px;
+    padding-top: 2px;
+    font-size: 25px;
+    width: 200px;
+    margin: 15px;
 }

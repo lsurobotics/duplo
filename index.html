@@ -14,9 +14,11 @@
   <div class="container-fluid">
     <div class="row" id="workspace">
       <div class="col-6">
+        <span id="workspace-identifier">ʟᴇғᴛ ᴀʀᴍ</span>
         <div id="left-workspace"><!-- Blockly will use this div --></div>
       </div>
       <div class="col-6">
+        <span id="workspace-identifier">ʀɪɢʜᴛ ᴀʀᴍ</span>
         <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
@@ -24,16 +26,7 @@
     <div class="row text-center" id="buttons">
       <div class="col">
         <!-- Execute button -->
-        <div class="btn-group">
-          <button id="execute-button" type="button" class="btn btn-success dropdown-toggle" 
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Execute
-          </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Left Arm</a>
-            <a class="dropdown-item" href="#">Right Arm</a>
-          </div>
-        </div>
+        <button id="execute-button" type="button" class="btn btn-success">ᴇxᴇᴄᴜᴛᴇ</button>
       </div>
     </div>
   </div>
@@ -68,23 +61,30 @@
       <block type="controls_repeat"></block>
     </category>
     <category name="Logic" colour="#9f32cf">
+        <block type="tbd"></block>
     </category>
     <category name="Signals" colour="#00c4de">
+        <block type="tbd"></block>
     </category>
     <category name="Procedures" colour="#ffa600">
+        <block type="tbd"></block>
     </category>
   </xml>
   
   <!-- Javascript -->
   <script>
-    document.getElementById('save-button').onclick = function() {
-      console.log('Submitting code to WebView...')
-      var rapid_code = `MODULE MainModule
-        PROC main()
-          ! Houston, this is a test.
-        ENDPROC
-      ENDMODULE`
-      window.chrome.webview.postMessage(rapid_code);
+    document.getElementById('execute-button').onclick = function() {
+      console.log('Submitting code to application...')
+      var left_arm_code = 'Fill this string with RAPID code for the left arm'
+      var right_arm_code = 'Fill this string with RAPID code for the right arm'
+      /* Submiting the code of the left arm */
+      window.chrome.webview.postMessage('T_ROB_L');
+      window.chrome.webview.postMessage(left_arm_code);
+      /* Submiting the code of the right arm */
+      window.chrome.webview.postMessage('T_ROB_R');
+      window.chrome.webview.postMessage(left_arm_code);
+      /* Ask the application to execute the code */
+      window.chrome.webview.postMessage('EXECUTE');
     };
   </script>
   <!-- Bootstrap -->

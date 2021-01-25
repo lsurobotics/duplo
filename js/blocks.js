@@ -7,7 +7,7 @@ Blockly.defineBlocksWithJsonArray([
     // Start
     {
         "type": "custom_start",
-        "message0": "When execute button is pressed, robot does this:",
+        "message0": "When ᴇxᴇᴄᴜᴛᴇ is pressed, arm does this:",
         "nextStatement": null,
         "colour": 110,
         "tooltip": "",
@@ -97,6 +97,16 @@ Blockly.defineBlocksWithJsonArray([
         "previousStatement": null,
         "nextStatement": null,
         "colour": 40,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    // To be determined
+    {
+        "type": "tbd",
+        "message0": "To be determined",
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 300,
         "tooltip": "",
         "helpUrl": ""
     }
