@@ -75,15 +75,13 @@
   <script>
     document.getElementById('execute-button').onclick = function() {
       console.log('Submitting code to application...')
-      var left_arm_code = `
-      MODULE MainModule
+      var left_arm_code = `MODULE LeftModuleExample
       	PROC main()
       		! Fill this string with a RAPID module for the left arm.
 	      ENDPROC
       ENDMODULE`
-      
-      var right_arm_code = `
-      MODULE MainModule
+
+      var right_arm_code = `MODULE RightModuleExample
       	PROC main()
       		! Fill this string with a RAPID module for the right arm.
 	      ENDPROC
