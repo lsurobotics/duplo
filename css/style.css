@@ -1,42 +1,18 @@
 html {
     background-color: #d1d1d1;
-    font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-#workspace-header {
-    background-color: #f1f1f1;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    color: black;
+    font-family: sans-serif;
 }
 
 #left-workspace, #right-workspace {
     height: 480px;
 }
 
-#save-button {
-    color: white;
-    width: 120px;
-    background-color: rgb(50, 132, 179);
-}
-
-#save-button-dropdown {
-    color: white;
-    background-color: #1b639e;
-}
-
 #execute-button {
-    color: white;
-    width: 120px;
-    background-color: rgb(50, 179, 82);
+    border-radius: 2px;
+    width: 150px;
+    margin: 10px;
 }
 
-#execute-button-dropdown {
-    color: white;
-    background-color: #1b9e31;
-}
-
-.dropdown-toggle::after {
-    display: none;
+#execute-button-icon {
+    width: 15px;
 }

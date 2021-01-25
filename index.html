@@ -2,61 +2,43 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Program two-armed robots</title>
+  <title>Duplo</title>
   <!-- CSS -->
   <!-- Bootstrap -->
   <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
-  <!-- Source -->
+  <!-- Duplo CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <!-- HTML elements -->
   <div class="container-fluid">
-    <div class="row text-center" id="workspace-header">
-      <div class="col-6">
-        <div>Left Arm</div>
-      </div>
-      <div class="col-6">
-        <div >Right Arm</div>  
-      </div>
-    </div>
     <div class="row" id="workspace">
       <div class="col-6">
-        <div id="left-workspace"></div>
+        <div id="left-workspace"><!-- Blockly will use this div --></div>
       </div>
       <div class="col-6">
-        <div id="right-workspace"></div>
+        <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
-    <br>
-    <div class="row" id="compile">
-      <div class="col-12 text-center">
-        <div class="btn-group">
-          <button type="button" id="save-button" class="btn btn-lg">Save</button>
-          <button type="button" id="save-button-dropdown" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Saving Options</span>
-            <img src="https://github.com/vcuse/robots/blob/master/img/save.png?raw=true" height="30">
-          </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Preferences</a>
-          </div>
-        </div>
 
+    <div class="row text-center" id="buttons">
+      <div class="col">
+        <!-- Execute button -->
         <div class="btn-group">
-          <button type="button" id="execute-button" class="btn btn-lg">Execute</button>
-          <button type="button" id="execute-button-dropdown" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Execution Options</span>
-            <img src="https://github.com/vcuse/robots/blob/master/img/hand.png?raw=true" height="30">
+          <button id="execute-button" type="button" class="btn btn-success dropdown-toggle" 
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Execute
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Preferences</a>
+            <a class="dropdown-item" href="#">Left Arm</a>
+            <a class="dropdown-item" href="#">Right Arm</a>
           </div>
         </div>
       </div>
     </div>
-    </div>
-    <br>
   </div>
+
+  <!-- Blockly -->
   <!-- Starting configuration -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="workspaceBlocks" style="display: none">
     <block type="custom_start" id="START" x="38" y="38"></block>
@@ -64,7 +46,7 @@
   
   <!-- Toolbox - Only the close finger block will double mirror -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-    <category name="Move" colour="#968e4f">
+    <category name="Move" colour="#DB4437">
       <block type="custom_move">
         <mutation type="null"></mutation>
       </block>
@@ -75,20 +57,25 @@
         <mutation type="& Mirror on other side"></mutation>
       </block>
     </category>
-    <category name="Grip" colour="#5b67a5">
+    <category name="Finger" colour="#4285F4">
       <block type="custom_open"></block>
       <block type="custom_close"></block>
     </category>
-    <category name="Synchronize" colour="#8c8c8c">
+    <category name="Synchrony" colour="#F4B400">
       <block type="custom_wait"></block>
     </category>
-    <sep></sep>
-    <!-- <category name="Functions" colour="#8f5ea1" custom="PROCEDURE"></category> -->
-    <category name="Loops" colour="#5ba55b">
+    <category name="Loops" colour="#0F9D58">
       <block type="controls_repeat"></block>
+    </category>
+    <category name="Logic" colour="#9f32cf">
+    </category>
+    <category name="Signals" colour="#00c4de">
+    </category>
+    <category name="Procedures" colour="#ffa600">
     </category>
   </xml>
   
+  <!-- Javascript -->
   <script>
     document.getElementById('save-button').onclick = function() {
       console.log('Submitting code to WebView...')
@@ -100,8 +87,6 @@
       window.chrome.webview.postMessage(rapid_code);
     };
   </script>
-  
-  <!-- Javascript -->
   <!-- Bootstrap -->
   <script src="bootstrap/jquery.min.js"></script>
   <script src="bootstrap/bootstrap.bundle.min.js"></script>
@@ -109,7 +94,7 @@
   <script src="blockly/blockly_compressed.js"></script>
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
-  <!-- Source -->
+  <!-- Duplo Code -->
   <script src="js/blocks.js"></script>
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
