@@ -26,14 +26,16 @@
  * @param {string} blockId The ID of the block in whose stack you will search for split stacks.
  * @param {boolean} fromLeft Workspace of above block.
  * @param {boolean} joining Whether you are connecting (`true`) or disconnecting (`false`) any split stacks found.
+ * @param {string} opt_otherBlockId In the special case that the higher pair of mirrored blocks needs to connect split stacks within its inputs
+ *                                  and both have blocks in those inputs, `blockId` and `opt_otherBlockId` should refer to the blocks in those inputs.
  */
-function setupSplitStacks(blockId, fromLeft, joining) {
+function setupSplitStacks(blockId, fromLeft, joining, opt_otherBlockId) {
   // The blocks on your side & the other side are identified by these indices.
   const your = 0;
   const other = 1;
 
   //find top mirroring otherBlock
-  var block = [workspace(fromLeft).getBlockById(blockId), workspace(!fromLeft).getBlockById(blockId)];
+  var block = [workspace(fromLeft).getBlockById(blockId), workspace(!fromLeft).getBlockById(opt_otherBlockId ? opt_otherBlockId : blockId)];
   if (!block[your]) return;
   while(!block[other] && block[your].getNextBlock()) {
     block[your] = block[your].getNextBlock();
@@ -70,8 +72,8 @@ function setupSplitStacks(blockId, fromLeft, joining) {
     }
 
     //internal split stacks
-    if (block[your].getInputTargetBlock(input.name)) setupSplitStacks(block[your].getInputTargetBlock(input.name).id, fromLeft, joining);
-    if (block[other].getInputTargetBlock(input.name)) setupSplitStacks(block[other].getInputTargetBlock(input.name).id, !fromLeft, joining);
+    if (block[your].getInputTargetBlock(input.name)) setupSplitStacks(block[your].getInputTargetBlock(input.name).id, fromLeft, joining, block[other].getInputTargetBlock(input.name)?.id);
+    if (block[other].getInputTargetBlock(input.name)) setupSplitStacks(block[other].getInputTargetBlock(input.name).id, !fromLeft, joining, block[your].getInputTargetBlock(input.name)?.id);
   });
 
   blockId = block[your].id;
