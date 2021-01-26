@@ -1,4 +1,4 @@
-# Duplo :mechanical_arm:	
+# Duplo :mechanical_arm:
 A prototype of a programming language for two-armed robots.
 
 ## :card_index_dividers:	Files
@@ -32,6 +32,8 @@ For the desktop application, you will need to know C#, the ABB PC SDK and Window
 ##  Building your local workspace
 First, download our repository using Git or use the "Code ↓" button at the top of this page to download it as a ZIP file. The website is static, so you don't need to install anything to make it work, just open the index.html file and have fun. To execute the code of our desktop application, open the VCUProject.sln that is inside the app/ folder using Visual Studio (not Visual Studio Code!), and let Visual Studio build your local workspace. If you are not familiar with Visual Studio, please take a look at the ["Getting Started"](https://developercenter.robotstudio.com/api/pcsdk/articles/Introduction/GettingStarted.html) section of ABB PC SDK website, and build a sample project on your computer to get a better comprehesion of it.
 
-
-## :speech_balloon:	Slack
-https://vcuse.slack.com/
+## :speech_balloon:	Get in touch with the community
+If you need our help or are interested in being part of our community, do not hesitate to send us a message:
+- Discord: https://discord.gg/qcPey2jp2M
+- Felipe Fronchetti: fronchettl@vcu.edu
+- David Shepherd: shepherdd@vcu.edu
