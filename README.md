@@ -1,9 +1,9 @@
 # Duplo :mechanical_arm:
 A prototype of a programming language for two-armed robots.
 
-<center>
+<p align="center">
 <img src="https://i.imgur.com/vgvoQ4d.gif" alt="alt text" width="600" height="350">
-</center>
+</p>
 
 
 ## :card_index_dividers:	Files
