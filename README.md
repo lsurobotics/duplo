@@ -30,7 +30,7 @@ For the website, make sure you are familiar with [Javascript](https://www.javasc
 For the desktop application, you will need to know C#, the ABB PC SDK and Windows Presentation Foundation (WPF). The [tutorials](https://docs.microsoft.com/en-us/visualstudio/designers/getting-started-with-wpf) provided by Microsoft for WPF development are awesome, and may be useful for you if you don't know how it works. If you are not familiar with the ABB PC SDK, start by reading their [manual](https://developercenter.robotstudio.com/api/pcsdk/) and watching the [videos](https://www.youtube.com/watch?v=8CZxQxSb5lk) provided by ABB employees on YouTube.
 
 ##  Building your local workspace
-First, download our repository using Git or use the "Code ↓" button at the top of this page to download it as a ZIP file. The website is static, so you don't need to install anything to make it work, just open the index.html file and have fun. To execute the code of our desktop application, open the VCUProject.sln inside the app/ folder using Visual Studio (not Visual Studio Code!). 
+First, download our repository using Git or use the "Code ↓" button at the top of this page to download it as a ZIP file. The website is static, so you don't need to install anything to make it work, just open the index.html file and have fun. To execute the code of our desktop application, open the VCUProject.sln inside the app/ folder using Visual Studio (not Visual Studio Code!). If you are not familiar with Visual Studio, please take a look at the ["Getting Started"](https://developercenter.robotstudio.com/api/pcsdk/articles/Introduction/GettingStarted.html) section of ABB PC SDK reference.
 
 
 ## :speech_balloon:	Slack
