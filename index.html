@@ -96,7 +96,7 @@
       console.log('Submitting code to application...')
       var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDMODULE";
 
-      var right_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDMODULE";
+      var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDMODULE";
       console.log("Left Arm:\n" + left_arm_code);
       console.log("Right Arm:\n" + right_arm_code);
       /* Submitting the code for the left arm */
