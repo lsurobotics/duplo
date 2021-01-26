@@ -13,7 +13,7 @@ A prototype of a programming language for two-armed robots.
 
 ## :nut_and_bolt: Dealing with the code
 
-### Project Structure
+### Structure
 
 Our project is divided in two parts: 
 
@@ -26,6 +26,8 @@ The second part of our project is our desktop application, written in Windows Pr
 ### Technologies
 
 For the website, make sure you are familiar with [Javascript](https://www.javascript.com/) and [Blockly](https://developers.google.com/blockly). We use Blockly not only to create the programming environment but also to translate the Blockly components to RAPID code (i.e. YuMi's programming language). If you are not familiar with RAPID code, start by taking a look at its [manual](https://library.e.abb.com/public/b227fcd260204c4dbeb8a58f8002fe64/Rapid_instructions.pdf?x-sign=f79v/883X1nHGc8fqH+WAJ2F30y/M6TZfYUuPuQpP+jeMBygouyGg+WSj8A9Otry) provided by ABB.
+
+For the desktop application, you will need to know C#, the ABB PC SDK and Windows Presentation Foundation (WPF). The [tutorials](https://docs.microsoft.com/en-us/visualstudio/designers/getting-started-with-wpf) provided by Microsoft for WPF development are awesome, and may be useful for you if you don't know how it works. If you are not familiar with the ABB PC SDK, start by reading their [manual](https://developercenter.robotstudio.com/api/pcsdk/) and watching the [videos](https://www.youtube.com/watch?v=8CZxQxSb5lk) provided by ABB employees on YouTube.
 
 ##  Building your local workspace
 
