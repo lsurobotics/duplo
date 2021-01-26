@@ -34,13 +34,8 @@ namespace VCUProject
         {
             string messageFromWeb = args.TryGetWebMessageAsString();
 
-            /* The may request the application to start program execution */
-            if (messageFromWeb == "EXECUTE")
-            {
-                StartProgramExecution();
-            }
             /* The webView may request the application to update the current robot task */
-            else if (messageFromWeb == "T_ROB_L" || messageFromWeb == "T_ROB_R")
+            if (messageFromWeb == "T_ROB_L" || messageFromWeb == "T_ROB_R")
             {
                 armTask = _controller.Rapid.GetTask(messageFromWeb);
             }
@@ -70,11 +65,11 @@ namespace VCUProject
             }
             catch (IOException ex)
             {
-                MessageBox.Show("Error while writing module file to computer: " + ex.ToString());
+                MessageBox.Show("Error while saving module: " + ex.ToString());
             }
             catch (ObjectDisposedException ex)
             {
-                MessageBox.Show("Error while writing module file to computer: " + ex.ToString());
+                MessageBox.Show("Error while saving module: " + ex.ToString());
             }
         }
 
@@ -102,6 +97,48 @@ namespace VCUProject
             {
                 MessageBox.Show("Unexpected error: " + ex.Message);
             }
+        }
+
+        private void StartRapidExecution(object sender, RoutedEventArgs e)
+        {
+            VirtualPanel panel = VirtualPanel.Attach(_controller);
+
+            try
+            {
+                panel.ChangeMode(ControllerOperatingMode.Auto, 5000);
+            }
+            catch (ABB.Robotics.TimeoutException)
+            {
+                MessageBox.Show("Connection timeout. Start the program again.");
+            }
+
+            panel.Dispose();
+
+            try
+            {
+                using (Mastership mastership = Mastership.Request(_controller))
+                {
+                    UserAuthorizationSystem uas = _controller.AuthenticationSystem;
+
+                    if (uas.CheckDemandGrant(Grant.ExecuteRapid))
+                    {
+                        StartResult result = _controller.Rapid.Start();
+                    }
+                }
+            }
+            catch (InvalidCastException ex)
+            {
+                MessageBox.Show("Mastership is held by another client: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unexpected error: " + ex.Message);
+            }
+        }
+
+        private void StopRapidExecution(object sender, RoutedEventArgs e)
+        {
+            _controller.Rapid.Stop();
         }
     }
 }

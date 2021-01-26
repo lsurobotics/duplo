@@ -7,18 +7,34 @@
       xmlns:local="clr-namespace:VCUProject"
       mc:Ignorable="d" 
       d:DesignHeight="480" d:DesignWidth="1280"
-      Title="DUPLO - Programming Page">
+      Title="Programming">
 
-    <Grid Background="#d1d1d1">
+    <Grid Background="#cccccc">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="10*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <wv2:WebView2 Name = "webView" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Source = "https://vcuse.github.io/duplo/"/>
+
+        <wv2:WebView2 Name = "webView" Grid.Row="1" Grid.ColumnSpan="2" Source="https://vcuse.github.io/duplo/"/>
+
+        <TextBox Grid.Row="0" Grid.Column="0" Text="Program Name" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" Margin="15, 0, 0, 0" Background="{x:Null}" BorderBrush="{x:Null}"></TextBox>
+
+        <Grid Grid.Row="0" Grid.Column="1" Width="300" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" Width="100" FontSize="20" FontWeight="Medium" Content="START" BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Click="StartRapidExecution"></Button>
+            <Button Grid.Row="0" Grid.Column="1" Width="100" FontSize="20" FontWeight="Medium" Content="STOP" BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Click="StopRapidExecution"></Button>
+            <Button Grid.Row="0" Grid.Column="2" Width="100" FontSize="20" FontWeight="Medium" Content="RETURN" BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}"></Button>
+        </Grid>
     </Grid>
 </Page>

@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:VCUProject"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
-      Title="DUPLO - Connection Page">
+      Title="Connection">
     
     <Grid Background="#e8e8e8">
         <Grid.RowDefinitions>
@@ -34,7 +34,7 @@
                 <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
             <Image Source="bigger-logo.png" Grid.Row="0" Grid.Column="1"></Image>
-            <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="Please, connect to your controller" FontFamily="Microsoft YaHei" FontSize="16" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="Please, connect your controller:" FontFamily="Microsoft YaHei" FontSize="16" FontWeight="Bold"/>
             <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="Address:" FontFamily="Microsoft YaHei" FontSize="16"/>
             <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="Authentication:" FontFamily="Microsoft YaHei" FontSize="16"/>
             <TextBox Grid.Row="3" Grid.Column="1" Name="AddressBox" Background="#f5f5f5" Text="127.0.0.1" FontSize="16" Height="30" BorderThickness="1.5" BorderBrush="Black" FontFamily="Microsoft YaHei"/>
