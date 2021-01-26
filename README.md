@@ -13,9 +13,10 @@ A prototype of a programming language for two-armed robots.
 
 ## Technologies
 Our project is divided in two parts: 
-The first part is our website (https://vcuse.github.io/duplo/), written in Javascript using the Blockly client-side library. Our website provides all the necessary functionalities of our programming language, including the programming workspace, components and compiler.
 
-The second part is our desktop application, written in a Windows Presentation Foundation (WPF) format and which uses a webview to render our website. Our desktop application uses the ABB PC SDK to communicate with the YuMi's controller, and is responsible for uploading code to the robot. 
+The first part is our [website](https://vcuse.github.io/duplo/), written in Javascript and using the Blockly client-side library, our website provides all the necessary functionalities of our programming language, including the programming workspace, components and compiler.
+
+The second part of our project is our desktop application, written in Windows Presentation Foundation (WPF), it uses a webview to render our website (i.e. programming language). Our desktop application also uses the [ABB PC SDK](https://developercenter.robotstudio.com/api/pcsdk/) to communicate with the YuMi's controller, and is responsible for uploading code to the robot. 
 
 ## :speech_balloon:	Slack
 https://vcuse.slack.com/
