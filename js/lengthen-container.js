@@ -24,21 +24,28 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
       // Add the heights of each side's blocks
       var firstInputs = [inputInSplitStack(this.block_, "DO"), inputInSplitStack(otherBlock, "DO")];
       [your, other].forEach(index => {
+        const other2 = index == 0 ? 1 : 0; //opposite of index
+
         var block = firstInputs[index];
         //no input -> just min height
         if (!block) return;
         //connected directly to loop -> add normal height
         if (block.getParent()) height[index] = block.getHeightWidth().height;
-        //split stack at top -> add normal height + extra visual space gap above
-        else {
-          //or more specifically... normal height - (distance to highest mirror block on this side) + (distance to top on other side)
-          //                      = normal height - (normal height - highest mirror block height) + (other side height - matching mirror block height)
-          //                      = highest mirror block height - matching mirror block height + other side height
+        //split stack that only connects at top -> add normal height + extra visual space gap above
+        if (!block.getParent() || (firstInputs[other2] && !isMirroringStack(block) && isMirroringStack(firstInputs[other2]))) {
           var highestMirror = block;
+          //in the special case that there is a split stack but it only connects with the loop block, find the highest mirror on the other side...
+          if (!isMirroringStack(block) && isMirroringStack(firstInputs[other2])) highestMirror = firstInputs[other2];
           do {
             if (getMirror(highestMirror)) break;
             else highestMirror = highestMirror.getNextBlock();
           } while (highestMirror);
+          //... then come back to this side.
+          if (!isMirroringStack(block) && isMirroringStack(firstInputs[other2])) highestMirror = getMirror(highestMirror);
+
+          //or more specifically... normal height - (distance to highest mirror block on this side) + (distance to top on other side)
+          //                      = normal height - (normal height - highest mirror block height) + (other side height - matching mirror block height)
+          //                      = highest mirror block height - matching mirror block height + other side height
           height[index] = highestMirror.getHeightWidth().height - getMirror(highestMirror).getHeightWidth().height + firstInputs[(index+1)%2].getHeightWidth().height;
         }
       });

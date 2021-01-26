@@ -147,6 +147,18 @@ function lastConnectionInSplitStack(topBlock) {
 }
 
 
+/**
+ * Returns whether or not the stack beginning with `topBlock` contains any mirrored blocks.
+ */
+function isMirroringStack(topBlock) {
+  do {
+    if (getMirror(topBlock)) return true;
+    topBlock = topBlock.getNextBlock();
+  } while (topBlock);
+  return false;
+}
+
+
 
 
 // Adjustments to functions
