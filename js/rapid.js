@@ -28,10 +28,10 @@ Blockly.Rapid.ORDER_NONE = 99;            // (...)
 
 Blockly.Rapid.init = function(workspace) {
   this.INDENT = "    ";
-  Blockly.Rapid.toolName = typeof window.coblox !== "undefined" ? window.coblox.getToolName() : "default_tool";
-  Blockly.Rapid.wobjName = typeof window.coblox !== "undefined" ? window.coblox.getWobjName() : "default_wobj";
-  Blockly.Rapid.namePrefix = typeof window.coblox !== "undefined" ? window.coblox.getNamePrefix() : "";
-  Blockly.Rapid.robotModel = typeof window.coblox !== "undefined" ? window.coblox.getRobotModelSync() : "";
+  Blockly.Rapid.toolName = "default_tool";
+  Blockly.Rapid.wobjName = "default_wobj";
+  Blockly.Rapid.namePrefix = "";
+  Blockly.Rapid.robotModel = "";
 
   //A dictionary of definitions to be printed before the code
   Blockly.Rapid.definitions_ = Object.create(null);
@@ -57,7 +57,9 @@ Blockly.Rapid.init = function(workspace) {
   
   // Add user variables, but only ones that are being used.
   var variables = Blockly.Variables.allUsedVarModels(workspace);
-  for (var i = 0; i < variables.length; i++) {
+  // Now custom variables for now
+
+  /*for (var i = 0; i < variables.length; i++) {
     if (variables[i].type === Blockly.Locations.VARIABLE_TYPE) {
       //don't include Locations in the variable declaration block.
       //these will be handled by the Coblox app
@@ -70,6 +72,7 @@ Blockly.Rapid.init = function(workspace) {
   }
 
   Blockly.Rapid.definitions_['variables'] = defvars.join('\n');
+  */
 }
 
 Blockly.Rapid.finish = function(code) {
@@ -87,13 +90,9 @@ Blockly.Rapid.finish = function(code) {
 }
 
 Blockly.Rapid.scrub_ = function(block, code) {
-  if (block.type != "run") {
-    // The run block generates the code for any attached statements itself.
-    // For any other block types we do it here.
-    var nextBlock = nextInSplitStack(block);
-    var nextCode = Blockly.Rapid.blockToCode(nextBlock);
-    code += nextCode;
-  }
+  var nextBlock = nextInSplitStack(block);
+  var nextCode = Blockly.Rapid.blockToCode(nextBlock);
+  code += nextCode;
   return code;
 }
 
@@ -110,13 +109,40 @@ Blockly.Rapid.scrubNakedValue = function(line) {
 }
 
 /**
- * Translates the given location name into a version that will be used in the
- * RAPID code on the robot controller.
+ * Translates the given name into a version that can be used RAPID.
  * 
- * The purpose of this is to avoid name collisions between code modules.
- * @param {string} locName The location name to translate.
- * @return {string} A name for the location to use in RAPID.
+ * The purpose of this is to avoid name collisions between code modules
+ * and to ensure that names don't contain characters forbidden in RAPID.
+ * @param {string} locName The name to translate.
+ * @return {string} A version of the name to use in RAPID.
  */
-Blockly.Rapid.makeRapidName = function(locName) {
-  return Blockly.Rapid.namePrefix + locName;
+Blockly.Rapid.makeRapidName = function(name) {
+  var sanitizedName = name.split('?').join('-');
+  sanitizedName = sanitizedName.split(';').join('-');
+  sanitizedName = sanitizedName.split('{').join('-');
+  sanitizedName = sanitizedName.split('}').join('-');
+  sanitizedName = sanitizedName.split(',').join('-');
+  sanitizedName = sanitizedName.split('.').join('-');
+  sanitizedName = sanitizedName.split('!').join('-');
+  sanitizedName = sanitizedName.split('[').join('-');
+  sanitizedName = sanitizedName.split(']').join('-');
+  sanitizedName = sanitizedName.split('$').join('-');
+  sanitizedName = sanitizedName.split('+').join('-');
+  sanitizedName = sanitizedName.split('(').join('-');
+  sanitizedName = sanitizedName.split(')').join('-');
+  sanitizedName = sanitizedName.split('`').join('-');
+  sanitizedName = sanitizedName.split('&').join('-');
+  sanitizedName = sanitizedName.split('=').join('-');
+  sanitizedName = sanitizedName.split('%').join('-');
+  sanitizedName = sanitizedName.split('#').join('-');
+  sanitizedName = sanitizedName.split('@').join('-');
+  sanitizedName = sanitizedName.split('/').join('-');
+  sanitizedName = sanitizedName.split('\\').join('-');
+  sanitizedName = sanitizedName.split('*').join('-');
+  sanitizedName = sanitizedName.split(':').join('-');
+  sanitizedName = sanitizedName.split('^').join('-');
+  sanitizedName = sanitizedName.split('~').join('-');
+
+
+  return "var" + sanitizedName + "v";
 }

@@ -9,7 +9,7 @@ goog.require('Blockly.constants');
 
 
 Blockly.Rapid['custom_wait'] = function (block) {
-  var syncident = "VAR syncident sync" + block.id + ";\n";
-  var sync = "WaitSyncTask sync" + block.id + ", task_list;\n";
+  var syncident = "VAR syncident sync" + Blockly.Rapid.makeRapidName(block.id) + ";\n";
+  var sync = "WaitSyncTask sync" + Blockly.Rapid.makeRapidName(block.id) + ", task_list;\n";
   return syncident + sync;
 };

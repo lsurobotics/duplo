@@ -24,6 +24,8 @@
     </div>
     <div class="row text-center">
       <div class="col">
+                <button id="execute-button" type="button" class="btn btn-success">ᴇxᴇᴄᴜᴛᴇ</button>
+
         <p>Made with <span style="color: #f0ad4e; font-size: 20px;">&hearts;</span> by 
           <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
       </div>
@@ -61,35 +63,11 @@
     </category>
   </xml>
   
-  <!-- Javascript -->
-  <script>
-    document.getElementById('execute-button').onclick = function() {
-      console.log('Submitting code to application...')
-      var left_arm_code = `MODULE LeftModuleExample
-        PROC main()
-          ! Fill this string with a RAPID module for the left arm.
-        ENDPROC
-ENDMODULE`
-
-      var right_arm_code = `MODULE RightModuleExample
-        PROC main()
-          ! Fill this string with a RAPID module for the right arm.
-        ENDPROC
-ENDMODULE`
-      
-      /* Submitting the code for the left arm */
-      window.chrome.webview.postMessage('T_ROB_L');
-      window.chrome.webview.postMessage(left_arm_code);
-      /* Submitting the code for the right arm */
-      window.chrome.webview.postMessage('T_ROB_R');
-      window.chrome.webview.postMessage(right_arm_code);
-    };
-  </script>
   <!-- Bootstrap -->
   <script src="bootstrap/jquery.min.js"></script>
   <script src="bootstrap/bootstrap.bundle.min.js"></script>
   <!-- Blockly -->
-  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/blockly_uncompressed.js"></script>
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
   <!-- Duplo Code -->
@@ -100,5 +78,34 @@ ENDMODULE`
   <script src="js/lengthen-container.js"></script>
   <script src="js/split-stacks.js"></script>
   <script src="js/index.js"></script>
+  <script src="js/rapid.js"></script>
+  <!-- RAPID Code Generation -->
+  <script src="js/rapid/logic.js"></script>
+  <script src="js/rapid/loops.js"></script>
+  <script src="js/rapid/math.js"></script>
+  <script src="js/rapid/procedures.js"></script>
+  <script src="js/rapid/robotArm.js"></script>
+  <script src="js/rapid/robotHand.js"></script>
+  <script src="js/rapid/run.js"></script>
+  <script src="js/rapid/sync.js"></script>
+  <script src="js/rapid/variables.js"></script>
+
+  <!-- Javascript -->
+  <script>
+    document.getElementById('execute-button').onclick = function() {
+      console.log('Submitting code to application...')
+      var left_arm_code = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));
+
+      var right_arm_code = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));
+      console.log("Left Arm:\n" + left_arm_code);
+      console.log("Right Arm:\n" + right_arm_code);
+      /* Submitting the code for the left arm */
+      window.chrome.webview.postMessage('T_ROB_L');
+      window.chrome.webview.postMessage(left_arm_code);
+      /* Submitting the code for the right arm */
+      window.chrome.webview.postMessage('T_ROB_R');
+      window.chrome.webview.postMessage(right_arm_code);
+    };
+  </script>
 </body>
 </html>
