@@ -100,16 +100,6 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
-    // To be determined
-    {
-        "type": "tbd",
-        "message0": "To be determined",
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 300,
-        "tooltip": "",
-        "helpUrl": ""
-    }
 ]);
 
 
