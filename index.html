@@ -94,9 +94,9 @@
   <script>
     document.getElementById('execute-button').onclick = function() {
       console.log('Submitting code to application...')
-      var left_arm_code = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));
+      var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDMODULE";
 
-      var right_arm_code = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));
+      var right_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDMODULE";
       console.log("Left Arm:\n" + left_arm_code);
       console.log("Right Arm:\n" + right_arm_code);
       /* Submitting the code for the left arm */
