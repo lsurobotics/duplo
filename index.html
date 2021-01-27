@@ -92,11 +92,28 @@
 
   <!-- Javascript -->
   <script>
+    var abovePickLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Above Pick Left').id_);
+    var abovePickRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Above Pick Right').id_);
+    var pickLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Pick Left').id_);
+    var pickRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Pick Right').id_);
+    var abovePlaceLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Above Place Left').id_);
+    var abovePlaceRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Above Place Right').id_);
+    var placeLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Place Left').id_);
+    var placeRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Place Right').id_);
     document.getElementById('execute-button').onclick = function() {
       console.log('Submitting code to application...')
       var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
       var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+      left_arm_code = left_arm_code.replaceAll(abovePickLeft, "abovePickLeft");
+      left_arm_code = left_arm_code.replaceAll(pickLeft, "pickLeft");
+      left_arm_code = left_arm_code.replaceAll(abovePlaceLeft, "abovePlaceLeft");
+      left_arm_code = left_arm_code.replaceAll(placeLeft, "placeLeft");
+      right_arm_code = right_arm_code.replaceAll(abovePickRight, "abovePickRight");
+      right_arm_code = right_arm_code.replaceAll(pickRight, "pickRight");
+      right_arm_code = right_arm_code.replaceAll(abovePlaceRight, "abovePlaceRight");
+      right_arm_code = right_arm_code.replaceAll(placeRight, "placeRight");
+
       console.log("Left Arm:\n" + left_arm_code);
       console.log("Right Arm:\n" + right_arm_code);
       /* Submitting the code for the left arm */
