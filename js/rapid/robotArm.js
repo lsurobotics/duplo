@@ -24,7 +24,7 @@ Blockly.Rapid['continue'] = function (block) {
 
 Blockly.Rapid['custom_move'] = function (block) {
   var move_speed = block.getFieldValue('SPEED');
-  var inst = "ID:" + Blockly.Rapid.makeRapidName(block.id) + " MoveJ";
+  var inst = "MoveJ";
   var speed = "v100";
   switch (move_speed) {
     case "QUICK":

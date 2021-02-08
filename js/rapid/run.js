@@ -9,5 +9,5 @@ Blockly.Rapid['custom_start'] = function (block) {
     // However, the function's statements are siblings of the block, rather than children.
     // The scrub_ method in the generator needs an exception for this block, or else the sibling
     // blocks will be included twice.
-    return "ID:" + block.id + " PROC main()\n";
+    return "PROC main()\n";
 };

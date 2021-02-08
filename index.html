@@ -107,6 +107,7 @@
     executionButton.onclick = function() {
       if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);
+      
       if (executionButton.value == "start-execution") {
         /* The next action will be to stop the execution,
          so we need to update the button */

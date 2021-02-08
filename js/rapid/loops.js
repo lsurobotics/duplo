@@ -12,7 +12,7 @@ Blockly.Rapid['controls_repeat_ext'] = function(block) {
   branch = Blockly.Rapid.addLoopTrap(branch, block.id);
   var loopVar = Blockly.Rapid.variableDB_.getDistinctName(
       'count', Blockly.Variables.NAME_TYPE);
-  var code = "ID:" + Blockly.Rapid.makeRapidName(block.id) + " FOR " + loopVar + " FROM 1 TO " + times + " DO\n";
+  var code = "FOR " + loopVar + " FROM 1 TO " + times + " DO\n";
   code += branch;
   code += "ENDFOR\n";
   return code;

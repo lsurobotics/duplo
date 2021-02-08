@@ -4,9 +4,7 @@
 'use strict';
 
 goog.provide('Blockly.Rapid.variables');
-
 goog.require('Blockly.Rapid');
-
 
 Blockly.Rapid['variables_get'] = function(block) {
   // Variable getter.
