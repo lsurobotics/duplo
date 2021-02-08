@@ -105,15 +105,15 @@
     var executionButton = document.getElementById('execution-button');
 
     executionButton.onclick = function() {
-      if (!Blockly.Rapid.isInitialized)
-        Blockly.Rapid.init(leftWorkspace);
-      
       if (executionButton.value == "start-execution") {
         /* The next action will be to stop the execution,
          so we need to update the button */
         executionButton.value = "stop-execution";
         $("#execution-button").removeClass("btn-success").addClass("btn-danger");
         $("#execution-button").text("sᴛᴏᴘ");
+
+        if (!Blockly.Rapid.isInitialized)
+          Blockly.Rapid.init(leftWorkspace);
 
         /* Prepare the "body" of the module */
         var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
@@ -128,12 +128,14 @@
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
         window.chrome.webview.postMessage(left_arm_code);
+        console.log(left_arm_code);
 
         /* Right Arm: Replace the blocks with RAPID */
         right_arm_code = right_arm_code.replaceAll(abovePickRight, "abovePickRight");
         right_arm_code = right_arm_code.replaceAll(pickRight, "pickRight");
         right_arm_code = right_arm_code.replaceAll(abovePlaceRight, "abovePlaceRight");
         right_arm_code = right_arm_code.replaceAll(placeRight, "placeRight");
+        console.log(right_arm_code);
 
         /* Submit the code for the right arm */
         window.chrome.webview.postMessage('T_ROB_R');
