@@ -27,6 +27,7 @@ Blockly.Rapid.ORDER_NONE = 99;            // (...)
 // TODO: add order overrides, if any
 
 Blockly.Rapid.init = function(workspace) {
+  this.isInitialized = true;
   this.INDENT = "    ";
   Blockly.Rapid.toolName = "default_tool";
   Blockly.Rapid.wobjName = "default_wobj";
@@ -35,7 +36,6 @@ Blockly.Rapid.init = function(workspace) {
 
   //A dictionary of definitions to be printed before the code
   Blockly.Rapid.definitions_ = Object.create(null);
-
   //initialize variable database
   if (!Blockly.Rapid.variableDB_) {
     Blockly.Rapid.variableDB_ = 

@@ -6,13 +6,13 @@ goog.require('Blockly.Rapid');
 
 Blockly.Rapid['controls_repeat_ext'] = function(block) {
   // Repeat X times block
-  var times = Blockly.Rapid.valueToCode(block, 'TIMES', Blockly.Rapid.ORDER_NONE) || '0';
+  var times = block.getFieldValue('TIMES') || '0';
   times = parseInt(times);
   var branch = Blockly.Rapid.statementToCode(block, 'DO');
   branch = Blockly.Rapid.addLoopTrap(branch, block.id);
   var loopVar = Blockly.Rapid.variableDB_.getDistinctName(
       'count', Blockly.Variables.NAME_TYPE);
-  var code = "ID:" + block.id + " FOR " + loopVar + " FROM 1 TO " + times + " DO\n";
+  var code = "ID:" + Blockly.Rapid.makeRapidName(block.id) + " FOR " + loopVar + " FROM 1 TO " + times + " DO\n";
   code += branch;
   code += "ENDFOR\n";
   return code;
@@ -20,7 +20,7 @@ Blockly.Rapid['controls_repeat_ext'] = function(block) {
 
 Blockly.Rapid['controls_repeat'] = Blockly.Rapid['controls_repeat_ext'];
 
-Blockly.Rapid['controls_whileUntil'] = function(block) {
+/*Blockly.Rapid['controls_whileUntil'] = function(block) {
   // Do while/until loop.
   var until = block.getFieldValue('MODE') == 'UNTIL';
   var argument0 = Blockly.Rapid.valueToCode(block, 'BOOL',
@@ -54,5 +54,5 @@ Blockly.Rapid['controls_for'] = function(block) {
   code += branch;
   code += "ENDFOR\n";
   return code;
-};
+};*/
 
