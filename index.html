@@ -24,9 +24,11 @@
     </div>
     <div class="row text-center">
       <div class="col">
-                <button id="execute-button" type="button" class="btn btn-success">ᴇxᴇᴄᴜᴛᴇ</button>
+        <!-- Execution button -->
+        <button id="execution-button" value="start-execution" type="button" class="btn btn-success">sᴛᴀʀᴛ</button>
+        <!-- VCU -->
         <p>Made with <span style="color: #f0ad4e; font-size: 20px;">&hearts;</span> by 
-          <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
+        <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
       </div>
     </div>
   </div>
@@ -100,27 +102,48 @@
     var placeLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Place Left').id_);
     var placeRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Place Right').id_);
 
-    document.getElementById('execute-button').onclick = function() {
-      console.log('Submitting code to application...')
-      var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
-      var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
-      left_arm_code = left_arm_code.replaceAll(abovePickLeft, "abovePickLeft");
-      left_arm_code = left_arm_code.replaceAll(pickLeft, "pickLeft");
-      left_arm_code = left_arm_code.replaceAll(abovePlaceLeft, "abovePlaceLeft");
-      left_arm_code = left_arm_code.replaceAll(placeLeft, "placeLeft");
-      right_arm_code = right_arm_code.replaceAll(abovePickRight, "abovePickRight");
-      right_arm_code = right_arm_code.replaceAll(pickRight, "pickRight");
-      right_arm_code = right_arm_code.replaceAll(abovePlaceRight, "abovePlaceRight");
-      right_arm_code = right_arm_code.replaceAll(placeRight, "placeRight");
+    var executionButton = document.getElementById('execution-button');
 
-      console.log("Left Arm:\n" + left_arm_code);
-      console.log("Right Arm:\n" + right_arm_code);
-      /* Submitting the code for the left arm */
-      window.chrome.webview.postMessage('T_ROB_L');
-      window.chrome.webview.postMessage(left_arm_code);
-      /* Submitting the code for the right arm */
-      window.chrome.webview.postMessage('T_ROB_R');
-      window.chrome.webview.postMessage(right_arm_code);
+    executionButton.onclick = function() {
+      if (executionButton.value == "start-execution") {
+        /* The next action will be to stop the execution,
+         so we need to update the button */
+        executionButton.value = "stop-execution";
+        $("#execution-button").removeClass("btn-success").addClass("btn-danger");
+        $("#execution-button").text("sᴛᴏᴘ");
+
+        /* Prepare the "body" of the module */
+        var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+
+        /* Left Arm: Replace the blocks with RAPID */
+        left_arm_code = left_arm_code.replaceAll(abovePickLeft, "abovePickLeft");
+        left_arm_code = left_arm_code.replaceAll(pickLeft, "pickLeft");
+        left_arm_code = left_arm_code.replaceAll(abovePlaceLeft, "abovePlaceLeft");
+        left_arm_code = left_arm_code.replaceAll(placeLeft, "placeLeft");
+
+        /* Submit the code for the left arm */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(left_arm_code);
+
+        /* Right Arm: Replace the blocks with RAPID */
+        right_arm_code = right_arm_code.replaceAll(abovePickRight, "abovePickRight");
+        right_arm_code = right_arm_code.replaceAll(pickRight, "pickRight");
+        right_arm_code = right_arm_code.replaceAll(abovePlaceRight, "abovePlaceRight");
+        right_arm_code = right_arm_code.replaceAll(placeRight, "placeRight");
+
+        /* Submit the code for the right arm */
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(right_arm_code);
+
+        /* Start execution */
+        window.chrome.webview.postMessage('START_EXEC');
+      } else {
+        window.chrome.webview.postMessage('STOP_EXEC');
+        executionButton.value = "start-execution";
+        $("#execution-button").removeClass("btn-danger").addClass("btn-success");
+        $("#execution-button").text("sᴛᴀʀᴛ");        
+      }
     };
   </script>
 </body>
