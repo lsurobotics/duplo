@@ -24,8 +24,7 @@
     </div>
     <div class="row text-center">
       <div class="col">
-                <button id="execute-button" type="button" class="btn btn-success" style="display: none;">ᴇxᴇᴄᴜᴛᴇ</button>
-
+                <button id="execute-button" type="button" class="btn btn-success">ᴇxᴇᴄᴜᴛᴇ</button>
         <p>Made with <span style="color: #f0ad4e; font-size: 20px;">&hearts;</span> by 
           <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
       </div>
@@ -100,10 +99,10 @@
     var abovePlaceRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Above Place Right').id_);
     var placeLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Place Left').id_);
     var placeRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Place Right').id_);
+
     document.getElementById('execute-button').onclick = function() {
       console.log('Submitting code to application...')
       var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
-
       var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
       left_arm_code = left_arm_code.replaceAll(abovePickLeft, "abovePickLeft");
       left_arm_code = left_arm_code.replaceAll(pickLeft, "pickLeft");
