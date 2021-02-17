@@ -75,6 +75,7 @@
   <script src="js/blocks.js"></script>
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
+  <script src="js/robtarget.js"></script>
   <script src="js/resolve.js"></script>
   <script src="js/lengthen-container.js"></script>
   <script src="js/split-stacks.js"></script>
@@ -92,16 +93,7 @@
   <script src="js/rapid/variables.js"></script>
 
   <!-- Javascript -->
-  <script>
-    var abovePickLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Above Pick Left').id_);
-    var abovePickRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Above Pick Right').id_);
-    var pickLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Pick Left').id_);
-    var pickRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Pick Right').id_);
-    var abovePlaceLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Above Place Left').id_);
-    var abovePlaceRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Above Place Right').id_);
-    var placeLeft = Blockly.Rapid.makeRapidName(leftWorkspace.createVariable('Place Left').id_);
-    var placeRight = Blockly.Rapid.makeRapidName(rightWorkspace.createVariable('Place Right').id_);
-
+  <script>    
     var executionButton = document.getElementById('execution-button');
 
     executionButton.onclick = function() {
@@ -112,39 +104,37 @@
         $("#execution-button").removeClass("btn-success").addClass("btn-danger");
         $("#execution-button").text("sᴛᴏᴘ");
 
-        if (!Blockly.Rapid.isInitialized)
-          Blockly.Rapid.init(leftWorkspace);
-
+        //if (!Blockly.Rapid.isInitialized)
+        Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
+        var leftTargets = "";
+        //pulls the robtargets for the left arm out
+        for (const [key, value] of Object.entries(leftArmRobTargets)) {
+          leftTargets += `PERS robtarget ${key}:=${value};\n`;
+        }
         /* Prepare the "body" of the module */
-        var left_arm_code = "MODULE LeftModule\n" + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
-        var right_arm_code = "MODULE RightModule\n" + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var left_arm_code = "MODULE LeftModule\n" + leftTargets + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
-        /* Left Arm: Replace the blocks with RAPID */
-        left_arm_code = left_arm_code.replaceAll(abovePickLeft, "abovePickLeft");
-        left_arm_code = left_arm_code.replaceAll(pickLeft, "pickLeft");
-        left_arm_code = left_arm_code.replaceAll(abovePlaceLeft, "abovePlaceLeft");
-        left_arm_code = left_arm_code.replaceAll(placeLeft, "placeLeft");
+        //have to initialize both workspaces(this one was not being initialized)
+        Blockly.Rapid.init(rightWorkspace);
+        var rightTargets = "";
+        //pulls the robtargets for the right arm out
+        for (const [key, value] of Object.entries(rightArmRobTargets)) {
+          rightTargets += `PERS robtarget ${key}:=${value};\n`;
+        }
+        var right_arm_code = "MODULE RightModule\n" + rightTargets + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
         window.chrome.webview.postMessage(left_arm_code);
-        console.log(left_arm_code);
-
-        /* Right Arm: Replace the blocks with RAPID */
-        right_arm_code = right_arm_code.replaceAll(abovePickRight, "abovePickRight");
-        right_arm_code = right_arm_code.replaceAll(pickRight, "pickRight");
-        right_arm_code = right_arm_code.replaceAll(abovePlaceRight, "abovePlaceRight");
-        right_arm_code = right_arm_code.replaceAll(placeRight, "placeRight");
-        console.log(right_arm_code);
-
+        
         /* Submit the code for the right arm */
         window.chrome.webview.postMessage('T_ROB_R');
         window.chrome.webview.postMessage(right_arm_code);
 
         /* Start execution */
-        window.chrome.webview.postMessage('START_EXEC');
+        //window.chrome.webview.postMessage('START_EXEC');
       } else {
-        window.chrome.webview.postMessage('STOP_EXEC');
+        //window.chrome.webview.postMessage('STOP_EXEC');
         executionButton.value = "start-execution";
         $("#execution-button").removeClass("btn-danger").addClass("btn-success");
         $("#execution-button").text("sᴛᴀʀᴛ");        
