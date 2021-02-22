@@ -38,3 +38,5 @@ leftWorkspace.addChangeListener(mirrorEvent);
 rightWorkspace.addChangeListener(mirrorEvent);
 leftWorkspace.addChangeListener(listenForDragging);
 rightWorkspace.addChangeListener(listenForDragging);
+leftWorkspace.addChangeListener(listenForVariable); //listener for variable changes
+rightWorkspace.addChangeListener(listenForVariable); //listener for variable changes

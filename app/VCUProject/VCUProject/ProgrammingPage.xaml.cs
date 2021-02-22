@@ -1,6 +1,7 @@
 ﻿using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.RapidDomain;
+using ABB.Robotics.Controllers.MotionDomain;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
@@ -52,7 +53,7 @@ namespace VCUProject
         }
 
         private void PrepareCodeForSubmission(string rapidCode)
-        {
+        {            
             try
             {
                 string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -81,11 +82,11 @@ namespace VCUProject
             {
                 using (Mastership mastership = Mastership.Request(_controller))
                 {
-                    UserAuthorizationSystem uas = _controller.AuthenticationSystem;
+                    UserAuthorizationSystem uas = _controller.AuthenticationSystem;                    
 
                     if (uas.CheckDemandGrant(Grant.LoadRapidProgram))
                     {
-                        loadingSuccessful = armTask.LoadModuleFromFile(programPath, RapidLoadMode.Replace);
+                        loadingSuccessful = armTask.LoadModuleFromFile(programPath, RapidLoadMode.Replace);   
                     }
                 }
             }
@@ -138,7 +139,37 @@ namespace VCUProject
 
         private void StopRapidExecution(object sender, RoutedEventArgs e)
         {
-            _controller.Rapid.Stop();
+            _controller.Rapid.Stop();         
+        }
+
+        //gets positions of arms on click of ARMS button from Duplo
+        private void GetArmPositions(object sender, RoutedEventArgs e)
+        {
+            RobTarget RightArmRobTarget;
+            RobTarget LeftArmRobTarget;
+            string leftArmMessage = "";
+            string rightArmMessage = "";
+
+            MechanicalUnitCollection aMechUnitCollection = _controller.MotionSystem.MechanicalUnits;    //get array of all mechanical units
+
+            //get robot target position of left and right arms
+            foreach (MechanicalUnit m in aMechUnitCollection)
+            {
+                switch (m.Name)
+                {
+                    case "ROB_R":
+                        RightArmRobTarget = m.GetPosition(CoordinateSystemType.World);  //get current right arm position as a robtarget
+                        rightArmMessage = "ROB_R:" + RightArmRobTarget.ToString();
+                        break;
+
+                    case "ROB_L":
+                        LeftArmRobTarget = m.GetPosition(CoordinateSystemType.World);   //get left arm position as a robtarget
+                        leftArmMessage = "ROB_L:" + LeftArmRobTarget.ToString();
+                        break;
+                }
+            }
+
+            webView.CoreWebView2.PostWebMessageAsString(rightArmMessage + "\n" + leftArmMessage);   //send arm positions to webview upon request
         }
     }
 }

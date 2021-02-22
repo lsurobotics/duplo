@@ -143,6 +143,5 @@ Blockly.Rapid.makeRapidName = function(name) {
   sanitizedName = sanitizedName.split('^').join('-');
   sanitizedName = sanitizedName.split('~').join('-');
 
-
-  return "var" + sanitizedName + "v";
+  return "var " + sanitizedName + "v";
 }

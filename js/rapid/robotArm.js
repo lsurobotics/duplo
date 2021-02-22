@@ -28,10 +28,10 @@ Blockly.Rapid['custom_move'] = function (block) {
   var speed = "v100";
   switch (move_speed) {
     case "QUICK":
-      speed = "v700";
+      speed = "v1000";
       break;
     case "MODERATE":
-      speed = "v300";
+      speed = "v500";
       break;
     case "SLOW":
       speed = "v100";
@@ -39,8 +39,10 @@ Blockly.Rapid['custom_move'] = function (block) {
     default:
       break;
   }
-  var target = Blockly.Rapid.makeRapidName(block.getFieldValue('LOCATION'));
+  //var target = Blockly.Rapid.makeRapidName(block.getFieldValue('LOCATION'));
+  var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
+
   //var tool = Blockly.Rapid.toolName;
-  var code = inst + ' ' + target + ', ' + speed + ', fine, tGripper' + ';\n';
+  var code = inst + ' ' + target + ', ' + speed + ', fine, tool0' + ';\n';
   return code;
 };
