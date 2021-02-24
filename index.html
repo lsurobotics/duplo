@@ -132,9 +132,9 @@
         window.chrome.webview.postMessage(right_arm_code);
 
         /* Start execution */
-        //window.chrome.webview.postMessage('START_EXEC');
+        window.chrome.webview.postMessage('START_EXEC');
       } else {
-        //window.chrome.webview.postMessage('STOP_EXEC');
+        window.chrome.webview.postMessage('STOP_EXEC');
         executionButton.value = "start-execution";
         $("#execution-button").removeClass("btn-danger").addClass("btn-success");
         $("#execution-button").text("sᴛᴀʀᴛ");        
