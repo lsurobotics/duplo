@@ -121,14 +121,16 @@
         for (const [key, value] of Object.entries(rightArmRobTargets)) {
           rightTargets += `PERS robtarget ${key}:=${value};\n`;
         }
-        var right_arm_code = "MODULE RightModule\n" + rightTargets + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var right_arm_code = "MODULE MainModule\n" + rightTargets + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
+        console.log(left_arm_code);
         window.chrome.webview.postMessage(left_arm_code);
         
         /* Submit the code for the right arm */
         window.chrome.webview.postMessage('T_ROB_R');
+        console.log(right_arm_code);
         window.chrome.webview.postMessage(right_arm_code);
 
         /* Start execution */
