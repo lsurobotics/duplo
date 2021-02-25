@@ -125,10 +125,12 @@
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
+        console.log(left_arm_code);
         window.chrome.webview.postMessage(left_arm_code);
         
         /* Submit the code for the right arm */
         window.chrome.webview.postMessage('T_ROB_R');
+        console.log(right_arm_code);
         window.chrome.webview.postMessage(right_arm_code);
 
         /* Start execution */
