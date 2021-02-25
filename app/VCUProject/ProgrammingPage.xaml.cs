@@ -61,6 +61,10 @@ namespace VCUProject
             {
                 _controller.Rapid.Stop();
             }
+            else if (messageFromWeb == "UPDATE_ARM_POSITION")
+            {
+                GetArmPositions();
+            }
             /* If the message received is T_ROB_L or T_ROB_R, update the robot task */
             else if (messageFromWeb == "T_ROB_L" || messageFromWeb == "T_ROB_R")
             {
@@ -304,7 +308,7 @@ namespace VCUProject
         }
 
         //gets positions of arms on click of ARMS button from Duplo
-        private void GetArmPositions(object sender, RoutedEventArgs e)
+        private void GetArmPositions()
         {
             RobTarget RightArmRobTarget;
             RobTarget LeftArmRobTarget;
@@ -312,6 +316,7 @@ namespace VCUProject
             string rightArmMessage = "";
 
             MechanicalUnitCollection aMechUnitCollection = _controller.MotionSystem.MechanicalUnits;    //get array of all mechanical units
+            
 
             //get robot target position of left and right arms
             foreach (MechanicalUnit m in aMechUnitCollection)
