@@ -37,7 +37,7 @@
             <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="Please, connect your controller:" FontFamily="Microsoft YaHei" FontSize="16" FontWeight="Bold"/>
             <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="Address:" FontFamily="Microsoft YaHei" FontSize="16"/>
             <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="Authentication:" FontFamily="Microsoft YaHei" FontSize="16"/>
-            <TextBox Grid.Row="3" Grid.Column="1" Name="AddressBox" Background="#f5f5f5" Text="127.0.0.1" FontSize="16" Height="30" BorderThickness="1.5" BorderBrush="Black" FontFamily="Microsoft YaHei"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Name="AddressBox" Background="#f5f5f5" Text="192.168.125.1" FontSize="16" Height="30" BorderThickness="1.5" BorderBrush="Black" FontFamily="Microsoft YaHei"/>
             <TextBox Grid.Row="5" Grid.Column="1"  Name="UsernameBox" Background="#f5f5f5" Text="Default User" FontSize="16" Height="30" BorderThickness="1.5" BorderBrush="Black" FontFamily="Microsoft YaHei"/>
             <PasswordBox Grid.Row="6" Grid.Column="1" Name="PasswordBox" Background="#f5f5f5" Password="robotics" FontSize="16" Height="30" BorderThickness="1.5" BorderBrush="Black" FontFamily="Microsoft YaHei"/>
             <Button Grid.Row="7" Grid.Column="1" Content="Connect" Height="40" Width="150" Background="Black" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14" Click="ConnectToController"/>

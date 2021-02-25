@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VCUProject"
         mc:Ignorable="d"
-        Title="Duplo" Height="720" Width="1280" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="logo.png">
+        Title="Duplo" Width="800" Height="600" WindowState="Maximized" WindowStartupLocation="CenterScreen" Icon="logo.png">
 
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
