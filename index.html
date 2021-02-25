@@ -112,7 +112,7 @@
           leftTargets += `PERS robtarget ${key}:=${value};\n`;
         }
         /* Prepare the "body" of the module */
-        var left_arm_code = "MODULE LeftModule\n" + leftTargets + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var left_arm_code = "MODULE MainModule\n" + leftTargets + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
         //have to initialize both workspaces(this one was not being initialized)
         Blockly.Rapid.init(rightWorkspace);
@@ -132,9 +132,9 @@
         window.chrome.webview.postMessage(right_arm_code);
 
         /* Start execution */
-        //window.chrome.webview.postMessage('START_EXEC');
+        window.chrome.webview.postMessage('START_EXEC');
       } else {
-        //window.chrome.webview.postMessage('STOP_EXEC');
+        window.chrome.webview.postMessage('STOP_EXEC');
         executionButton.value = "start-execution";
         $("#execution-button").removeClass("btn-danger").addClass("btn-success");
         $("#execution-button").text("sᴛᴀʀᴛ");        
