@@ -32,7 +32,8 @@ function variableRenameEvent_(event) {
     else if (event.workspaceId == rightWorkspace.id) rightArmVariableRenamed = true; //true if triggered from the right workspace
     
     newVariableName = event.newName;  //so get position function knows which variable to put target to
-    alert("Move arm to desired position. Press ok on this message. Then press ARMS button.");
+    alert("Please move the arm to the desired position.");
+    window.chrome.webview.postMessage('UPDATE_ARM_POSITION');
   }
 
   //register listener for message from host app and pass event to handler
