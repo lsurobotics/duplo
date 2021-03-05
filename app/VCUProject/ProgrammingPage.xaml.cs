@@ -61,9 +61,9 @@ namespace VCUProject
             {
                 _controller.Rapid.Stop();
             }
-            else if (messageFromWeb == "UPDATE_ARM_POSITION")
+            else if (messageFromWeb == "UPDATE_LEFT_ARM_POSITION" || messageFromWeb == "UPDATE_RIGHT_ARM_POSITION")
             {
-                GetArmPositions();
+                GetArmPositions(messageFromWeb);
             }
             /* If the message received is T_ROB_L or T_ROB_R, update the robot task */
             else if (messageFromWeb == "T_ROB_L" || messageFromWeb == "T_ROB_R")
@@ -308,34 +308,43 @@ namespace VCUProject
         }
 
         //gets positions of arms on click of ARMS button from Duplo
-        private void GetArmPositions()
+        private void GetArmPositions(string messageFromWeb)
         {
-            RobTarget RightArmRobTarget;
-            RobTarget LeftArmRobTarget;
-            string leftArmMessage = "";
-            string rightArmMessage = "";
+            RobTarget armRobTarget;
+            Task task;
+            string messageToWeb = "";
 
-            MechanicalUnitCollection aMechUnitCollection = _controller.MotionSystem.MechanicalUnits;    //get array of all mechanical units
-            
-
-            //get robot target position of left and right arms
-            foreach (MechanicalUnit m in aMechUnitCollection)
+            switch (messageFromWeb)
             {
-                switch (m.Name)
-                {
-                    case "ROB_R":
-                        RightArmRobTarget = m.GetPosition(CoordinateSystemType.World);  //get current right arm position as a robtarget
-                        rightArmMessage = "ROB_R:" + RightArmRobTarget.ToString();
-                        break;
+                case "UPDATE_LEFT_ARM_POSITION":
+                    try
+                    {
+                        task = _controller.Rapid.GetTask("T_ROB_L");
+                        armRobTarget = task.GetRobTarget();
+                        messageToWeb = armRobTarget.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Exception while getting left arm target:: " + ex.Message);
+                    }
+                    break;
 
-                    case "ROB_L":
-                        LeftArmRobTarget = m.GetPosition(CoordinateSystemType.World);   //get left arm position as a robtarget
-                        leftArmMessage = "ROB_L:" + LeftArmRobTarget.ToString();
-                        break;
-                }
+                case "UPDATE_RIGHT_ARM_POSITION":
+                    try
+                    {
+                        task = _controller.Rapid.GetTask("T_ROB_R");
+                        armRobTarget = task.GetRobTarget();
+                        messageToWeb = armRobTarget.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Exception while getting right arm target:: " + ex.Message);
+                    }
+                    break;
+
             }
-
-            webView.CoreWebView2.PostWebMessageAsString(rightArmMessage + "\n" + leftArmMessage);   //send arm positions to webview upon request
+            
+            webView.CoreWebView2.PostWebMessageAsString(messageToWeb);   //send arm positions to webview upon request
         }
     }
 }
