@@ -39,7 +39,7 @@ Blockly.defineBlocksWithJsonArray([
             {
                 "type": "field_variable",
                 "name": "LOCATION",
-                "variable": "[location]"
+                "variable": "<somewhere>"
             }
         ],
         "inputsInline": false,
