@@ -43,6 +43,6 @@ Blockly.Rapid['custom_move'] = function (block) {
   var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
 
   //var tool = Blockly.Rapid.toolName;
-  var code = inst + ' ' + target + ', ' + speed + ', fine, tool0' + ';\n';
+  var code = inst + ' ' + target + ', ' + speed + ', fine, Servo' + ';\n';
   return code;
 };

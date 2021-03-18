@@ -104,6 +104,9 @@
         $("#execution-button").removeClass("btn-success").addClass("btn-danger");
         $("#execution-button").text("sᴛᴏᴘ");
 
+        //definition for the servo gripper on the YUMI
+        const ServoGripper = "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+
         //if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
         var leftTargets = "";
@@ -112,7 +115,7 @@
           leftTargets += `PERS robtarget ${key}:=${value};\n`;
         }
         /* Prepare the "body" of the module */
-        var left_arm_code = "MODULE MainModule\n" + leftTargets + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var left_arm_code = "MODULE MainModule\n" + leftTargets + ServoGripper + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
         //have to initialize both workspaces(this one was not being initialized)
         Blockly.Rapid.init(rightWorkspace);
@@ -121,7 +124,7 @@
         for (const [key, value] of Object.entries(rightArmRobTargets)) {
           rightTargets += `PERS robtarget ${key}:=${value};\n`;
         }
-        var right_arm_code = "MODULE MainModule\n" + rightTargets + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var right_arm_code = "MODULE MainModule\n" + rightTargets + ServoGripper + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
