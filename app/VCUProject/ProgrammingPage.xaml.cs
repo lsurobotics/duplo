@@ -54,12 +54,12 @@ namespace VCUProject
             /* If the message received is START_EXEC, start controller execution */
             if (messageFromWeb == "START_EXEC")
             {
-                _controller.Rapid.Start();
+                StartRapidExecution();
             }
             /* If the message received is STOP_EXEC, stop controller execution */
             else if (messageFromWeb == "STOP_EXEC")
             {
-                _controller.Rapid.Stop();
+                _controller.Rapid.Stop(StopMode.Instruction);
             }
             else if (messageFromWeb == "UPDATE_LEFT_ARM_POSITION" || messageFromWeb == "UPDATE_RIGHT_ARM_POSITION")
             {
@@ -255,7 +255,7 @@ namespace VCUProject
                             }
 
                             _controller.FileSystem.PutFile(moduleLocalFilepath, moduleRemoteFilepath);
-                            armTask.LoadModuleFromFile(FileSystemPath.Combine(_controller.FileSystem.RemoteDirectory, moduleRemoteFilepath), RapidLoadMode.Replace);
+                            armTask.LoadModuleFromFile(FileSystemPath.Combine(_controller.FileSystem.RemoteDirectory, moduleRemoteFilepath), RapidLoadMode.Replace);                            
                         }
                     }
                 }
@@ -270,8 +270,10 @@ namespace VCUProject
             }
         }
 
-        private void StartRapidExecution(object sender, RoutedEventArgs e)
+        private void StartRapidExecution()
         {
+            string[] taskNames = { "T_ROB_L", "T_ROB_R" }; 
+
             VirtualPanel panel = VirtualPanel.Attach(_controller);
 
             try
@@ -293,7 +295,15 @@ namespace VCUProject
 
                     if (uas.CheckDemandGrant(Grant.ExecuteRapid))
                     {
+                        foreach (string task in taskNames)
+                        {
+                            armTask = _controller.Rapid.GetTask(task);  //get each task
+                            armTask.ResetProgramPointer();  //reset program pointer of task to main
+                        }
+                        
                         StartResult result = _controller.Rapid.Start();
+                        if(result.ToString() != "Ok")
+                            MessageBox.Show("Start Failed: " + result.ToString());
                     }
                 }
             }
@@ -307,6 +317,7 @@ namespace VCUProject
             }
         }
 
+       
         //gets positions of arms on click of ARMS button from Duplo
         private void GetArmPositions(string messageFromWeb)
         {
