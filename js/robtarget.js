@@ -15,7 +15,7 @@ function listenForVariable(event) {
  
 /**
  * Called on DELETE event
- * Delete event does not get triggered if user renames a variable
+ * TO DO: Delete event does not get triggered if user renames a variable
  * This causes old robtargets and positions to not get deleted out of
  * RobTargets object. A simple fix probably.
  */

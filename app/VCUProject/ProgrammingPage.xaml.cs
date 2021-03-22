@@ -272,20 +272,20 @@ namespace VCUProject
 
         private void StartRapidExecution()
         {
-            string[] taskNames = { "T_ROB_L", "T_ROB_R" }; 
+            string[] taskNames = { "T_ROB_L", "T_ROB_R" };
+            //MessageBox.Show("Start Failed: ");
+            //VirtualPanel panel = VirtualPanel.Attach(_controller);
 
-            VirtualPanel panel = VirtualPanel.Attach(_controller);
+            //try
+            //{
+            //    panel.ChangeMode(ControllerOperatingMode.Auto, 5000);
+            //}
+            //catch (ABB.Robotics.TimeoutException)
+            //{
+            //    MessageBox.Show("Connection timeout. Start the program again.");
+            //}
 
-            try
-            {
-                panel.ChangeMode(ControllerOperatingMode.Auto, 5000);
-            }
-            catch (ABB.Robotics.TimeoutException)
-            {
-                MessageBox.Show("Connection timeout. Start the program again.");
-            }
-
-            panel.Dispose();
+            //panel.Dispose();
 
             try
             {

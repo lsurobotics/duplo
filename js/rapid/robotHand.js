@@ -8,14 +8,15 @@ goog.require('Blockly.Rapid');
 Blockly.Rapid['custom_open'] = function (block) {
   var code = "";
   //assume robot has YuMi-style gripper
-  code = "g_JogOut;\n";  
+  code = "g_GripOut;\n";
+  code += "g_Stop;\n";  
   return code;
 };
 
 Blockly.Rapid['custom_close'] = function (block) {
   var code = "";
   //assume robot has YuMi-style gripper
-  code = "g_JogIn;\n";
+  code = "g_GripIn;\n";
   return code;
 };
 

@@ -9,5 +9,11 @@ Blockly.Rapid['custom_start'] = function (block) {
     // However, the function's statements are siblings of the block, rather than children.
     // The scrub_ method in the generator needs an exception for this block, or else the sibling
     // blocks will be included twice.
-    return "PROC main()\n";
+
+    var CalibrateGripper = "Var bool isCalibrated := FALSE;\n";
+    CalibrateGripper    += "isCalibrated := g_IsCalibrated();\n";
+    CalibrateGripper    += "IF isCalibrated = FALSE THEN\n";
+    CalibrateGripper    += "  g_Init \\Calibrate;\n";
+    CalibrateGripper    += "ENDIF\n";
+    return "PROC main()\n" + CalibrateGripper;
 };
