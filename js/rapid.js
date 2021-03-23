@@ -117,31 +117,33 @@ Blockly.Rapid.scrubNakedValue = function(line) {
  * @return {string} A version of the name to use in RAPID.
  */
 Blockly.Rapid.makeRapidName = function(name) {
-  var sanitizedName = name.split('?').join('-');
-  sanitizedName = sanitizedName.split(';').join('-');
-  sanitizedName = sanitizedName.split('{').join('-');
-  sanitizedName = sanitizedName.split('}').join('-');
-  sanitizedName = sanitizedName.split(',').join('-');
-  sanitizedName = sanitizedName.split('.').join('-');
-  sanitizedName = sanitizedName.split('!').join('-');
-  sanitizedName = sanitizedName.split('[').join('-');
-  sanitizedName = sanitizedName.split(']').join('-');
-  sanitizedName = sanitizedName.split('$').join('-');
-  sanitizedName = sanitizedName.split('+').join('-');
-  sanitizedName = sanitizedName.split('(').join('-');
-  sanitizedName = sanitizedName.split(')').join('-');
-  sanitizedName = sanitizedName.split('`').join('-');
-  sanitizedName = sanitizedName.split('&').join('-');
-  sanitizedName = sanitizedName.split('=').join('-');
-  sanitizedName = sanitizedName.split('%').join('-');
-  sanitizedName = sanitizedName.split('#').join('-');
-  sanitizedName = sanitizedName.split('@').join('-');
-  sanitizedName = sanitizedName.split('/').join('-');
-  sanitizedName = sanitizedName.split('\\').join('-');
-  sanitizedName = sanitizedName.split('*').join('-');
-  sanitizedName = sanitizedName.split(':').join('-');
-  sanitizedName = sanitizedName.split('^').join('-');
-  sanitizedName = sanitizedName.split('~').join('-');
+  var sanitizedName = name.split('?').join('_');
+  sanitizedName = sanitizedName.split(';').join('_');
+  sanitizedName = sanitizedName.split('{').join('_');
+  sanitizedName = sanitizedName.split('}').join('_');
+  sanitizedName = sanitizedName.split(',').join('_');
+  sanitizedName = sanitizedName.split('.').join('_');
+  sanitizedName = sanitizedName.split('!').join('_');
+  sanitizedName = sanitizedName.split('[').join('_');
+  sanitizedName = sanitizedName.split(']').join('_');
+  sanitizedName = sanitizedName.split('$').join('_');
+  sanitizedName = sanitizedName.split('+').join('_');
+  sanitizedName = sanitizedName.split('(').join('_');
+  sanitizedName = sanitizedName.split(')').join('_');
+  sanitizedName = sanitizedName.split('`').join('_');
+  sanitizedName = sanitizedName.split('&').join('_');
+  sanitizedName = sanitizedName.split('=').join('_');
+  sanitizedName = sanitizedName.split('%').join('_');
+  sanitizedName = sanitizedName.split('#').join('_');
+  sanitizedName = sanitizedName.split('@').join('_');
+  sanitizedName = sanitizedName.split('/').join('_');
+  sanitizedName = sanitizedName.split('\\').join('_');
+  sanitizedName = sanitizedName.split('*').join('_');
+  sanitizedName = sanitizedName.split(':').join('_');
+  sanitizedName = sanitizedName.split('^').join('_');
+  sanitizedName = sanitizedName.split('~').join('_');
+  sanitizedName = sanitizedName.split('-').join('_');
+  sanitizedName = sanitizedName.split('|').join('_');
 
-  return "var " + sanitizedName + "v";
+  return "var" + sanitizedName + "v";
 }
