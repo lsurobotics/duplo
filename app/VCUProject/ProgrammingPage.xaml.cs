@@ -59,7 +59,7 @@ namespace VCUProject
             /* If the message received is STOP_EXEC, stop controller execution */
             else if (messageFromWeb == "STOP_EXEC")
             {
-                _controller.Rapid.Stop(StopMode.Instruction);
+                _controller.Rapid.Stop(StopMode.Immediate);
             }
             else if (messageFromWeb == "UPDATE_LEFT_ARM_POSITION" || messageFromWeb == "UPDATE_RIGHT_ARM_POSITION")
             {
@@ -273,19 +273,6 @@ namespace VCUProject
         private void StartRapidExecution()
         {
             string[] taskNames = { "T_ROB_L", "T_ROB_R" };
-            //MessageBox.Show("Start Failed: ");
-            //VirtualPanel panel = VirtualPanel.Attach(_controller);
-
-            //try
-            //{
-            //    panel.ChangeMode(ControllerOperatingMode.Auto, 5000);
-            //}
-            //catch (ABB.Robotics.TimeoutException)
-            //{
-            //    MessageBox.Show("Connection timeout. Start the program again.");
-            //}
-
-            //panel.Dispose();
 
             try
             {
