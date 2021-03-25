@@ -56,7 +56,7 @@ Blockly.defineBlocksWithJsonArray([
         "message0": "Follow other arm",
         "previousStatement": null,
         "nextStatement": null,
-        "colour": 50,
+        "colour": 40,
         "tooltip": "",
         "helpUrl": ""
     },
@@ -66,7 +66,7 @@ Blockly.defineBlocksWithJsonArray([
         "message0": "Mirror other arm",
         "previousStatement": null,
         "nextStatement": null,
-        "colour": 50,
+        "colour": 40,
         "tooltip": "",
         "helpUrl": ""
     },
@@ -100,6 +100,25 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
+    // Do all instructions together
+    {
+        "type": "custom_sync",
+        "message0": "Do These Moves Together %1 %2",
+        "args0": [
+          {
+            "type": "input_dummy"
+          },
+          {
+            "type": "input_statement",
+            "name": "BEGIN SYNC"
+          }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 40,
+        "tooltip": "",
+        "helpUrl": ""
+      }
 ]);
 
 

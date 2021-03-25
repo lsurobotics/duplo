@@ -15,9 +15,6 @@ function listenForVariable(event) {
  
 /**
  * Called on DELETE event
- * TO DO: Delete event does not get triggered if user renames a variable
- * This causes old robtargets and positions to not get deleted out of
- * RobTargets object. A simple fix probably.
  */
 function variableDeleteEvent_(event) {
     if (event.workspaceId == leftWorkspace.id) delete leftArmRobTargets[event.varName];
@@ -33,10 +30,12 @@ function variableRenameEvent_(event) {
     if (event.workspaceId == leftWorkspace.id){
       leftArmVariableRenamed = true; //true if triggered from the left workspace
       arm = "LEFT";
+      delete leftArmRobTargets[event.oldName];  //delete old variable name from rob targets array
     } 
     else if (event.workspaceId == rightWorkspace.id){
       rightArmVariableRenamed = true; //true if triggered from the right workspace
       arm = "RIGHT";
+      delete rightArmRobTargets[event.oldName];  //delete old variable name from rob targets array
     } 
     
     newVariableName = event.newName;  //so get position function knows which variable to put target to

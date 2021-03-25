@@ -10,7 +10,7 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
   var BASE_HEIGHT = Math.max(this.constants_.TOP_ROW_PRECEDES_STATEMENT_MIN_HEIGHT, this.constants_.MEDIUM_PADDING + this.constants_.FIELD_TEXT_HEIGHT + this.constants_.MEDIUM_PADDING) + this.constants_.STATEMENT_BOTTOM_SPACER + this.constants_.BOTTOM_ROW_AFTER_STATEMENT_MIN_HEIGHT + this.constants_.NOTCH_HEIGHT;
 
   //after the bounds have been computed, add to the end of the function w/ adjustments
-  if (this.block_.type == "controls_repeat") {
+  if (this.block_.type == "controls_repeat" || this.block_.type == "custom_sync") {
     var fromLeft = (this.block_.workspace == leftWorkspace);
     var otherBlock = getMirror(this.block_);
     if (otherBlock && this.inputRows[1]) {
@@ -22,7 +22,9 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
       var height = [this.constants_.MIN_BLOCK_HEIGHT, this.constants_.MIN_BLOCK_HEIGHT];
       
       // Add the heights of each side's blocks
-      var firstInputs = [inputInSplitStack(this.block_, "DO"), inputInSplitStack(otherBlock, "DO")];
+      var firstInputs;
+      if(this.block_.type == "controls_repeat") firstInputs = [inputInSplitStack(this.block_, "DO"), inputInSplitStack(otherBlock, "DO")];
+      else if(this.block_.type == "custom_sync") firstInputs = [inputInSplitStack(this.block_, "BEGIN SYNC"), inputInSplitStack(otherBlock, "BEGIN SYNC")];
       [your, other].forEach(index => {
         const other2 = index == 0 ? 1 : 0; //opposite of index
 
@@ -62,9 +64,6 @@ Blockly.blockRendering.RenderInfo.prototype.computeBounds_ = function() {
       }
     }
   }
-
-
-
 
   // Visual correction for insertion markers of mutating move blocks (originally look too long)
   if (this.block_.type == 'custom_move' && this.isInsertionMarker) this.block_.updateShape_('null');
