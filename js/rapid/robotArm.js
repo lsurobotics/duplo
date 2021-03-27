@@ -47,20 +47,25 @@ Blockly.Rapid['custom_move'] = function (block) {
   /**
    * If the move block is located in the left workspace, this conditional
    * determines if there is a block in the right workspace with its same block.id.
-   * This means that a custom follow block was mirrored to the right workspace.
+   * This means that a custom follow or custom mirror block was mirrored to the right workspace.
    * Therefore a wait sync instruction should be inserted at the top of the code
-   * for custom_follow implementation.
+   * for custom_follow/custom_mirror implementation. This implementation only works if
+   * left arm code is generated BEFORE right arm code in index.html
    */
   var otherBlock = workspace(block.workspace == rightWorkspace).getBlockById(block.id);
   if((block.workspace.id == leftWorkspace.id) && (otherBlock != null)){    
     //I am in the left workspace AND found a mirrored block on right
     //create your wait sync instruction and matching sync variable
-    var syncVariable = "VAR syncident sync" + Blockly.Rapid.makeRapidName(block.id) + ";\n";  //compile all of the sync variables
-    if (Blockly.Rapid.sync.syncArray.indexOf(syncVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncVariable); //only push to syncArray if variable not already there
-    code = "WaitSyncTask sync" + Blockly.Rapid.makeRapidName(block.id) + ", task_list;\n";
+    var blockId = Blockly.Rapid.makeRapidName(block.id);
+    var syncMoveOnVariable = `VAR syncident syncON${blockId};\n`;  //compile all of the sync variables
+    var syncMoveOffVariable = `VAR syncident syncOFF${blockId};\n`;  //compile all of the sync variables
+    if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOnVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOnVariable); //only push to syncArray if variable not already there
+    if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOffVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOffVariable); //only push to syncArray if variable not already there
+    var code = `SyncMoveOn syncON${blockId}, task_list;\n`;
     //create your target instruction
     target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
-    code += `MoveL ${target}, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
+    code += `MoveL ${target}\\ID:=10, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
+    code += `SyncMoveOff syncOFF${blockId};\n`;
     //push shared target name into object so that mirrored custom_follow block on right can find it
     //so that right workspace custom_follow blocks can check their id against the obj keys and get target name and speed
     Blockly.Rapid.robotArm.sharedTargetNames[block.id] = {"target":target, "speed":speed};        
