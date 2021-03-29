@@ -58,6 +58,7 @@
     </category>
     <category name="Synchrony" colour="#F4B400">
       <block type="custom_wait"></block>
+      <block type="custom_sync"></block>
     </category>
     <category name="Loops" colour="#0F9D58">
       <block type="controls_repeat"></block>
@@ -104,24 +105,47 @@
         $("#execution-button").removeClass("btn-success").addClass("btn-danger");
         $("#execution-button").text("sᴛᴏᴘ");
 
+        //definition for the servo gripper on the YUMI
+        const ServoGripper = "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+        //this task list needs to be defined for sync instructions
+        const task_list = "PERS tasks task_list{2} := [ [\"T_ROB_L\"], [\"T_ROB_R\"] ];\n";
+        var leftTargets = "";
+        var rightTargets = "";
+        /**
+         * Pull code together for left arm
+        */
         //if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
-        var leftTargets = "";
-        //pulls the robtargets for the left arm out
+        
+        //pulls the robtargets for the left arm out and add it's targets to the rightArm list
         for (const [key, value] of Object.entries(leftArmRobTargets)) {
           leftTargets += `PERS robtarget ${key}:=${value};\n`;
-        }
+          rightTargets += `PERS robtarget ${key};\n`;
+        }       
+        var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
+        var leftAndRightSyncVars = Blockly.Rapid.sync.syncArray.join(''); //join syncArray variable string definitions together for code insertion (MUST BE DONE AFTER BLOCKS ARE COMPILED)
         /* Prepare the "body" of the module */
-        var left_arm_code = "MODULE MainModule\n" + leftTargets + Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var left_arm_code = "MODULE MainModule\n" + leftTargets + ServoGripper + task_list + leftAndRightSyncVars + leftCode + "ENDPROC\nENDMODULE";
 
+        /**
+         * Pull code together for the right arm
+        */
         //have to initialize both workspaces(this one was not being initialized)
         Blockly.Rapid.init(rightWorkspace);
-        var rightTargets = "";
+        
         //pulls the robtargets for the right arm out
         for (const [key, value] of Object.entries(rightArmRobTargets)) {
           rightTargets += `PERS robtarget ${key}:=${value};\n`;
         }
-        var right_arm_code = "MODULE MainModule\n" + rightTargets + Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START")) + "ENDPROC\nENDMODULE";
+        var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
+        var right_arm_code = "MODULE MainModule\n" + rightTargets + ServoGripper + task_list + leftAndRightSyncVars + rightCode + "ENDPROC\nENDMODULE";
+
+        /**
+         * We have to clear the sync variable array. Because the array gets rebuilt
+         * each time the blocks are recompiled, this ensures that only the blocks within
+         * the current workspace are included.
+        */
+        Blockly.Rapid.sync.syncArray.length = 0;  //clear but keep original array reference
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');

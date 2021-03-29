@@ -12,7 +12,7 @@
  * Array of accepted block types.
  * If a block is only mirrored under certain conditions, it is included here, and the conditions is stated in `isMirrored`.
  */
-const mirroredBlocks = ['custom_wait', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
+const mirroredBlocks = ['custom_wait', 'custom_sync', 'controls_repeat', 'custom_move', 'custom_follow', 'custom_mirror'];
 
 /**
  * Returns whether this block is or should be mirrored.

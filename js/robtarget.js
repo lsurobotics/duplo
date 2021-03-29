@@ -15,9 +15,6 @@ function listenForVariable(event) {
  
 /**
  * Called on DELETE event
- * Delete event does not get triggered if user renames a variable
- * This causes old robtargets and positions to not get deleted out of
- * RobTargets object. A simple fix probably.
  */
 function variableDeleteEvent_(event) {
     if (event.workspaceId == leftWorkspace.id) delete leftArmRobTargets[event.varName];
@@ -28,38 +25,39 @@ function variableDeleteEvent_(event) {
  * Called on RENAME event
  */
 function variableRenameEvent_(event) {
-    if (event.workspaceId == leftWorkspace.id) leftArmVariableRenamed = true; //true if triggered from the left workspace
-    else if (event.workspaceId == rightWorkspace.id) rightArmVariableRenamed = true; //true if triggered from the right workspace
+    var arm = "";
+
+    if (event.workspaceId == leftWorkspace.id){
+      leftArmVariableRenamed = true; //true if triggered from the left workspace
+      arm = "LEFT";
+      delete leftArmRobTargets[event.oldName];  //delete old variable name from rob targets array
+    } 
+    else if (event.workspaceId == rightWorkspace.id){
+      rightArmVariableRenamed = true; //true if triggered from the right workspace
+      arm = "RIGHT";
+      delete rightArmRobTargets[event.oldName];  //delete old variable name from rob targets array
+    } 
     
     newVariableName = event.newName;  //so get position function knows which variable to put target to
-    alert("Please move the arm to the desired position.");
-    window.chrome.webview.postMessage('UPDATE_ARM_POSITION');
+    alert(`Please move ${arm} arm to the desired position.`);
+    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
   }
 
   //register listener for message from host app and pass event to handler
-  //receives a new robtarget for both arms from the host app when the ARMS button is pressed
+  //receives a new robtarget for both arms from the host app when the Ok button is pressed
   window.chrome.webview.addEventListener('message', robTargetsReceivedEvent);
   
   function robTargetsReceivedEvent(event){
-    var leftArmPosition;
-    var rightArmPosition;
-
-    var arms = event.data.split('\n'); //split into left arm and right arm because host sends both arm targets as a string
-    arms.forEach(function(arm) {  //parse out robtarget and assign to correct arm
-      var temp = arm.split(':');
-      if(temp[0]=="ROB_L") leftArmPosition = temp[1];
-      else if(temp[0]=="ROB_R") rightArmPosition = temp[1]; 
-    });
-
-    if(leftArmVariableRenamed){
-      leftArmRobTargets[newVariableName] = leftArmPosition;
-      leftArmVariableRenamed = false;
-    }else if(rightArmVariableRenamed){
-      rightArmRobTargets[newVariableName] = rightArmPosition;
-      rightArmVariableRenamed = false;
+    
+    if(event.data === ""){  //if message received is empty string then an error occurred so delete varName
+      if(leftArmVariableRenamed) delete leftArmRobTargets[newVariableName];        
+      else if(rightArmVariableRenamed) delete rightArmRobTargets[newVariableName];          
+    }else{  //else set robtarget to specified variable name
+      if(leftArmVariableRenamed) leftArmRobTargets[newVariableName] = event.data;        
+      else if(rightArmVariableRenamed) rightArmRobTargets[newVariableName] = event.data;       
     }
-
+    //clear everything
+    leftArmVariableRenamed = false;
+    rightArmVariableRenamed = false;
     newVariableName = "";
-  }
-
-  
+  } 
