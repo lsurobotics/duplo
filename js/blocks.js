@@ -99,26 +99,7 @@ Blockly.defineBlocksWithJsonArray([
         "colour": 40,
         "tooltip": "",
         "helpUrl": ""
-    },
-    // Do all instructions together
-    {
-        "type": "custom_sync",
-        "message0": "Do These Moves Together %1 %2",
-        "args0": [
-          {
-            "type": "input_dummy"
-          },
-          {
-            "type": "input_statement",
-            "name": "BEGIN SYNC"
-          }
-        ],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 40,
-        "tooltip": "",
-        "helpUrl": ""
-      }
+    }
 ]);
 
 

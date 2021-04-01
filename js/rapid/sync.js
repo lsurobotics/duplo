@@ -67,13 +67,3 @@ Blockly.Rapid['custom_follow'] = function(block) {
   delete Blockly.Rapid.robotArm.sharedTargetNames[block.id];  //clean object out
   return code;
 };
-
-
-Blockly.Rapid['custom_sync'] = function(block) {
-  var statements_begin_sync = Blockly.Rapid.statementToCode(block, 'BEGIN SYNC');
-  // TODO: Assemble Rapid into code variable.
-  console.log(statements_begin_sync);
-  console.log(block.getDescendants(true));  //get ordered list of all blocks inside the statement, begins with statement block itself
-  var code = '...;\n';
-  return code;
-};
