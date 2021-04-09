@@ -53,13 +53,15 @@ function transferBlock_(event, fromLeft) {
     widest = Math.max(widest, blocks[i].width);
   }
 
+  var metrics = toWorkspace.getMetrics(); //check if workspace has been scrolled
+
   offsetX = fromLeft ? 0 : -leftWorkspace.getToolbox().width - widest;
   offsetY = -17;
 
   //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
   var xml = Blockly.Xml.blockToDom(blocks[0], true);
-  xml.setAttribute('x', event.offsetX);
-  xml.setAttribute('y', event.offsetY);
+  xml.setAttribute('x', event.offsetX + metrics.viewLeft);  //account for scrolling
+  xml.setAttribute('y', event.offsetY + metrics.viewTop);   //account for scrolling
   xml.setAttribute("id", blocks[0].id);
 
   //paste & start dragging
