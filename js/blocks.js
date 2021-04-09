@@ -99,7 +99,7 @@ Blockly.defineBlocksWithJsonArray([
         "colour": 40,
         "tooltip": "",
         "helpUrl": ""
-    }
+    },
 ]);
 
 

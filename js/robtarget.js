@@ -39,7 +39,14 @@ function variableRenameEvent_(event) {
     } 
     
     newVariableName = event.newName;  //so get position function knows which variable to put target to
-    alert(`Please move ${arm} arm to the desired position.`);
+    $('#position-modal').modal('show');
+    var position_modal_warning = document.getElementById("position-modal-warning");
+    position_modal_warning.innerHTML = `Please move <b>${arm}</b> arm to the desired position.`;
+    var position_modal_close_button = document.getElementById("position-modal-close-button");
+    position_modal_close_button.onclick = function(e) {
+      $('#position-modal').modal('hide');
+    };
+
     window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
   }
 

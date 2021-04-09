@@ -33,6 +33,26 @@
     </div>
   </div>
 
+  <div id="position-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Attention</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span id="position-modal-warning"></span>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="position-modal-close-button" type="button" class="btn btn-success">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
   <!-- Blockly -->
   <!-- Starting configuration -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="workspaceBlocks" style="display: none">
@@ -46,17 +66,17 @@
         <mutation type="null"></mutation>
       </block>
       <block type="custom_move">
-        <mutation type="& Follow on other side"></mutation>
+        <mutation type="and follow on other side"></mutation>
       </block>
       <block type="custom_move">
-        <mutation type="& Mirror on other side"></mutation>
+        <mutation type="and mirror on other side"></mutation>
       </block>
     </category>
     <category name="Finger" colour="#4285F4">
       <block type="custom_open"></block>
       <block type="custom_close"></block>
     </category>
-    <category name="Synchrony" colour="#F4B400">
+    <category name="Synchrony" colour="#ffcd40">
       <block type="custom_wait"></block>
     </category>
     <category name="Loops" colour="#0F9D58">
