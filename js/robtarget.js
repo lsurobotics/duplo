@@ -30,25 +30,44 @@ function variableRenameEvent_(event) {
     if (event.workspaceId == leftWorkspace.id){
       leftArmVariableRenamed = true; //true if triggered from the left workspace
       arm = "LEFT";
-      delete leftArmRobTargets[event.oldName];  //delete old variable name from rob targets array
+      delete leftArmRobTargets[event.oldName];  //delete old variable name from rob targets object
     } 
     else if (event.workspaceId == rightWorkspace.id){
       rightArmVariableRenamed = true; //true if triggered from the right workspace
       arm = "RIGHT";
-      delete rightArmRobTargets[event.oldName];  //delete old variable name from rob targets array
+      delete rightArmRobTargets[event.oldName];  //delete old variable name from rob targets object      
     } 
     
     newVariableName = event.newName;  //so get position function knows which variable to put target to
-    $('#position-modal').modal('show');
+
+    $('#position-modal').modal('show'); //show teach position modal
     var position_modal_warning = document.getElementById("position-modal-warning");
     position_modal_warning.innerHTML = `Please move <b>${arm}</b> arm to the desired position.`;
-    var position_modal_close_button = document.getElementById("position-modal-close-button");
-    position_modal_close_button.onclick = function(e) {
-      $('#position-modal').modal('hide');
-    };
-
-    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
   }
+
+  /**
+   * Event listener for teach position modal cancel button
+   */
+  document.getElementById("position-modal-cancel-button").addEventListener("click", canceledModal);
+  function canceledModal() {
+    //clear everything
+    leftArmVariableRenamed = false;
+    rightArmVariableRenamed = false;
+    newVariableName = "";
+  };
+
+  /**
+   * Event listener for teach position modal confirm teach position button
+   */
+  document.getElementById("position-modal-confirm-button").addEventListener("click", confirmedModal);
+  function confirmedModal() {
+    var arm;
+    if (leftArmVariableRenamed) arm = "LEFT";
+    else if (rightArmVariableRenamed) arm = "RIGHT";     
+    $('#position-modal').modal('hide');
+    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+  };
+
 
   //register listener for message from host app and pass event to handler
   //receives a new robtarget for both arms from the host app when the Ok button is pressed
