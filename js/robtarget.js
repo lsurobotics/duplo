@@ -50,9 +50,18 @@ function variableRenameEvent_(event) {
    */
   document.getElementById("position-modal-cancel-button").addEventListener("click", canceledModal);
   function canceledModal() {
-    //clear everything
-    leftArmVariableRenamed = false;
-    rightArmVariableRenamed = false;
+    var name;
+    //clear everything, delete variable and delete block with variable name not taught
+    if(leftArmVariableRenamed){
+      name = leftWorkspace.getVariable(newVariableName);
+      leftWorkspace.deleteVariableById(name.id_);
+      leftArmVariableRenamed = false;
+    }
+    if(rightArmVariableRenamed){
+      name = rightWorkspace.getVariable(newVariableName);
+      rightWorkspace.deleteVariableById(name.id_);
+      rightArmVariableRenamed = false;
+    }    
     newVariableName = "";
   };
 
