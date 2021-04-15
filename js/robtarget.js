@@ -50,19 +50,11 @@ function variableRenameEvent_(event) {
    */
   document.getElementById("position-modal-cancel-button").addEventListener("click", canceledModal);
   function canceledModal() {
-    var name;
-    //clear everything, delete variable and delete block with variable name not taught
-    if(leftArmVariableRenamed){
-      name = leftWorkspace.getVariable(newVariableName);
-      leftWorkspace.deleteVariableById(name.id_);
-      leftArmVariableRenamed = false;
-    }
-    if(rightArmVariableRenamed){
-      name = rightWorkspace.getVariable(newVariableName);
-      rightWorkspace.deleteVariableById(name.id_);
-      rightArmVariableRenamed = false;
-    }    
-    newVariableName = "";
+    var arm;
+    if (leftArmVariableRenamed) arm = "LEFT";
+    else if (rightArmVariableRenamed) arm = "RIGHT";
+    alert(`WARNING: ${newVariableName} location may move robot to an unwanted position. Consider deleting or reteaching!`);   
+    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
   };
 
   /**

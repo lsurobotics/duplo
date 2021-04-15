@@ -25,7 +25,15 @@ Blockly.Rapid['continue'] = function (block) {
 }
 
 Blockly.Rapid['custom_move'] = function (block) {
-  var target = "";
+
+  //check to ensure that the user has actually taught a position into the block. If not then set warning and return
+  if (block.getField('LOCATION').variable_.name == block.getField('LOCATION').defaultVariableName) {
+    block.setWarningText("Block should have a teach position selected!"); //warn user they need to set the variable name of this block
+    return "!ERROR!\n"; //block does not generate code, return !ERROR!
+  }
+
+  var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
+
   var code = "";
 
   var move_speed = block.getFieldValue('SPEED');
@@ -63,7 +71,6 @@ Blockly.Rapid['custom_move'] = function (block) {
     if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOffVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOffVariable); //only push to syncArray if variable not already there
     var code = `SyncMoveOn syncON${blockId}, task_list;\n`;
     //create your target instruction
-    target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
     code += `MoveL ${target}\\ID:=10, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
     code += `SyncMoveOff syncOFF${blockId};\n`;
     //push shared target name into object so that mirrored custom_follow block on right can find it
@@ -72,7 +79,6 @@ Blockly.Rapid['custom_move'] = function (block) {
   }else { 
     //I am either in the left workspace but did NOT find a mirrored block on right OR I am in the right workspace
     //and mirroring doesn't matter to me
-    target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
     code = `MoveJ ${target}, ${speed}, fine, Servo;\n`;
   }
 

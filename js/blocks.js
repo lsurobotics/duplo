@@ -48,7 +48,8 @@ Blockly.defineBlocksWithJsonArray([
         "colour": 8,
         "tooltip": "",
         "helpUrl": "",
-        "mutator": "move_mutator"
+        "mutator": "move_mutator",
+        "extensions":["move_listener"]
     },
     // Follow movement
     {
@@ -129,3 +130,15 @@ var moveMixin = {
 }
 
 Blockly.Extensions.registerMutator("move_mutator", moveMixin);
+
+//listener on move blocks
+Blockly.Extensions.register('move_listener', function() {
+    this.setOnChange(function(changeEvent) {
+        console.log(changeEvent);
+        if(changeEvent instanceof Blockly.Events.Change || changeEvent instanceof Blockly.Events.VarRename) {
+            if (this.getField('LOCATION').variable_.name !== this.getField('LOCATION').defaultVariableName) {
+                this.setWarningText(null);
+            }
+        }
+    });
+});
