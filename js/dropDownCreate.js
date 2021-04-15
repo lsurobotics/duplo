@@ -35,7 +35,7 @@
       // Set the UUID as the internal representation of the variable.
       options[i] = [variableModelList[i].name, variableModelList[i].getId()];
     }
-    options.push([Blockly.Msg['RENAME_VARIABLE'], Blockly.RENAME_VARIABLE_ID]); //will be "Rename Location"
+    options.push([Blockly.Msg['RENAME_VARIABLE'], Blockly.RENAME_VARIABLE_ID]); //will be "Reteach Location"
     if (Blockly.Msg['DELETE_VARIABLE']) {
       options.push(
           [
@@ -60,7 +60,7 @@
         if(name == this.defaultVariableName){
           for(var j = 0; j < options.length; j++){
             if(options[j][1] == Blockly.DELETE_VARIABLE_ID) options.splice(j, 1); //delete "delete variable option"
-            else if(options[j][1] == Blockly.RENAME_VARIABLE_ID) options[j][0] = Blockly.Msg['RENAME_VARIABLE'].replace('Rename', "New");
+            else if(options[j][1] == Blockly.RENAME_VARIABLE_ID) options[j][0] = Blockly.Msg['RENAME_VARIABLE'].replace('Reteach', "New");
           }
         }
         break;      
