@@ -24,3 +24,12 @@ html {
     width: 200px;
     margin: 15px;
 }
+
+#leftHand-button, #rightHand-button {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    font-size: 25px; 
+    margin-top: 15px;
+    box-shadow: none;
+}
