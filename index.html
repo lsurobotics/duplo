@@ -22,13 +22,25 @@
         <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
-    <div class="row text-center">
-      <div class="col">
+    <div class="row">
+      <div class="col text-right">
+        <img src="img/hand.png" class="img-fluid" />
+      </div>
+      <div class="col text-left">
+        <button id="leftHand-button" value="open-hand" type="button" class="btn btn-primary" style="text-decoration: none; color: rgb(34, 0, 128); font-weight: 700;">OPEN</button>
+      </div>
+      <div class="col text-center">
         <!-- Execution button -->
         <button id="execution-button" value="start-execution" type="button" class="btn btn-success">sᴛᴀʀᴛ</button>
         <!-- VCU -->
         <p>Made with <span style="color: #f0ad4e; font-size: 20px;">&hearts;</span> by 
         <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
+      </div>
+      <div class="col text-right">
+        <button id="rightHand-button" value="open-hand" type="button" class="btn btn-primary" style="text-decoration: none; color: rgb(34, 0, 128); font-weight: 700;">OPEN</button>
+      </div>
+      <div class="col text-left">
+        <img src="img/hand.png" class="img-fluid" />
       </div>
     </div>
   </div>
@@ -188,6 +200,107 @@
         $("#execution-button").text("sᴛᴀʀᴛ");        
       }
     };
+  </script>
+
+  <script>
+    var leftHandButton = document.getElementById('leftHand-button');
+
+    leftHandButton.onclick = function() {
+      const rightHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
+
+      var leftHandOpen = "MODULE MainModule\n";
+      leftHandOpen += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      leftHandOpen += "PROC main()\n";
+      leftHandOpen += "Var bool isCalibrated := FALSE;\n";
+      leftHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
+      leftHandOpen += "isCalibrated := g_IsCalibrated();\n";
+      leftHandOpen += "IF isCalibrated = FALSE THEN\n";
+      leftHandOpen += "g_Init \\Calibrate;\n";
+      leftHandOpen += "ENDIF\n";
+      leftHandOpen += "g_GripOut;\n";
+      leftHandOpen += "g_Stop;\n";
+      leftHandOpen += "ENDPROC\n";
+      leftHandOpen += "ENDMODULE\n";
+
+      if (leftHandButton.value == "open-hand") {
+        //logic to open left hand gripper
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(leftHandOpen);
+        /* Submit the code for the right hand */
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(rightHandNoOp);
+
+        leftHandButton.value = "close-hand";
+        $("#leftHand-button").text("CLOSE");
+      }
+      else{
+        //logic to close left hand gripper
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        //change left hand open logic so that gripper is closed
+        var leftHandClose = leftHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");
+        window.chrome.webview.postMessage(leftHandClose);
+        /* Submit the code for the right hand */
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(rightHandNoOp);
+
+        leftHandButton.value = "open-hand";
+        $("#leftHand-button").text("OPEN");
+      }
+      /* Start execution */
+      window.chrome.webview.postMessage('START_EXEC');
+    }
+  </script>
+
+  <script>
+    var rightHandButton = document.getElementById('rightHand-button');
+
+    rightHandButton.onclick = function() {
+      const leftHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
+
+      var rightHandOpen = "MODULE MainModule\n";
+      rightHandOpen += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      rightHandOpen += "PROC main()\n";
+      rightHandOpen += "Var bool isCalibrated := FALSE;\n";
+      rightHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
+      rightHandOpen += "isCalibrated := g_IsCalibrated();\n";
+      rightHandOpen += "IF isCalibrated = FALSE THEN\n";
+      rightHandOpen += "g_Init \\Calibrate;\n";
+      rightHandOpen += "ENDIF\n";
+      rightHandOpen += "g_GripOut;\n";
+      rightHandOpen += "g_Stop;\n";
+      rightHandOpen += "ENDPROC\n";
+      rightHandOpen += "ENDMODULE\n";
+
+      if (rightHandButton.value == "open-hand") {
+        //logic to open right hand gripper
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(leftHandNoOp);
+        /* Submit the code for the right hand */
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(rightHandOpen);
+
+        rightHandButton.value = "close-hand";
+        $("#rightHand-button").text("CLOSE");
+      }else{
+        //logic to close right hand gripper
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(leftHandNoOp);
+        /* Submit the code for the right hand */
+        window.chrome.webview.postMessage('T_ROB_R');
+        //change right hand open logic so that gripper is closed
+        var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
+        window.chrome.webview.postMessage(rightHandClose);
+
+        rightHandButton.value = "open-hand";
+        $("#rightHand-button").text("OPEN");
+      }
+      /* Start execution */
+      window.chrome.webview.postMessage('START_EXEC');
+    }
   </script>
 </body>
 </html>
