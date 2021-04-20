@@ -1,3 +1,7 @@
+'use strict';
+
+goog.provide('robtarget');
+
 var leftArmRobTargets = {};
 var rightArmRobTargets = {};
 var leftArmVariableRenamed = false;
