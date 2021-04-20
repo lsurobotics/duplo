@@ -2,8 +2,11 @@
 
 goog.provide('Blockly.Rapid.robotArm');
 goog.require('Blockly.Rapid');
+goog.require('robtarget');
 
 Blockly.Rapid.robotArm.sharedTargetNames = {};  //robtarget instructions that must be shared across tasks
+Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed = {}; //these are the scrubbed robot targets that match those scrubbed in the generator
+Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed = {}; //these are the scrubbed robot targets that match those scrubbed in the generator
 
 Blockly.Rapid['error_action'] = function (block) {
     var code = block.getFieldValue('HANDLE')
@@ -32,7 +35,18 @@ Blockly.Rapid['custom_move'] = function (block) {
     return "!ERROR!\n"; //block does not generate code, return !ERROR!
   }
 
-  var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE);
+  var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE); //returns the scrubbed variable name
+  var unscrubbedTargetName = block.getField('LOCATION').variable_.name; //get the unscrubbed variable name for replacing of the key in the unscrubbed robot target object
+
+  //match the scrubbed variable name with the unscrubbed one and then add robtarget position to the scrubbed variable name for code generation
+  if(block.workspace.id == leftWorkspace.id){    
+    target = `${target}_L`;  //in left workspace so append _L to target for move instruction
+    Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed[target] = leftArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
+  } 
+  else if(block.workspace.id == rightWorkspace.id){
+    target = `${target}_R`;  //in right workspace so append _R to target for move instruction
+    Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed[target] = rightArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
+  } 
 
   var code = "";
 

@@ -150,13 +150,14 @@
         */
         //if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
+        var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
         //pulls the robtargets for the left arm out and add it's targets to the rightArm list
-        for (const [key, value] of Object.entries(leftArmRobTargets)) {
+        for (const [key, value] of Object.entries(Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed)) {
           leftTargets += `PERS robtarget ${key}:=${value};\n`;
           rightTargets += `PERS robtarget ${key};\n`;
         }       
-        var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
+        
         var leftAndRightSyncVars = Blockly.Rapid.sync.syncArray.join(''); //join syncArray variable string definitions together for code insertion (MUST BE DONE AFTER BLOCKS ARE COMPILED)
         /* Prepare the "body" of the module */
         var left_arm_code = "MODULE MainModule\n" + leftTargets + ServoGripper + task_list + leftAndRightSyncVars + leftCode + "ENDPROC\nENDMODULE";
@@ -166,12 +167,13 @@
         */
         //have to initialize both workspaces(this one was not being initialized)
         Blockly.Rapid.init(rightWorkspace);
+        var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
         //pulls the robtargets for the right arm out
-        for (const [key, value] of Object.entries(rightArmRobTargets)) {
+        for (const [key, value] of Object.entries(Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed)) {
           rightTargets += `PERS robtarget ${key}:=${value};\n`;
         }
-        var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
+        
         var right_arm_code = "MODULE MainModule\n" + rightTargets + ServoGripper + task_list + leftAndRightSyncVars + rightCode + "ENDPROC\nENDMODULE";
 
         /**
@@ -180,6 +182,8 @@
          * the current workspace are included.
         */
         Blockly.Rapid.sync.syncArray.length = 0;  //clear but keep original array reference
+        Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed = {};
+        Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed = {};
 
         /* Submit the code for the left arm */
         window.chrome.webview.postMessage('T_ROB_L');
