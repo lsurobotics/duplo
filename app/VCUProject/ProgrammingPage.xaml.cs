@@ -97,7 +97,8 @@ namespace VCUProject
                 string[] taskNames = { "T_ROB_L", "T_ROB_R" };
 
                 foreach (string taskName in taskNames) {
-                    string programFilename = programNameTextBox.Text + "_" + taskName + ".pgf";
+                    //string programFilename = programNameTextBox.Text + "_" + taskName + ".pgf";
+                    string programFilename = "DuploExample_" + taskName + ".pgf";   //TODO: fileName should come from webpage
                     string programLocalFilepath = Path.Combine(duploFolder, programFilename);
                     string[] programBoilerplate = { "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>", "<Program>", "</Program>" };
 
