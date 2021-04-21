@@ -34,9 +34,15 @@ namespace VCUProject
         {
             /* Method - Initializes the async communication with the WebView. When a POST mesage is received,
              * the listener ParseMessageFromWeb is invoked. */
-
             await webView.EnsureCoreWebView2Async(null);
             webView.CoreWebView2.WebMessageReceived += ParseMessageFromWeb;
+
+            _controller.Rapid.ExecutionStatusChanged += Rapid_ExecutionStatusChanged;   //execution status of the controller event handler
+        }
+        
+        private void Rapid_ExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
+        {
+            webView.CoreWebView2.PostWebMessageAsString(e.Status.ToString());   //update webview on controllers execution status
         }
 
         private void ParseMessageFromWeb(object sender, CoreWebView2WebMessageReceivedEventArgs args)
@@ -97,7 +103,8 @@ namespace VCUProject
                 string[] taskNames = { "T_ROB_L", "T_ROB_R" };
 
                 foreach (string taskName in taskNames) {
-                    string programFilename = programNameTextBox.Text + "_" + taskName + ".pgf";
+                    //string programFilename = programNameTextBox.Text + "_" + taskName + ".pgf";
+                    string programFilename = "DuploExample_" + taskName + ".pgf";   //TODO: fileName should come from webpage
                     string programLocalFilepath = Path.Combine(duploFolder, programFilename);
                     string[] programBoilerplate = { "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>", "<Program>", "</Program>" };
 

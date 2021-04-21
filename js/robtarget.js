@@ -55,9 +55,13 @@ function variableRenameEvent_(event) {
   document.getElementById("position-modal-cancel-button").addEventListener("click", canceledModal);
   function canceledModal() {
     var arm;
+    const options = {once : true};
     if (leftArmVariableRenamed) arm = "LEFT";
     else if (rightArmVariableRenamed) arm = "RIGHT";
-    alert(`WARNING: ${newVariableName} location may move robot to an unwanted position. Consider deleting or reteaching!`);   
+    alert(`WARNING: ${newVariableName} location may move robot to an unwanted position. Consider deleting or reteaching!`);
+    //register listener for message from host app and pass event to handler
+    //receives a new robtarget for both arms from the host app when the Ok button is pressed
+    window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);    
     window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
   };
 
@@ -67,19 +71,18 @@ function variableRenameEvent_(event) {
   document.getElementById("position-modal-confirm-button").addEventListener("click", confirmedModal);
   function confirmedModal() {
     var arm;
+    const options = {once : true};
     if (leftArmVariableRenamed) arm = "LEFT";
     else if (rightArmVariableRenamed) arm = "RIGHT";     
     $('#position-modal').modal('hide');
+    //register listener for message from host app and pass event to handler
+    //receives a new robtarget for both arms from the host app when the Ok button is pressed
+    window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);
     window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
   };
 
-
-  //register listener for message from host app and pass event to handler
-  //receives a new robtarget for both arms from the host app when the Ok button is pressed
-  window.chrome.webview.addEventListener('message', robTargetsReceivedEvent);
-  
-  function robTargetsReceivedEvent(event){
-    
+  //callback function for receiving of arm positions as robot targets 
+  function robTargetsReceivedEvent(event){    
     if(event.data === ""){  //if message received is empty string then an error occurred so delete varName
       if(leftArmVariableRenamed) delete leftArmRobTargets[newVariableName];        
       else if(rightArmVariableRenamed) delete rightArmRobTargets[newVariableName];          

@@ -14,12 +14,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
 
         <wv2:WebView2 Name="webView" Grid.Row="1" Grid.ColumnSpan="2" Source="https://vcuse.github.io/duplo/"/>
-        <TextBox Name="programNameTextBox" Grid.Row="0" Grid.Column="0" Text="DuploExample" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" Margin="15, 0, 0, 0" Background="{x:Null}" BorderBrush="{x:Null}"></TextBox>
     </Grid>
 </Page>

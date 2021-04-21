@@ -12,6 +12,15 @@
 <body>
   <!-- HTML elements -->
   <div class="container-fluid">
+    <div class="row" id="margin-top">
+      <div class="col-1 align-self-center text-left">
+        <img src="img/save.png" id="save-image" class="img-fluid" />
+      </div>
+      <div class="col"></div>
+      <div class="col-3 align-self-center text-right">
+        <button id="reset-button" type="button" class="btn btn-success">RESET ROBOT</button>
+      </div>
+    </div>
     <div class="row" id="workspace">
       <div class="col-6">
         <span id="workspace-identifier">ʟᴇғᴛ ᴀʀᴍ</span>
@@ -22,12 +31,12 @@
         <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
-    <div class="row">
+    <div class="row" id="below-workspace">
       <div class="col text-right">
         <img src="img/hand.png" class="img-fluid" />
       </div>
       <div class="col text-left">
-        <button id="leftHand-button" value="open-hand" type="button" class="btn btn-primary" style="text-decoration: none; color: rgb(34, 0, 128); font-weight: 700;">OPEN</button>
+        <button id="leftHand-button" value="open-hand" type="button" class="btn btn-primary">OPEN</button>
       </div>
       <div class="col text-center">
         <!-- Execution button -->
@@ -37,13 +46,13 @@
         <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
       </div>
       <div class="col text-right">
-        <button id="rightHand-button" value="open-hand" type="button" class="btn btn-primary" style="text-decoration: none; color: rgb(34, 0, 128); font-weight: 700;">OPEN</button>
+        <button id="rightHand-button" value="open-hand" type="button" class="btn btn-primary">OPEN</button>
       </div>
       <div class="col text-left">
         <img src="img/hand.png" class="img-fluid" />
       </div>
     </div>
-  </div>
+    <div class="row" id="margin-bottom"></div>
 
   <div id="position-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -109,6 +118,7 @@
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
   <script src="js/robtarget.js"></script>
+  <script src="js/controllerState.js"></script>
   <script src="js/scrolling.js"></script>
   <script src="js/dropDownCreate.js"></script>
   <script src="js/resolve.js"></script>
@@ -133,12 +143,6 @@
 
     executionButton.onclick = function() {
       if (executionButton.value == "start-execution") {
-        /* The next action will be to stop the execution,
-         so we need to update the button */
-        executionButton.value = "stop-execution";
-        $("#execution-button").removeClass("btn-success").addClass("btn-danger");
-        $("#execution-button").text("sᴛᴏᴘ");
-
         //definition for the servo gripper on the YUMI
         const ServoGripper = "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
         //this task list needs to be defined for sync instructions
@@ -197,11 +201,8 @@
 
         /* Start execution */
         window.chrome.webview.postMessage('START_EXEC');
-      } else {
+      } else if(executionButton.value == "stop-execution") {
         window.chrome.webview.postMessage('STOP_EXEC');
-        executionButton.value = "start-execution";
-        $("#execution-button").removeClass("btn-danger").addClass("btn-success");
-        $("#execution-button").text("sᴛᴀʀᴛ");        
       }
     };
   </script>
@@ -226,7 +227,9 @@
       leftHandOpen += "ENDPROC\n";
       leftHandOpen += "ENDMODULE\n";
 
-      if (leftHandButton.value == "open-hand") {
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        if (leftHandButton.value == "open-hand") {
         //logic to open left hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -254,6 +257,7 @@
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
+      }      
     }
   </script>
 
@@ -277,7 +281,9 @@
       rightHandOpen += "ENDPROC\n";
       rightHandOpen += "ENDMODULE\n";
 
-      if (rightHandButton.value == "open-hand") {
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        if (rightHandButton.value == "open-hand") {
         //logic to open right hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -304,6 +310,47 @@
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
+      }      
+    }
+  </script>
+
+  <script>
+    var resetButton = document.getElementById('reset-button');
+
+    resetButton.onclick = function() {
+
+      var leftHome = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
+      var rightHome = "[[420.32,-227.3,254.83],[0.0652473,0.347217,0.917623,0.182073],[0,0,0,4],[121.253,9E9,9E9,9E9,9E9,9E9]]";
+
+      var leftArmReset = "MODULE MainModule\n";
+      leftArmReset += "CONST robtarget home:=[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]];\n";
+      leftArmReset += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      leftArmReset += "PROC main()\n";
+      leftArmReset += "Var bool isCalibrated := FALSE;\n";
+      leftArmReset += "SetLeadThrough \\On \\NoStopMove;\n";
+      leftArmReset += "isCalibrated := g_IsCalibrated();\n";
+      leftArmReset += "IF isCalibrated = FALSE THEN\n";
+      leftArmReset += "g_Init \\Calibrate;\n";
+      leftArmReset += "ENDIF\n";      
+      leftArmReset += "g_GripOut;\n";
+      leftArmReset += "g_Stop;\n";
+      leftArmReset += "MoveJ home, v100, fine, Servo;\n"
+      leftArmReset += "ENDPROC\n";
+      leftArmReset += "ENDMODULE\n";
+
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(leftArmReset);
+        /* Submit the code for the right hand */
+        var rightArmReset = leftArmReset.replace(leftHome, rightHome);
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(rightArmReset);
+        
+        /* Start execution */
+        window.chrome.webview.postMessage('START_EXEC');
+      }      
     }
   </script>
 </body>
