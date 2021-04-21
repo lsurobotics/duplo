@@ -34,9 +34,15 @@ namespace VCUProject
         {
             /* Method - Initializes the async communication with the WebView. When a POST mesage is received,
              * the listener ParseMessageFromWeb is invoked. */
-
             await webView.EnsureCoreWebView2Async(null);
             webView.CoreWebView2.WebMessageReceived += ParseMessageFromWeb;
+
+            _controller.Rapid.ExecutionStatusChanged += Rapid_ExecutionStatusChanged;   //execution status of the controller event handler
+        }
+        
+        private void Rapid_ExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
+        {
+            webView.CoreWebView2.PostWebMessageAsString(e.Status.ToString());   //update webview on controllers execution status
         }
 
         private void ParseMessageFromWeb(object sender, CoreWebView2WebMessageReceivedEventArgs args)

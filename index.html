@@ -118,6 +118,7 @@
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
   <script src="js/robtarget.js"></script>
+  <script src="js/controllerState.js"></script>
   <script src="js/scrolling.js"></script>
   <script src="js/dropDownCreate.js"></script>
   <script src="js/resolve.js"></script>
@@ -142,12 +143,6 @@
 
     executionButton.onclick = function() {
       if (executionButton.value == "start-execution") {
-        /* The next action will be to stop the execution,
-         so we need to update the button */
-        executionButton.value = "stop-execution";
-        $("#execution-button").removeClass("btn-success").addClass("btn-danger");
-        $("#execution-button").text("sᴛᴏᴘ");
-
         //definition for the servo gripper on the YUMI
         const ServoGripper = "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
         //this task list needs to be defined for sync instructions
@@ -206,11 +201,8 @@
 
         /* Start execution */
         window.chrome.webview.postMessage('START_EXEC');
-      } else {
+      } else if(executionButton.value == "stop-execution") {
         window.chrome.webview.postMessage('STOP_EXEC');
-        executionButton.value = "start-execution";
-        $("#execution-button").removeClass("btn-danger").addClass("btn-success");
-        $("#execution-button").text("sᴛᴀʀᴛ");        
       }
     };
   </script>
@@ -235,7 +227,9 @@
       leftHandOpen += "ENDPROC\n";
       leftHandOpen += "ENDMODULE\n";
 
-      if (leftHandButton.value == "open-hand") {
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        if (leftHandButton.value == "open-hand") {
         //logic to open left hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -263,6 +257,7 @@
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
+      }      
     }
   </script>
 
@@ -286,7 +281,9 @@
       rightHandOpen += "ENDPROC\n";
       rightHandOpen += "ENDMODULE\n";
 
-      if (rightHandButton.value == "open-hand") {
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        if (rightHandButton.value == "open-hand") {
         //logic to open right hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -313,6 +310,7 @@
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
+      }      
     }
   </script>
 
@@ -336,21 +334,23 @@
       leftArmReset += "ENDIF\n";      
       leftArmReset += "g_GripOut;\n";
       leftArmReset += "g_Stop;\n";
-      leftArmReset += "MoveJ home, v500, fine, Servo;\n"
+      leftArmReset += "MoveJ home, v100, fine, Servo;\n"
       leftArmReset += "ENDPROC\n";
       leftArmReset += "ENDMODULE\n";
 
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){
+        /* Submit the code for the left hand */
+        window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage(leftArmReset);
+        /* Submit the code for the right hand */
+        var rightArmReset = leftArmReset.replace(leftHome, rightHome);
+        window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage(rightArmReset);
         
-      /* Submit the code for the left hand */
-      window.chrome.webview.postMessage('T_ROB_L');
-      window.chrome.webview.postMessage(leftArmReset);
-      /* Submit the code for the right hand */
-      var rightArmReset = leftArmReset.replace(leftHome, rightHome);
-      window.chrome.webview.postMessage('T_ROB_R');
-      window.chrome.webview.postMessage(rightArmReset);
-      
-      /* Start execution */
-      window.chrome.webview.postMessage('START_EXEC');
+        /* Start execution */
+        window.chrome.webview.postMessage('START_EXEC');
+      }      
     }
   </script>
 </body>
