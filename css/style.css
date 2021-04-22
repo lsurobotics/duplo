@@ -20,8 +20,8 @@ html {
 #execution-button {
     border-radius: 2px;
     padding-top: 2px;
-    font-size: 25px;
-    width: 200px;
+    font-size: 22px;
+    width: 175px;
     margin: 15px;
 }
 
@@ -32,6 +32,7 @@ html {
 
 #toolbar button {
     border-radius: 2px;
+    font-size: 18px;
     margin-right: 5px;
     width: 150px;
 }
