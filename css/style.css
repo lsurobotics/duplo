@@ -18,41 +18,20 @@ html {
 }
 
 #execution-button {
-    border-radius: 7px;
+    border-radius: 2px;
     padding-top: 2px;
     font-size: 25px;
     width: 200px;
     margin: 15px;
 }
 
-#leftHand-button, #rightHand-button {
-    border: none;
-    background-color: inherit;
-    cursor: pointer;
-    font-size: 25px; 
-    margin-top: 15px;
-    box-shadow: none;
-    color: rgb(34, 0, 128);
-    text-decoration: none;
-    font-weight: 700;
+#toolbar {
+    padding: 5px;
+    background-color: #d1d1d1;
 }
 
-#reset-button {
-    border-radius: 7px;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 700;
-    margin: 7px;
-    padding-left: 25px;
-    padding-right: 25px;
-}
-
-#margin-top, #margin-bottom {
-    background-color: #cccccc;
-    height: 50px;
-}
-
-#save-image{
-    max-height: 36px;
-    margin: 7px;
+#toolbar button {
+    border-radius: 2px;
+    margin-right: 5px;
+    width: 150px;
 }

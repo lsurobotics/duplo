@@ -12,47 +12,48 @@
 <body>
   <!-- HTML elements -->
   <div class="container-fluid">
-    <div class="row" id="margin-top">
-      <div class="col-1 align-self-center text-left">
-        <img src="img/save.png" id="save-image" class="img-fluid" />
+
+    <div class="row" id="toolbar">
+      <div class="col-6">
       </div>
-      <div class="col"></div>
-      <div class="col-3 align-self-center text-right">
-        <button id="reset-button" type="button" class="btn btn-success">RESET ROBOT</button>
+      <div class="col-6" id="actions-menu">
+        <div class="row justify-content-end">
+          <button id="left-hand-switch-button" value="open-hand" type="button" class="btn">Left Hand</button>
+          <button id="right-hand-switch-button" value="open-hand" type="button" class="btn">Right Hand</button>
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Actions
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+              <h6 class="dropdown-header">Workspace Options</h6>
+              <a class="dropdown-item" id="save-button">Save</a>
+              <a class="dropdown-item" id="reset-button">Reset</a>
+              <h6 class="dropdown-header">Gripper Definition</h6>
+              <a class="dropdown-item" id="define-left-gripper">Left Gripper</a>
+              <a class="dropdown-item" id="define-right-gripper">Right Gripper</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
     <div class="row" id="workspace">
       <div class="col-6">
-        <span id="workspace-identifier">ʟᴇғᴛ ᴀʀᴍ</span>
+        <span id="workspace-identifier">Left Arm</span>
         <div id="left-workspace"><!-- Blockly will use this div --></div>
       </div>
       <div class="col-6">
-        <span id="workspace-identifier">ʀɪɢʜᴛ ᴀʀᴍ</span>
+        <span id="workspace-identifier">Right Arm</span>
         <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
+
     <div class="row" id="below-workspace">
-      <div class="col text-right">
-        <img src="img/hand.png" class="img-fluid" />
-      </div>
-      <div class="col text-left">
-        <button id="leftHand-button" value="open-hand" type="button" class="btn btn-primary">OPEN</button>
-      </div>
       <div class="col text-center">
         <!-- Execution button -->
-        <button id="execution-button" value="start-execution" type="button" class="btn btn-success">sᴛᴀʀᴛ</button>
-        <!-- VCU -->
-        <p>Made with <span style="color: #f0ad4e; font-size: 20px;">&hearts;</span> by 
-        <span style="text-decoration: none; color: black; font-weight: 700;">VCU</span></p>
-      </div>
-      <div class="col text-right">
-        <button id="rightHand-button" value="open-hand" type="button" class="btn btn-primary">OPEN</button>
-      </div>
-      <div class="col text-left">
-        <img src="img/hand.png" class="img-fluid" />
+        <button id="execution-button" value="start-execution" type="button" class="btn btn-success">Start</button>
       </div>
     </div>
-    <div class="row" id="margin-bottom"></div>
 
   <div id="position-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -73,7 +74,6 @@
       </div>
     </div>
   </div>
-  
 
   <!-- Blockly -->
   <!-- Starting configuration -->
@@ -208,7 +208,15 @@
   </script>
 
   <script>
-    var leftHandButton = document.getElementById('leftHand-button');
+    var resetButton = document.getElementById('reset-button');
+
+    resetButton.onclick = function() {
+      location.reload();
+    }
+  </script>
+
+  <script>
+    var leftHandButton = document.getElementById('left-hand-switch-button');
 
     leftHandButton.onclick = function() {
       const rightHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
@@ -239,7 +247,7 @@
         window.chrome.webview.postMessage(rightHandNoOp);
 
         leftHandButton.value = "close-hand";
-        $("#leftHand-button").text("CLOSE");
+        document.getElementById("left-hand-switch-button").style.background='#d9534f';
       }
       else{
         //logic to close left hand gripper
@@ -253,7 +261,7 @@
         window.chrome.webview.postMessage(rightHandNoOp);
 
         leftHandButton.value = "open-hand";
-        $("#leftHand-button").text("OPEN");
+        document.getElementById("left-hand-switch-button").style.background='#f7f7f7';
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
@@ -262,7 +270,7 @@
   </script>
 
   <script>
-    var rightHandButton = document.getElementById('rightHand-button');
+    var rightHandButton = document.getElementById('right-hand-switch-button');
 
     rightHandButton.onclick = function() {
       const leftHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
@@ -293,8 +301,8 @@
         window.chrome.webview.postMessage(rightHandOpen);
 
         rightHandButton.value = "close-hand";
-        $("#rightHand-button").text("CLOSE");
-      }else{
+        document.getElementById("right-hand-switch-button").style.background='#d9534f';
+      } else{
         //logic to close right hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -306,7 +314,7 @@
         window.chrome.webview.postMessage(rightHandClose);
 
         rightHandButton.value = "open-hand";
-        $("#rightHand-button").text("OPEN");
+        document.getElementById("right-hand-switch-button").style.background='#f7f7f7';
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
