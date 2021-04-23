@@ -86,7 +86,7 @@ Blockly.Rapid['custom_move'] = function (block) {
     var code = `SyncMoveOn syncON${blockId}, task_list;\n`;
     //create your target instruction
     //code += `ConfL \\Off;\n`;
-    code += `MoveJ ${target}\\ID:=10, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
+    code += `MoveL ${target}\\ID:=10, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
     //code += `ConfL \\On;\n`;
     code += `SyncMoveOff syncOFF${blockId};\n`;
     //push shared target name into object so that mirrored custom_follow block on right can find it
