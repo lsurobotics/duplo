@@ -85,7 +85,9 @@ Blockly.Rapid['custom_move'] = function (block) {
     if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOffVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOffVariable); //only push to syncArray if variable not already there
     var code = `SyncMoveOn syncON${blockId}, task_list;\n`;
     //create your target instruction
+    code += `ConfL \\Off;\n`;
     code += `MoveL ${target}\\ID:=10, ${speed}, fine, Servo;\n`;  //MoveL because arms will move together
+    code += `ConfL \\On;\n`;
     code += `SyncMoveOff syncOFF${blockId};\n`;
     //push shared target name into object so that mirrored custom_follow block on right can find it
     //so that right workspace custom_follow blocks can check their id against the obj keys and get target name and speed
