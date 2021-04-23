@@ -22,15 +22,17 @@
             <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Actions
             </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-              <h6 class="dropdown-header">Workspace Options</h6>
-              <a class="dropdown-item" id="save-button">Save</a>
-              <a class="dropdown-item" id="reload-button">Reload</a>
-              <h6 class="dropdown-header">Robot Options</h6>
-              <a class="dropdown-item" id="reset-button">Home Position</a>
-              <h6 class="dropdown-header">Gripper Options</h6>
-              <a class="dropdown-item" id="left-hand-switch-button" value = "open-hand">Open Left Gripper</a>
-              <a class="dropdown-item" id="right-hand-switch-button" value = "open-hand">Open Right Gripper</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <h6 class="dropdown-item-text">Workspace Options</h6>
+              <button class="dropdown-item" type="button" id="save-button">Save</button>
+              <button class="dropdown-item" type="button" id="reload-button">Reload</button>
+              <hr class="dropdown-divider">
+              <h6 class="dropdown-item-text">Robot Options</h6>
+              <button class="dropdown-item" type="button" id="reset-button">Home Position</button>
+              <hr class="dropdown-divider">
+              <h6 class="dropdown-item-text">Gripper Options</h6>
+              <button class="dropdown-item" type="button" id="left-hand-switch-button" value = "open-hand">Open Left</button>
+              <button class="dropdown-item" type="button" id="right-hand-switch-button" value = "open-hand">Open Right</button>
             </div>
           </div>
         </div>
@@ -246,10 +248,10 @@
         window.chrome.webview.postMessage('T_ROB_R');
         window.chrome.webview.postMessage(rightHandNoOp);
 
+        $("#left-hand-switch-button").text("Close Left");
         leftHandButton.value = "close-hand";
-        leftHandButton.style.background='#f7f7f7';
       }
-      else{
+      else if(leftHandButton.value == "close-hand"){
         //logic to close left hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -260,8 +262,8 @@
         window.chrome.webview.postMessage('T_ROB_R');
         window.chrome.webview.postMessage(rightHandNoOp);
 
+        $("#left-hand-switch-button").text("Open Left");
         leftHandButton.value = "open-hand";
-        leftHandButton.style.background='#d9534f';
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
@@ -291,7 +293,7 @@
 
       //if robot is not already moving
       if(controllerState != controllerExecutionState.RUNNING){
-        if (rightHandButton.value == "open-hand") {
+        if (rightHandButton.value == "open-hand") {        
         //logic to open right hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -300,9 +302,9 @@
         window.chrome.webview.postMessage('T_ROB_R');
         window.chrome.webview.postMessage(rightHandOpen);
 
+        $("#right-hand-switch-button").text("Close Right");
         rightHandButton.value = "close-hand";
-        rightHandButton.style.background='#f7f7f7';
-      } else{
+      } else if(rightHandButton.value == "close-hand"){        
         //logic to close right hand gripper
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
@@ -313,8 +315,8 @@
         var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
         window.chrome.webview.postMessage(rightHandClose);
 
+        $("#right-hand-switch-button").text("Open Right");
         rightHandButton.value = "open-hand";
-        rightHandButton.style.background='#d9534f';
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
@@ -323,12 +325,12 @@
   </script>
 
   <script>
-    var resetButton = document.getElementById('reset-button');
+    var resetButton = document.getElementById('reset-button');    
 
     resetButton.onclick = function() {
-
+      
       var leftHome = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
-      var rightHome = "[[420.32,-227.3,254.83],[0.0652473,0.347217,0.917623,0.182073],[0,0,0,4],[121.253,9E9,9E9,9E9,9E9,9E9]]";
+      var rightHome = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
 
       var leftArmReset = "MODULE MainModule\n";
       leftArmReset += "CONST robtarget home:=[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]];\n";
@@ -358,6 +360,14 @@
         
         /* Start execution */
         window.chrome.webview.postMessage('START_EXEC');
+
+        //set both gripper buttons to close since the grippers are opened on reset
+        var leftHandButton = document.getElementById('left-hand-switch-button');
+        var rightHandButton = document.getElementById('right-hand-switch-button');
+        $("#left-hand-switch-button").text("Close Left");
+        leftHandButton.value = "close-hand";
+        $("#right-hand-switch-button").text("Close Right");
+        rightHandButton.value = "close-hand";
       }      
     }
   </script>
