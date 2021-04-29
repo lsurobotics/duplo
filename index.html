@@ -156,7 +156,6 @@
         /**
          * Pull code together for left arm
         */
-        //if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
         var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
@@ -173,7 +172,7 @@
         /**
          * Pull code together for the right arm
         */
-        //have to initialize both workspaces(this one was not being initialized)
+        //have to initialize both workspaces
         Blockly.Rapid.init(rightWorkspace);
         var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
