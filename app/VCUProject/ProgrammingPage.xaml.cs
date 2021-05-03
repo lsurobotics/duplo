@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
 namespace VCUProject
@@ -21,6 +22,15 @@ namespace VCUProject
         /* ABB SDK variables */
         private Controller _controller;
         private Task armTask;
+
+        //states for saving of a file or submitting RAPID code
+        private enum next_message_type
+        {
+            RAPID,
+            FILE
+        }
+
+        private next_message_type next_message = next_message_type.RAPID;   //tells host app what the next type of message will be if it hits else statement in parsemessage() function
 
         public ProgrammingPage(Controller controller)
         {
@@ -48,10 +58,13 @@ namespace VCUProject
         private void ParseMessageFromWeb(object sender, CoreWebView2WebMessageReceivedEventArgs args)
         {
             /* Listener - Handles the POST messages received from our website (https://vcuse.github.io/duplo/).
-             * There are three different kinds of tasks received from the website:
+             * There are different kinds of tasks received from the website:
              * 1) Start/Stop execution.
              * 2) Change current arm (which we define as robot's tasks T_ROB_R and T_ROB_L).
              * 3) Upload code to the controller.
+             * 4) Request the arm positions as robtargets
+             * 5) Save a Blockly workspace to disk
+             * 6) Load a saved workspace into Blockly
              * Notice that each task is handled by the if below.
              */
 
@@ -76,10 +89,27 @@ namespace VCUProject
             {
                 armTask = _controller.Rapid.GetTask(messageFromWeb);
             }
-            /* If it is not one of the options above, we consider the message as RAPID code */
+            //tells WPF that next message will contain the file contents
+            else if (messageFromWeb == "SAVE_FILE")
+            {
+                next_message = next_message_type.FILE;
+            }
+            //tells WPF that save is done and change next message state back to RAPID
+            else if (messageFromWeb == "END_SAVE")
+            {
+                next_message = next_message_type.RAPID;
+            }
+            //user is requesting a file be opened from the webview
+            else if (messageFromWeb == "OPEN_FILE")
+            {
+                OpenFile();
+            }
+            /* If it is not one of the options above, we check the next_message state to determine if we are submitting RAPID code,
+             *or saving the message as a json file*/
             else
             {
-                CreateModuleLocally(messageFromWeb);
+                if(next_message == next_message_type.RAPID) CreateModuleLocally(messageFromWeb);
+                else if (next_message == next_message_type.FILE) SaveBlocklyWorkspaceLocally(messageFromWeb);
             }
         }
 
@@ -184,6 +214,91 @@ namespace VCUProject
             catch (Exception ex)
             {
                 MessageBox.Show("Exception while loading program from local: " + ex.Message);
+            }
+        }
+
+        private void SaveBlocklyWorkspaceLocally(string file)
+        {           
+            try
+            {
+                string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string duploFolder = Path.Combine(documentFolder, "Duplo/SavedWorkspaces");
+
+                if (!Directory.Exists(duploFolder))
+                {
+                    Directory.CreateDirectory(duploFolder);
+                }
+                
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    InitialDirectory = documentFolder + "\\Duplo\\SavedWorkspaces\\",
+                    Title = "Save Blockly Workspace",
+                    OverwritePrompt = true,
+                    DefaultExt = "json",
+                    Filter = "json files (*.json)|*.json",
+                    FilterIndex = 2,
+                    RestoreDirectory = true,
+                    
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    File.WriteAllText(saveFileDialog.FileName, file);
+                    webView.CoreWebView2.PostWebMessageAsString(saveFileDialog.SafeFileName);
+                }
+                else webView.CoreWebView2.PostWebMessageAsString("SAVE_CANCELLED");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception while saving workspace: " + ex);
+                next_message = next_message_type.RAPID;
+                webView.CoreWebView2.PostWebMessageAsString("SAVE_FILE_ERROR");
+            }
+        }
+
+        private void OpenFile()
+        {
+            try
+            {
+                string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string duploFolder = Path.Combine(documentFolder, "Duplo/SavedWorkspaces");
+
+                if (Directory.Exists(duploFolder))
+                {
+                    OpenFileDialog openFileDialog = new OpenFileDialog
+                    {
+                        InitialDirectory = documentFolder + "\\Duplo\\SavedWorkspaces\\",
+                        Title = "Load Saved Blockly Workspace",
+
+                        CheckFileExists = true,
+                        CheckPathExists = true,
+
+                        DefaultExt = "json",
+                        Filter = "json files (*.json)|*.json",
+                        FilterIndex = 2,
+                        RestoreDirectory = true,
+
+                        ReadOnlyChecked = true,
+                        ShowReadOnly = true
+                    };
+
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        string file_contents = File.ReadAllText(openFileDialog.FileName);
+                        webView.CoreWebView2.PostWebMessageAsString(openFileDialog.SafeFileName);   //send filename to webview
+                        webView.CoreWebView2.PostWebMessageAsString(file_contents); //send file contents to webview                        
+                    }
+                }
+                else
+                {
+                    webView.CoreWebView2.PostWebMessageAsString("OPEN_FILE_ERROR");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error opening file: " + ex);
+                webView.CoreWebView2.PostWebMessageAsString("OPEN_FILE_ERROR");
             }
         }
 

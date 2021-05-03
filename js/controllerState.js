@@ -24,7 +24,7 @@ function executionStatusChangedEvent(event){
         if(executionButton.value == "start-execution"){
             executionButton.value = "stop-execution";
             $("#execution-button").removeClass("btn-success").addClass("btn-danger");
-            $("#execution-button").text("sᴛᴏᴘ");
+            $("#execution-button").text("Stop");
         } 
     } 
     else if(event.data == controllerExecutionState.STOPPED){
@@ -34,7 +34,7 @@ function executionStatusChangedEvent(event){
         if(executionButton.value == "stop-execution"){
             executionButton.value = "start-execution";
             $("#execution-button").removeClass("btn-danger").addClass("btn-success");
-            $("#execution-button").text("sᴛᴀʀᴛ"); 
+            $("#execution-button").text("Start"); 
         }
     }
     else if(event.data == controllerExecutionState.UNKNOWN){

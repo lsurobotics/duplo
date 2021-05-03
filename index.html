@@ -15,6 +15,7 @@
 
     <div class="row" id="toolbar">
       <div class="col-6">
+        <span id="filename-display" style="font-size:20px;"></span>
       </div>
       <div class="col-6" id="actions-menu">
         <div class="row justify-content-end">
@@ -24,15 +25,16 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <h6 class="dropdown-item-text">Workspace Options</h6>
-              <button class="dropdown-item" type="button" id="save-button">Save</button>
+              <button class="dropdown-item" type="button" id="save-button">Save As</button>
+              <button class="dropdown-item" type="button" id="open-file-button">Open File</button>
               <button class="dropdown-item" type="button" id="reload-button">Reload</button>
               <hr class="dropdown-divider">
               <h6 class="dropdown-item-text">Robot Options</h6>
               <button class="dropdown-item" type="button" id="reset-button">Home Position</button>
               <hr class="dropdown-divider">
               <h6 class="dropdown-item-text">Gripper Options</h6>
-              <button class="dropdown-item" type="button" id="left-hand-switch-button" value = "open-hand">Open Left</button>
-              <button class="dropdown-item" type="button" id="right-hand-switch-button" value = "open-hand">Open Right</button>
+              <button class="dropdown-item" type="button" id="left-hand-switch-button" value="open-hand">Open Left</button>
+              <button class="dropdown-item" type="button" id="right-hand-switch-button" value="open-hand">Open Right</button>
             </div>
           </div>
         </div>
@@ -154,7 +156,6 @@
         /**
          * Pull code together for left arm
         */
-        //if (!Blockly.Rapid.isInitialized)
         Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
         var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
@@ -171,7 +172,7 @@
         /**
          * Pull code together for the right arm
         */
-        //have to initialize both workspaces(this one was not being initialized)
+        //have to initialize both workspaces
         Blockly.Rapid.init(rightWorkspace);
         var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
         
@@ -210,6 +211,79 @@
   </script>
 
   <script>
+    var saveButton = document.getElementById('save-button');
+
+    saveButton.onclick = function() {
+      var leftWorkspace_xml = Blockly.Xml.workspaceToDom(leftWorkspace);
+      var leftWorkspace_xml_text = Blockly.Xml.domToPrettyText(leftWorkspace_xml);
+
+      var rightWorkspace_xml = Blockly.Xml.workspaceToDom(rightWorkspace);
+      var rightWorkspace_xml_text = Blockly.Xml.domToPrettyText(rightWorkspace_xml);
+                
+      //compile all relevant info into a json object and send to cs
+      var file = {
+        "leftWorkspace_xml_text" : leftWorkspace_xml_text,
+        "rightWorkspace_xml_text" : rightWorkspace_xml_text,
+        "leftArmRobTargets" : leftArmRobTargets,
+        "rightArmRobTargets" : rightArmRobTargets
+      }
+
+      file = JSON.stringify(file, undefined, 4); 
+       
+      window.chrome.webview.postMessage('SAVE_FILE');
+      window.chrome.webview.postMessage(file);
+      window.chrome.webview.postMessage('END_SAVE');
+        
+      const options = {once : true};
+      window.chrome.webview.addEventListener('message', saveFilenameReceivedEvent, options);      
+    }
+
+    function saveFilenameReceivedEvent(event){
+      if(event.data != "SAVE_FILE_ERROR" && event.data != "SAVE_CANCELLED"){
+        var filename_display = document.getElementById("filename-display");
+        filename_display.innerHTML = `${event.data}`;
+      }
+    }
+  </script>
+
+  <script>
+    var openFileButton = document.getElementById('open-file-button');
+
+    openFileButton.onclick = function() {
+      window.chrome.webview.postMessage('OPEN_FILE');
+      window.chrome.webview.addEventListener('message', openFileReceivedEvent);
+    }
+    
+    function openFileReceivedEvent(event){
+      //filename is being sent so add to workspace bar
+      //(this is sent from webview first)
+      if(event.data.includes(".json")){
+        var filename_display = document.getElementById("filename-display");
+        filename_display.innerHTML = `${event.data}`;
+      }
+      //there was an error so remove the event listener
+      else if(event.data == "OPEN_FILE_ERROR"){
+        window.chrome.webview.removeEventListener('message', openFileReceivedEvent);
+      }
+      //file contents are now being sent
+      //remove event listener at end
+      else{
+        var file = JSON.parse(event.data);
+        leftArmRobTargets = file.leftArmRobTargets;
+        rightArmRobTargets = file.rightArmRobTargets;
+
+        /*This loads the xml back into the workspace*/
+        var leftWorkspace_xml = Blockly.Xml.textToDom(file.leftWorkspace_xml_text);
+        Blockly.Xml.clearWorkspaceAndLoadFromXml(leftWorkspace_xml, leftWorkspace);
+        var rightWorkspace_xml = Blockly.Xml.textToDom(file.rightWorkspace_xml_text);
+        Blockly.Xml.clearWorkspaceAndLoadFromXml(rightWorkspace_xml, rightWorkspace);
+
+        window.chrome.webview.removeEventListener('message', openFileReceivedEvent);
+      }
+    }
+  </script>
+
+  <script>
     var resetButton = document.getElementById('reload-button');
 
     resetButton.onclick = function() {
@@ -220,7 +294,7 @@
   <script>
     var leftHandButton = document.getElementById('left-hand-switch-button');
 
-    leftHandButton.onclick = function() {
+    leftHandButton.onclick = function(event) {
       const rightHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
 
       var leftHandOpen = "MODULE MainModule\n";
@@ -239,6 +313,8 @@
 
       //if robot is not already moving
       if(controllerState != controllerExecutionState.RUNNING){
+        event.stopPropagation();
+
         if (leftHandButton.value == "open-hand") {
         //logic to open left hand gripper
         /* Submit the code for the left hand */
@@ -274,7 +350,7 @@
   <script>
     var rightHandButton = document.getElementById('right-hand-switch-button');
 
-    rightHandButton.onclick = function() {
+    rightHandButton.onclick = function(event) {
       const leftHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
 
       var rightHandOpen = "MODULE MainModule\n";
@@ -293,6 +369,8 @@
 
       //if robot is not already moving
       if(controllerState != controllerExecutionState.RUNNING){
+        event.stopPropagation();
+
         if (rightHandButton.value == "open-hand") {        
         //logic to open right hand gripper
         /* Submit the code for the left hand */
