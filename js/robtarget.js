@@ -2,8 +2,11 @@
 
 goog.provide('robtarget');
 
-var leftArmRobTargets = {};
-var rightArmRobTargets = {};
+var leftHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
+var rightHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
+
+var leftArmRobTargets = {"Home Position" : leftHomePosition};
+var rightArmRobTargets = {"Home Position" : rightHomePosition};
 var leftArmVariableRenamed = false;
 var rightArmVariableRenamed = false;
 var newVariableName = "";

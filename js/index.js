@@ -34,6 +34,9 @@ Blockly.Xml.domToWorkspace(workspaceBlocks, rightWorkspace);
 leftWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
 rightWorkspace.getAllBlocks().forEach(block => { block.setMovable(false); block.setDeletable(false); block.setEditable(false) });
 
+leftWorkspace.createVariable("Home Position");
+rightWorkspace.createVariable("Home Position");
+
 leftWorkspace.addChangeListener(mirrorEvent);
 rightWorkspace.addChangeListener(mirrorEvent);
 leftWorkspace.addChangeListener(listenForDragging);
