@@ -8,7 +8,7 @@ html {
 }
 
 #left-workspace, #right-workspace {
-    height: 980px;
+    height: 680px;
 }
 
 #workspace-identifier {
@@ -28,16 +28,4 @@ html {
 #toolbar {
     padding: 5px;
     background-color: #d1d1d1;
-}
-
-#dropdownMenuButton {
-    border-radius: 2px;
-    font-size: 18px;
-    margin-right: 5px;
-    width: 160px;
-}
-
-#toolbar h6{
-    margin-left: 7px;
-    margin-right: 7px;
 }
