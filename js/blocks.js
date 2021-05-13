@@ -61,20 +61,10 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     },
-    // Mirror movement
-    {
-        "type": "custom_mirror",
-        "message0": "Mirror other arm",
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 40,
-        "tooltip": "",
-        "helpUrl": ""
-    },
     // Open hand
     {
         "type": "custom_open",
-        "message0": "Open hand",
+        "message0": "Open gripper",
         "previousStatement": null,
         "nextStatement": null,
         "colour": 200,
@@ -84,7 +74,7 @@ Blockly.defineBlocksWithJsonArray([
     // Close hand
     {
         "type": "custom_close",
-        "message0": "Close hand",
+        "message0": "Close gripper",
         "previousStatement": null,
         "nextStatement": null,
         "colour": 200,

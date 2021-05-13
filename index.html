@@ -14,28 +14,23 @@
   <div class="container-fluid">
 
     <div class="row" id="toolbar">
-      <div class="col-6">
+      <div class="col-3">
         <span id="filename-display" style="font-size:20px;"></span>
       </div>
-      <div class="col-6" id="actions-menu">
-        <div class="row justify-content-end">
-          <div class="dropdown">
-            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Actions
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <h6 class="dropdown-item-text">Workspace Options</h6>
-              <button class="dropdown-item" type="button" id="save-button">Save As</button>
-              <button class="dropdown-item" type="button" id="open-file-button">Open File</button>
-              <button class="dropdown-item" type="button" id="reload-button">Reload</button>
-              <hr class="dropdown-divider">
-              <h6 class="dropdown-item-text">Robot Options</h6>
-              <button class="dropdown-item" type="button" id="reset-button">Home Position</button>
-              <hr class="dropdown-divider">
-              <h6 class="dropdown-item-text">Gripper Options</h6>
-              <button class="dropdown-item" type="button" id="left-hand-switch-button" value="open-hand">Open Left</button>
-              <button class="dropdown-item" type="button" id="right-hand-switch-button" value="open-hand">Open Right</button>
-            </div>
+      <div class="col-9" id="actions-menu">
+        <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with action button groups">
+          <div class="btn-group mr-2" role="group" aria-label="Workspace Options">
+            <button type="button" class="btn btn-primary" id="save-button">Save As</button>
+            <button type="button" class="btn btn-primary" id="open-file-button">Open File</button>
+            <button type="button" class="btn btn-primary" id="reload-button">Reload</button>
+          </div>
+          <div class="btn-group mr-2" role="group" aria-label="Robot Options">
+            <button type="button" class="btn btn-secondary" id="reset-button">Home Position</button>
+          </div>
+          <div class="btn-group" role="group" aria-label="Gripper Options">
+            <button type="button" class="btn btn-info" id="left-hand-switch-button" value="open-hand">Open Left</button>
+            <button type="button" class="btn btn-info" id="left-right-hand-switch-button" value="open-hand">Open Both</button>
+            <button type="button" class="btn btn-info" id="right-hand-switch-button" value="open-hand">Open Right</button>
           </div>
         </div>
       </div>
@@ -58,6 +53,8 @@
         <button id="execution-button" value="start-execution" type="button" class="btn btn-success">Start</button>
       </div>
     </div>
+
+  </div>
 
   <div id="position-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -94,11 +91,8 @@
       <block type="custom_move">
         <mutation type="and follow on other side"></mutation>
       </block>
-      <block type="custom_move">
-        <mutation type="and mirror on other side"></mutation>
-      </block>
     </category>
-    <category name="Finger" colour="#4285F4">
+    <category name="Gripper" colour="#4285F4">
       <block type="custom_open"></block>
       <block type="custom_close"></block>
     </category>
@@ -313,7 +307,6 @@
 
       //if robot is not already moving
       if(controllerState != controllerExecutionState.RUNNING){
-        event.stopPropagation();
 
         if (leftHandButton.value == "open-hand") {
         //logic to open left hand gripper
@@ -326,6 +319,11 @@
 
         $("#left-hand-switch-button").text("Close Left");
         leftHandButton.value = "close-hand";
+        //if both the same value then set both gripper button to match
+        if(rightHandButton.value == "close-hand"){
+          $("#left-right-hand-switch-button").text("Close Both");
+          bothHandsButton.value = "close-hand";
+        }
       }
       else if(leftHandButton.value == "close-hand"){
         //logic to close left hand gripper
@@ -340,6 +338,11 @@
 
         $("#left-hand-switch-button").text("Open Left");
         leftHandButton.value = "open-hand";
+        //if both the same value then set both gripper button to match
+        if(rightHandButton.value == "open-hand"){
+          $("#left-right-hand-switch-button").text("Open Both");
+          bothHandsButton.value = "open-hand";
+        }
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
@@ -369,32 +372,101 @@
 
       //if robot is not already moving
       if(controllerState != controllerExecutionState.RUNNING){
-        event.stopPropagation();
 
-        if (rightHandButton.value == "open-hand") {        
-        //logic to open right hand gripper
-        /* Submit the code for the left hand */
-        window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage(leftHandNoOp);
-        /* Submit the code for the right hand */
-        window.chrome.webview.postMessage('T_ROB_R');
-        window.chrome.webview.postMessage(rightHandOpen);
+          if (rightHandButton.value == "open-hand") {        
+          //logic to open right hand gripper
+          /* Submit the code for the left hand */
+          window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage(leftHandNoOp);
+          /* Submit the code for the right hand */
+          window.chrome.webview.postMessage('T_ROB_R');
+          window.chrome.webview.postMessage(rightHandOpen);
 
-        $("#right-hand-switch-button").text("Close Right");
-        rightHandButton.value = "close-hand";
-      } else if(rightHandButton.value == "close-hand"){        
-        //logic to close right hand gripper
-        /* Submit the code for the left hand */
-        window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage(leftHandNoOp);
-        /* Submit the code for the right hand */
-        window.chrome.webview.postMessage('T_ROB_R');
-        //change right hand open logic so that gripper is closed
-        var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
-        window.chrome.webview.postMessage(rightHandClose);
+          $("#right-hand-switch-button").text("Close Right");
+          rightHandButton.value = "close-hand";
+          //if both the same value then set both gripper button to match
+          if(leftHandButton.value == "close-hand"){
+              $("#left-right-hand-switch-button").text("Close Both");
+              bothHandsButton.value = "close-hand";
+          }
+        } else if(rightHandButton.value == "close-hand"){        
+          //logic to close right hand gripper
+          /* Submit the code for the left hand */
+          window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage(leftHandNoOp);
+          /* Submit the code for the right hand */
+          window.chrome.webview.postMessage('T_ROB_R');
+          //change right hand open logic so that gripper is closed
+          var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
+          window.chrome.webview.postMessage(rightHandClose);
 
-        $("#right-hand-switch-button").text("Open Right");
-        rightHandButton.value = "open-hand";
+          $("#right-hand-switch-button").text("Open Right");
+          rightHandButton.value = "open-hand";
+          //if both the same value then set both gripper button to match
+          if(leftHandButton.value == "open-hand"){
+              $("#left-right-hand-switch-button").text("Open Both");
+              bothHandsButton.value = "open-hand";
+          }
+        }
+        /* Start execution */
+        window.chrome.webview.postMessage('START_EXEC');
+      }      
+    }
+  </script>
+
+  <script>
+    var bothHandsButton = document.getElementById('left-right-hand-switch-button');
+
+    bothHandsButton.onclick = function(event) {
+
+      var openHand = "MODULE MainModule\n";
+      openHand += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      openHand += "PROC main()\n";
+      openHand += "Var bool isCalibrated := FALSE;\n";
+      openHand += "SetLeadThrough \\On \\NoStopMove;\n";
+      openHand += "isCalibrated := g_IsCalibrated();\n";
+      openHand += "IF isCalibrated = FALSE THEN\n";
+      openHand += "g_Init \\Calibrate;\n";
+      openHand += "ENDIF\n";
+      openHand += "g_GripOut;\n";
+      openHand += "g_Stop;\n";
+      openHand += "ENDPROC\n";
+      openHand += "ENDMODULE\n";
+
+      //if robot is not already moving
+      if(controllerState != controllerExecutionState.RUNNING){      
+
+        if (bothHandsButton.value == "open-hand") {        
+          //logic to open grippers
+          /* Submit the code for the left hand */
+          window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage(openHand);
+          /* Submit the code for the right hand */
+          window.chrome.webview.postMessage('T_ROB_R');
+          window.chrome.webview.postMessage(openHand);
+
+          $("#left-right-hand-switch-button").text("Close Both");
+          bothHandsButton.value = "close-hand";
+          $("#left-hand-switch-button").text("Close Left");
+          leftHandButton.value = "close-hand";
+          $("#right-hand-switch-button").text("Close Right");
+          rightHandButton.value = "close-hand";          
+      } else if(bothHandsButton.value == "close-hand"){
+          var closeHand = openHand.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");       
+          //logic to close grippers
+          /* Submit the code for the left hand */
+          window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage(closeHand);
+          /* Submit the code for the right hand */
+          window.chrome.webview.postMessage('T_ROB_R');        
+          window.chrome.webview.postMessage(closeHand);
+
+          $("#left-right-hand-switch-button").text("Open Both");
+          bothHandsButton.value = "open-hand";
+          $("#left-hand-switch-button").text("Open Left");
+          leftHandButton.value = "open-hand";
+          $("#right-hand-switch-button").text("Open Right");
+          rightHandButton.value = "open-hand";          
       }
       /* Start execution */
       window.chrome.webview.postMessage('START_EXEC');
@@ -440,12 +512,12 @@
         window.chrome.webview.postMessage('START_EXEC');
 
         //set both gripper buttons to close since the grippers are opened on reset
-        var leftHandButton = document.getElementById('left-hand-switch-button');
-        var rightHandButton = document.getElementById('right-hand-switch-button');
         $("#left-hand-switch-button").text("Close Left");
         leftHandButton.value = "close-hand";
         $("#right-hand-switch-button").text("Close Right");
         rightHandButton.value = "close-hand";
+        $("#left-right-hand-switch-button").text("Close Both");
+        bothHandsButton.value = "close-hand";
       }      
     }
   </script>

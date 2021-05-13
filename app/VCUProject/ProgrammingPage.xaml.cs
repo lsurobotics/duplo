@@ -87,6 +87,7 @@ namespace VCUProject
             /* If the message received is T_ROB_L or T_ROB_R, update the robot task */
             else if (messageFromWeb == "T_ROB_L" || messageFromWeb == "T_ROB_R")
             {
+                _controller.Rapid.Stop(StopMode.Immediate); //stop robot before load to prevent double click of start/gripper button errors
                 armTask = _controller.Rapid.GetTask(messageFromWeb);
             }
             //tells WPF that next message will contain the file contents
