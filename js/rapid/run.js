@@ -24,5 +24,5 @@ Blockly.Rapid['custom_start'] = function (block) {
     CalibrateGripper    += "  g_Init \\Calibrate;\n";
     CalibrateGripper    += "ENDIF\n";
 
-    return "PROC main()\n" + leftArmPos + rightArmPos + gripperVariable + enableLeadThrough;// + CalibrateGripper;
+    return "PROC main()\n" + leftArmPos + rightArmPos + gripperVariable + enableLeadThrough + CalibrateGripper;
 };
