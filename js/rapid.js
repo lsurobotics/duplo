@@ -14,6 +14,8 @@ Blockly.Rapid.addReservedWords(
   'alias,and,backward,case,connect,const,default,div,do,else,elseif,endfor,endfunc,endif,endmodule,endproc,endrecord,endtest,endtrap,endwhile,error,exit,false,for,from,func,goto,if,inout,local,mod,module,nostepin,not,noview,or,pers,proc,raise,readonly,record,retry,return,step,sysmodule,test,then,to,trap,true,trynext,var,viewonly,while,with,xor'
 );
 
+Blockly.Rapid.RETEACH_VARIABLE_ID = "RETEACH_VARIABLE_ID";
+
 // Order of operation ENUMs
 Blockly.Rapid.ORDER_ATOMIC = 0;           // 0 "" ...
 Blockly.Rapid.ORDER_FUNCTION_CALL = 0.1;
