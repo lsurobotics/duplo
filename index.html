@@ -70,7 +70,47 @@
           <img src="img/RightArm-LeftArm.gif" class="img-fluid" />
         </div>
         <div class="modal-footer justify-content-center">
-          <button id="position-modal-confirm-button" type="button" class="btn btn-success">Confirm</button>
+          <button id="position-modal-confirm-button" type="button" class="btn btn-success">Teach Position</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reteach-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-size:30px;">Attention</h5>
+          <button id = "reteach-modal-cancel-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span id="reteach-modal-warning" style="font-size:20px;"></span>
+          <img src="img/RightArm-LeftArm.gif" class="img-fluid" />
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="reteach-modal-confirm-button" type="button" class="btn btn-success">Reteach Position</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="variable-prompt-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-size:30px;">Attention</h5>
+          <button id = "variable-prompt-modal-cancel-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span id="variable-prompt-modal-warning" style="font-size:20px;"></span>
+          <div class="input-group mt-3 mb-3">
+            <input type="text" class="form-control" id="variable-name-input" placeholder="New location name" aria-label="New location name" aria-describedby="button-addon2">
+            <button id="variable-prompt-modal-confirm-button" class="btn btn-success" type="button" id="variable-prompt-modal-confirm-button">Ok</button>
+          </div>
         </div>
       </div>
     </div>
@@ -115,7 +155,7 @@
   <script src="js/robtarget.js"></script>
   <script src="js/controllerState.js"></script>
   <script src="js/scrolling.js"></script>
-  <script src="js/dropDownCreate.js"></script>
+  <script src="js/variablePrompt.js"></script>
   <script src="js/resolve.js"></script>
   <script src="js/lengthen-container.js"></script>
   <script src="js/split-stacks.js"></script>
@@ -261,13 +301,23 @@
       else{
         var file = JSON.parse(event.data);
         leftArmRobTargets = file.leftArmRobTargets;
+        leftArmRobTargets["Home Position"] = leftHomePosition;  //home position defined in robtargets.js
+
         rightArmRobTargets = file.rightArmRobTargets;
+        rightArmRobTargets["Home Position"] = rightHomePosition;  //home position defined in robtargets.js
 
         /*This loads the xml back into the workspace*/
         var leftWorkspace_xml = Blockly.Xml.textToDom(file.leftWorkspace_xml_text);
         Blockly.Xml.clearWorkspaceAndLoadFromXml(leftWorkspace_xml, leftWorkspace);
         var rightWorkspace_xml = Blockly.Xml.textToDom(file.rightWorkspace_xml_text);
         Blockly.Xml.clearWorkspaceAndLoadFromXml(rightWorkspace_xml, rightWorkspace);
+
+        //get all variables within the workspaces to see if "Home Position" is there
+        var leftWorkspaceVariables = leftWorkspace.getAllVariables();
+        if(leftWorkspaceVariables.find(o => o.name.toLowerCase() === "Home Position") === undefined) leftWorkspace.createVariable("Home Position");
+
+        var rightWorkspaceVariables = rightWorkspace.getAllVariables();
+        if(rightWorkspaceVariables.find(o => o.name.toLowerCase() === "Home Position") === undefined) rightWorkspace.createVariable("Home Position");
 
         window.chrome.webview.removeEventListener('message', openFileReceivedEvent);
       }
@@ -476,11 +526,11 @@
 
     resetButton.onclick = function() {
       
-      var leftHome = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
-      var rightHome = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
+      var leftHome = leftHomePosition;  //home position defined in robtarget.js
+      var rightHome = rightHomePosition;  //defined in robtarget.js
 
       var leftArmReset = "MODULE MainModule\n";
-      leftArmReset += "CONST robtarget home:=[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]];\n";
+      leftArmReset += `CONST robtarget home:=${leftHome};\n`;
       leftArmReset += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
       leftArmReset += "PROC main()\n";
       leftArmReset += "Var bool isCalibrated := FALSE;\n";
