@@ -40,11 +40,11 @@ Blockly.Rapid['custom_move'] = function (block) {
 
   //match the scrubbed variable name with the unscrubbed one and then add robtarget position to the scrubbed variable name for code generation
   if(block.workspace.id == leftWorkspace.id){    
-    target = `${target}_L`;  //in left workspace so append _L to target for move instruction
+    target = `L_${target}_L`;  //in left workspace so append L_ and _L to target for move instruction
     Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed[target] = leftArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
   } 
   else if(block.workspace.id == rightWorkspace.id){
-    target = `${target}_R`;  //in right workspace so append _R to target for move instruction
+    target = `R_${target}_R`;  //in right workspace so append R_ and _R to target for move instruction
     Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed[target] = rightArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
   } 
 
