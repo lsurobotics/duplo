@@ -127,6 +127,8 @@ function variableRenameEvent_(event) {
     leftArmVariableRenamed = false;
     rightArmVariableRenamed = false;
     newVariableName = "";
+
+    autosave(); //autosave workspace after a new position has been taught
   }
 
 
@@ -135,6 +137,14 @@ function variableRenameEvent_(event) {
   function reteachRobTargetsReceivedEvent(event){    
     if(event.data !== ""){  //if message received is empty string then an error occurred so leave position alone. Otherwise adjust
       if(renameVariableWorkspace == leftWorkspace.id) leftArmRobTargets[selectedVariable] = event.data;     //selectedVariable comes from variablePrompt.js   
-      else if(renameVariableWorkspace == rightWorkspace.id) rightArmRobTargets[selectedVariable] = event.data;   //selectedVariable comes from variablePrompt.js        
+      else if(renameVariableWorkspace == rightWorkspace.id) rightArmRobTargets[selectedVariable] = event.data;   //selectedVariable comes from variablePrompt.js  
+      
+      autosave(); //autosave workspace after a position has been retaught
     }
+  }
+
+  //this function triggers an autosave by changin save button value to autosave and clicking button
+  function autosave(){
+    $('#save-button').val("autosave"); //change button value to autosave
+    $("#save-button").trigger("click");
   }
