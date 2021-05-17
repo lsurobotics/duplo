@@ -53,6 +53,7 @@ function variableRenameEvent_(event) {
       }      
       newVariableName = event.newName;  //so get position function knows which variable to put target to
       $('#position-modal').modal('show'); //show teach position modal
+      $('#position-modal').attr('data-value', 'new-position');
       $("#position-modal-warning").html(`Please move <b>${arm}</b> arm to the desired position.`)
     }else{  //adjust key to new variable name
       if (event.workspaceId == leftWorkspace.id){
@@ -71,15 +72,17 @@ function variableRenameEvent_(event) {
    */
   document.getElementById("position-modal-cancel-button").addEventListener("click", canceledModal);
   function canceledModal() {
-    var arm;
-    const options = {once : true};
-    if (leftArmVariableRenamed) arm = "LEFT";
-    else if (rightArmVariableRenamed) arm = "RIGHT";
-    alert(`WARNING: ${newVariableName} location may move robot to an unwanted position. Consider deleting or reteaching!`);
-    //register listener for message from host app and pass event to handler
-    //receives a new robtarget for both arms from the host app when the Ok button is pressed
-    window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);    
-    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
+    if($('#position-modal').attr('data-value') == "new-position"){
+      var arm;
+      const options = {once : true};
+      if (leftArmVariableRenamed) arm = "LEFT";
+      else if (rightArmVariableRenamed) arm = "RIGHT";
+      alert(`WARNING: ${newVariableName} location may move robot to an unwanted position. Consider deleting or reteaching!`);
+      //register listener for message from host app and pass event to handler
+      //receives a new robtarget for both arms from the host app when the Ok button is pressed
+      window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);    
+      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
+    }
   };
 
   /**
@@ -87,18 +90,31 @@ function variableRenameEvent_(event) {
    */
   document.getElementById("position-modal-confirm-button").addEventListener("click", confirmedModal);
   function confirmedModal() {
-    var arm;
-    const options = {once : true};
-    if (leftArmVariableRenamed) arm = "LEFT";
-    else if (rightArmVariableRenamed) arm = "RIGHT";     
-    $('#position-modal').modal('hide');
-    //register listener for message from host app and pass event to handler
-    //receives a new robtarget for both arms from the host app when the Ok button is pressed
-    window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);
-    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+    if($('#position-modal').attr('data-value') == "new-position"){
+      var arm;
+      const options = {once : true};
+      if (leftArmVariableRenamed) arm = "LEFT";
+      else if (rightArmVariableRenamed) arm = "RIGHT";     
+      $('#position-modal').modal('hide');
+      //register listener for message from host app and pass event to handler
+      //receives a new robtarget for both arms from the host app when the Ok button is pressed
+      window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);
+      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+    }else if($('#position-modal').attr('data-value') == "reteach-position"){
+      var arm;
+      const options = {once : true};
+      if (renameVariableWorkspace == leftWorkspace.id) arm = "LEFT";
+      else if (renameVariableWorkspace == rightWorkspace.id) arm = "RIGHT";     
+      $('#position-modal').modal('hide');
+      //register listener for message from host app and pass event to handler
+      //receives a new robtarget for both arms from the host app when the Ok button is pressed
+      window.chrome.webview.addEventListener('message', reteachRobTargetsReceivedEvent, options);
+      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+    }    
   };
 
-  //callback function for receiving of arm positions as robot targets 
+  //callback function for receiving of arm positions as robot targets
+  //called when user requests a new position teach and position modal data-attribute is set to "new-position" 
   function robTargetsReceivedEvent(event){    
     if(event.data === ""){  //if message received is empty string then an error occurred so delete varName
       if(leftArmVariableRenamed) delete leftArmRobTargets[newVariableName];        
@@ -111,4 +127,14 @@ function variableRenameEvent_(event) {
     leftArmVariableRenamed = false;
     rightArmVariableRenamed = false;
     newVariableName = "";
-  } 
+  }
+
+
+  //callback function for receiving of arm positions as robot targets
+  //called when user requests a reteach and position modal data-attribute is set to "reteach-position" 
+  function reteachRobTargetsReceivedEvent(event){    
+    if(event.data !== ""){  //if message received is empty string then an error occurred so leave position alone. Otherwise adjust
+      if(renameVariableWorkspace == leftWorkspace.id) leftArmRobTargets[selectedVariable] = event.data;     //selectedVariable comes from variablePrompt.js   
+      else if(renameVariableWorkspace == rightWorkspace.id) rightArmRobTargets[selectedVariable] = event.data;   //selectedVariable comes from variablePrompt.js        
+    }
+  }

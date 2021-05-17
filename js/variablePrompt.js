@@ -172,37 +172,12 @@ Blockly.FieldVariable.prototype.onItemSelected_ = function(menu, menuItem) {
     } else if (id == Blockly.Rapid.RETEACH_VARIABLE_ID){
       if (renameVariableWorkspace == leftWorkspace.id) arm = "LEFT";
       else if (renameVariableWorkspace == rightWorkspace.id) arm = "RIGHT";
-      $('#reteach-modal').modal('show'); //show teach position modal
-      $("#reteach-modal-warning").html(`To reteach <b>${selectedVariable}</b> position, please move <b>${arm}</b> arm to the desired position.`)
-      console.log("reteach variable")
+      $('#position-modal').modal('show'); //show teach position modal
+      $('#position-modal').attr('data-value', 'reteach-position');  //set data attribute of position modal to reteach-position (Used in confirm button)
+      $("#position-modal-warning").html(`To reteach <b>${selectedVariable}</b> position, please move <b>${arm}</b> arm to the desired position.`);
       return;
     }
   }
   // Handle unspecial case.
   this.setValue(id);
 };
-
-
-/**
-   * Event listener for teach position modal confirm teach position button
-   */
-  document.getElementById("reteach-modal-confirm-button").addEventListener("click", confirmedReteachModal);
-  function confirmedReteachModal() {
-    var arm;
-    const options = {once : true};
-    if (renameVariableWorkspace == leftWorkspace.id) arm = "LEFT";
-    else if (renameVariableWorkspace == rightWorkspace.id) arm = "RIGHT";     
-    $('#reteach-modal').modal('hide');
-    //register listener for message from host app and pass event to handler
-    //receives a new robtarget for both arms from the host app when the Ok button is pressed
-    window.chrome.webview.addEventListener('message', reteachRobTargetsReceivedEvent, options);
-    window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
-  };
-
-  //callback function for receiving of arm positions as robot targets 
-  function reteachRobTargetsReceivedEvent(event){    
-    if(event.data !== ""){  //if message received is empty string then an error occurred so leave position alone. Otherwise adjust
-      if(renameVariableWorkspace == leftWorkspace.id) leftArmRobTargets[selectedVariable] = event.data;        
-      else if(renameVariableWorkspace == rightWorkspace.id) rightArmRobTargets[selectedVariable] = event.data;           
-    }
-  }
