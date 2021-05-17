@@ -113,7 +113,7 @@ Blockly.prompt = function(message, defaultValue, callback) {
     If a new block is deployed then the default variable name will be contained in the dropdown list.
     this loop searches through the elements of the dropdown list looking for a match with the default. 
     if found, it removes that element from the drop down. It also removes the delete option so that if
-    the selected variable name matches the default variable name. This means it is a new block and the
+    the selected variable name matches the default variable name this means it is a new block and the
     user should only see a prompt for creating a 'New Location' within the variable dropdown
     */
     for(var i = 0; i < options.length; i++){
@@ -129,6 +129,17 @@ Blockly.prompt = function(message, defaultValue, callback) {
           }
         }
         break;      
+      }
+    }
+
+    //ADDED! The purpose of this loop is to keep user from being able to change or delete the default Home Position variable
+    //this is done by just removing the rename, reteach, and delete options from the drop down
+    if(name == "Home Position"){
+      var j = options.length;
+      while(j--){
+        if(options[j][1] == Blockly.DELETE_VARIABLE_ID) options.splice(j, 1); //delete "delete variable option"
+        else if(options[j][1] == Blockly.RENAME_VARIABLE_ID) options.splice(j, 1);  //delete "rename variable option"
+        else if(options[j][1] == Blockly.Rapid.RETEACH_VARIABLE_ID) options.splice(j, 1); //delete "reteach variable option"
       }
     }
 
