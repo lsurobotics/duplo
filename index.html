@@ -20,7 +20,7 @@
       <div class="col-9" id="actions-menu">
         <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with action button groups">
           <div class="btn-group mr-2" role="group" aria-label="Workspace Options">
-            <button type="button" class="btn btn-primary" id="save-button">Save As</button>
+            <button type="button" value="save-by-name" class="btn btn-primary" id="save-button">Save As</button>
             <button type="button" class="btn btn-primary" id="open-file-button">Open File</button>
             <button type="button" class="btn btn-primary" id="reload-button">Reload</button>
           </div>
@@ -239,14 +239,27 @@
         "rightArmRobTargets" : rightArmRobTargets
       }
 
-      file = JSON.stringify(file, undefined, 4); 
+      //means this is a user desired save
+      if($('#save-button').val() == "save-by-name"){
+        file = JSON.stringify(file, undefined, 4); 
        
-      window.chrome.webview.postMessage('SAVE_FILE');
-      window.chrome.webview.postMessage(file);
-      window.chrome.webview.postMessage('END_SAVE');
-        
-      const options = {once : true};
-      window.chrome.webview.addEventListener('message', saveFilenameReceivedEvent, options);      
+        window.chrome.webview.postMessage('SAVE_FILE');
+        window.chrome.webview.postMessage(file);
+        window.chrome.webview.postMessage('END_SAVE');
+          
+        const options = {once : true};
+        window.chrome.webview.addEventListener('message', saveFilenameReceivedEvent, options);
+      //means this is an autosave  
+      }else if($('#save-button').val() == "autosave"){
+        file["autosave"] = true;  //set autosave key to true so that wpf knows this is an autosave by searching for it on wpf side
+        file = JSON.stringify(file, undefined, 4);
+
+        window.chrome.webview.postMessage('SAVE_FILE');
+        window.chrome.webview.postMessage(file);
+        window.chrome.webview.postMessage('END_SAVE');
+
+        $('#save-button').val("save-by-name"); //change button value back to save-by-name
+      }   
     }
 
     function saveFilenameReceivedEvent(event){

@@ -218,44 +218,71 @@ namespace VCUProject
             }
         }
 
+        //Saves the blockly workspace either as an autosave or a save by name. Autosaved workspace is overwritten each time.
+        //The goal of the autosave is to be able to recover your workspace in case of a crash. Otherwise use save as.
         private void SaveBlocklyWorkspaceLocally(string file)
-        {           
-            try
+        {
+            if (file.Contains("\"autosave\": true")) //this is an autosave
             {
-                string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string duploFolder = Path.Combine(documentFolder, "Duplo/SavedWorkspaces");
-
-                if (!Directory.Exists(duploFolder))
+                try
                 {
-                    Directory.CreateDirectory(duploFolder);
+                    string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    string duploFolder = Path.Combine(documentFolder, "Duplo/AutosavedWorkspace");
+
+                    if (!Directory.Exists(duploFolder))
+                    {
+                        Directory.CreateDirectory(duploFolder);
+                    }
+
+                    string filename = "WorkspaceBackup" + ".json";
+                    string localFilepath = Path.Combine(duploFolder, filename);
+                    File.WriteAllText(localFilepath, file);
                 }
-                
-                SaveFileDialog saveFileDialog = new SaveFileDialog
+                catch (Exception ex)
                 {
-                    InitialDirectory = documentFolder + "\\Duplo\\SavedWorkspaces\\",
-                    Title = "Save Blockly Workspace",
-                    OverwritePrompt = true,
-                    DefaultExt = "json",
-                    Filter = "json files (*.json)|*.json",
-                    FilterIndex = 2,
-                    RestoreDirectory = true,
-                    
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    File.WriteAllText(saveFileDialog.FileName, file);
-                    webView.CoreWebView2.PostWebMessageAsString(saveFileDialog.SafeFileName);
+                    MessageBox.Show("Exception while autosaving workspace: " + ex);
+                    next_message = next_message_type.RAPID;
                 }
-                else webView.CoreWebView2.PostWebMessageAsString("SAVE_CANCELLED");
-
             }
-            catch (Exception ex)
+            else //this is a save by name
             {
-                MessageBox.Show("Exception while saving workspace: " + ex);
-                next_message = next_message_type.RAPID;
-                webView.CoreWebView2.PostWebMessageAsString("SAVE_FILE_ERROR");
-            }
+                try
+                {
+                    string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    string duploFolder = Path.Combine(documentFolder, "Duplo/SavedWorkspaces");
+
+                    if (!Directory.Exists(duploFolder))
+                    {
+                        Directory.CreateDirectory(duploFolder);
+                    }
+
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        InitialDirectory = documentFolder + "\\Duplo\\SavedWorkspaces\\",
+                        Title = "Save Blockly Workspace",
+                        OverwritePrompt = true,
+                        DefaultExt = "json",
+                        Filter = "json files (*.json)|*.json",
+                        FilterIndex = 2,
+                        RestoreDirectory = true,
+
+                    };
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        File.WriteAllText(saveFileDialog.FileName, file);
+                        webView.CoreWebView2.PostWebMessageAsString(saveFileDialog.SafeFileName);
+                    }
+                    else webView.CoreWebView2.PostWebMessageAsString("SAVE_CANCELLED");
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Exception while saving workspace: " + ex);
+                    next_message = next_message_type.RAPID;
+                    webView.CoreWebView2.PostWebMessageAsString("SAVE_FILE_ERROR");
+                }
+            }           
         }
 
         private void OpenFile()
