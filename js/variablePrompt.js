@@ -1,3 +1,8 @@
+/**
+ * This file contains the functions for adjusting the variable dropdown to our use case and
+ * for creating the variable prompt modal that occurs on a new position or rename selection.
+ */
+
 
 var rename_variable_callback;   //stores the callback reference for the variable prompt
 var renameVariableWorkspace;    //stores workspace id that variable is being renamed in. Comes from dropdowncreate function
