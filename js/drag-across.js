@@ -56,7 +56,7 @@ function transferBlock_(event, fromLeft) {
   var metrics = toWorkspace.getMetrics(); //check if workspace has been scrolled
 
   offsetX = fromLeft ? 0 : -leftWorkspace.getToolbox().width - widest;
-  offsetY = -17;
+  offsetY = -17;  
 
   //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
   var xml = Blockly.Xml.blockToDom(blocks[0], true);
@@ -66,8 +66,11 @@ function transferBlock_(event, fromLeft) {
 
   //paste & start dragging
   blocks.forEach((block) => block.dispose());
-  toWorkspace.paste(xml);
+  toWorkspace.paste(xml);  
   newTopBlock = toWorkspace.getBlockById(blocks[0].id);
+
+  blocks = getAllFamily(toWorkspace.getBlockById(blocks[0].id));
+  clearVariables(blocks, toWorkspace); //check blocks array for variables from opposite workspace and reset if necessary
 
   dragger = new Blockly.BlockDragger(newTopBlock, toWorkspace);
   dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
@@ -130,4 +133,40 @@ function unhighlightAll() {
   rightWorkspace.getAllBlocks().forEach((block) => {
     unhighlight(block.svgGroup_);
   });
+}
+
+/**
+ * Checks each block for the LOCATION field and sets the variable within
+ * that field to the default variable name if it is set to something else.
+ * This keeps variables from one workspace being transferred into the other.
+ * Also deletes any carried over variables from the previous workspace. Makes
+ * an exception for the "Home Position" variable.
+ */
+function clearVariables(blocks, toWorkspace){
+  var field;
+  var variablesToDelete = [];
+  var variableList = toWorkspace.getAllVariables(); //get array of variables contained in workspace
+  //search each block for field named LOCATION
+  blocks.forEach(function(block){
+    field = block.getField("LOCATION");
+    //if field is found this means it is a custom move block
+    if(field !== null){
+      //if the default variable name is not selected in the block AND Home Position variable is not selected
+      var currentSelection = field.variable_;
+      if((field.defaultVariableName !== currentSelection.name) && (currentSelection.name !== "Home Position")){
+        //if default variable is present in the workspace
+        var obj = variableList.find(o => o.name === field.defaultVariableName)
+        //default variable is present in workspace so just set field value to it
+        if(obj !== undefined){
+          field.setValue(obj.id_);  //set the field to the default
+        //default variable not present so create and set field to it
+        }else{          
+          var defaultVariable = toWorkspace.createVariable(field.defaultVariableName);  //create the default variable in the workspace
+          field.setValue(defaultVariable.id_);  //set the field to the default
+        }
+        variablesToDelete.push(currentSelection.id_); //save id of variables that will need deleted after forEach loop is done                
+      }
+    }
+  });
+  variablesToDelete.forEach((variableId) => toWorkspace.deleteVariableById(variableId));  //delete carried over variable from the new workspace
 }
