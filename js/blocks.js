@@ -51,6 +51,43 @@ Blockly.defineBlocksWithJsonArray([
         "mutator": "move_mutator",
         "extensions":["move_listener"]
     },
+    // Move somewhere linearly
+    {
+        "type": "linear_custom_move",
+        "message0": "Move arm %1 in a straight line to %2",
+        "args0": [
+            {
+                "type": "field_dropdown",
+                "name": "SPEED",
+                "options": [
+                [
+                    "quickly",
+                    "QUICK"
+                ],
+                [
+                    "moderately",
+                    "MODERATE"
+                ],
+                [
+                    "slowly",
+                    "SLOW"
+                ]
+                ]
+            },
+            {
+                "type": "field_variable",
+                "name": "LOCATION",
+                "variable": "<somewhere>"
+            }
+        ],
+        "inputsInline": false,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 8,
+        "tooltip": "",
+        "helpUrl": "",
+        "extensions":["move_listener"]
+    },
     // Follow movement
     {
         "type": "custom_follow",
