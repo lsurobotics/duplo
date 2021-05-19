@@ -27,8 +27,10 @@ Blockly.Rapid['custom_follow'] = function(block) {
   if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOnVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOnVariable); //only push to syncArray if variable not already there
   if (Blockly.Rapid.sync.syncArray.indexOf(syncMoveOffVariable) === -1) Blockly.Rapid.sync.syncArray.push(syncMoveOffVariable); //only push to syncArray if variable not already there
   var code = `SyncMoveOn syncON${blockId}, task_list;\n`;
-  code += "LeftArmPos := CRobT(\\TaskName:=\"T_ROB_L\");\n";  //get left arms current position
-  code += "RightArmPos := CRobT(\\TaskName:=\"T_ROB_R\");\n"; //get right arms current position
+  //code += "LeftArmPos := CRobT(\\TaskName:=\"T_ROB_L\");\n";  //get left arms current position
+  //code += "RightArmPos := CRobT(\\TaskName:=\"T_ROB_R\");\n"; //get right arms current position
+  code += "LeftArmPos := CRobT(\\TaskName:=\"T_ROB_R\");\n";  //T_ROB_R needs to be attached to left arm to account for switched workspace/arm view
+  code += "RightArmPos := CRobT(\\TaskName:=\"T_ROB_L\");\n"; //T_ROB_L needs to be attached to right arm to account for switched workspace/arm view
 
   var sharedRobTarget = Blockly.Rapid.robotArm.sharedTargetNames[block.id].target;  //get the name of the shared robtarget variable
   var targetSpeed = Blockly.Rapid.robotArm.sharedTargetNames[block.id].speed;  //get the name of the shared robtarget variable

@@ -2,8 +2,14 @@
 
 goog.provide('robtarget');
 
-var leftHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
-var rightHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
+//var leftHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
+//var rightHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
+
+/**
+ * These are inverted due to workspace/arm reversal
+ */
+var rightHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
+var leftHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
 
 var leftArmRobTargets = {"Home Position" : leftHomePosition};
 var rightArmRobTargets = {"Home Position" : rightHomePosition};
@@ -81,7 +87,8 @@ function variableRenameEvent_(event) {
       //register listener for message from host app and pass event to handler
       //receives a new robtarget for both arms from the host app when the Ok button is pressed
       window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);    
-      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
+      //window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);  //still need a robtarget to go with variable name
+      requestOppositeArmPosition(arm);
     }
   };
 
@@ -99,7 +106,8 @@ function variableRenameEvent_(event) {
       //register listener for message from host app and pass event to handler
       //receives a new robtarget for both arms from the host app when the Ok button is pressed
       window.chrome.webview.addEventListener('message', robTargetsReceivedEvent, options);
-      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+      //window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+      requestOppositeArmPosition(arm);
     }else if($('#position-modal').attr('data-value') == "reteach-position"){
       var arm;
       const options = {once : true};
@@ -109,7 +117,8 @@ function variableRenameEvent_(event) {
       //register listener for message from host app and pass event to handler
       //receives a new robtarget for both arms from the host app when the Ok button is pressed
       window.chrome.webview.addEventListener('message', reteachRobTargetsReceivedEvent, options);
-      window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+      //window.chrome.webview.postMessage(`UPDATE_${arm}_ARM_POSITION`);
+      requestOppositeArmPosition(arm);
     }    
   };
 
@@ -147,4 +156,14 @@ function variableRenameEvent_(event) {
   function autosave(){
     $('#save-button').val("autosave"); //change button value to autosave
     $("#save-button").trigger("click");
+  }
+
+  /**
+   * This is needed because the user is working in the left/right workspace but actually manipulating the opposite arm
+   * so the position request needs to reflect that. The arm argument reflects the workspace that the user
+   * is working in. In reality, they are however manipulating the opposite arm from the one that they should be.
+   */
+  function requestOppositeArmPosition(arm){
+    if(arm == "LEFT") window.chrome.webview.postMessage(`UPDATE_RIGHT_ARM_POSITION`);
+    else if(arm == "RIGHT") window.chrome.webview.postMessage(`UPDATE_LEFT_ARM_POSITION`);
   }
