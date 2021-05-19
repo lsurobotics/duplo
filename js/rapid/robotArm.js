@@ -98,3 +98,47 @@ Blockly.Rapid['custom_move'] = function (block) {
 
   return code;
 };
+
+
+Blockly.Rapid['linear_custom_move'] = function (block) {
+
+  //check to ensure that the user has actually taught a position into the block. If not then set warning and return
+  if (block.getField('LOCATION').variable_.name == block.getField('LOCATION').defaultVariableName) {
+    block.setWarningText("Block should have a teach position selected!"); //warn user they need to set the variable name of this block
+    return "!ERROR!\n"; //block does not generate code, return !ERROR!
+  }
+
+  var target = Blockly.Rapid.variableDB_.getName(block.getFieldValue('LOCATION'), Blockly.Variables.NAME_TYPE); //returns the scrubbed variable name
+  var unscrubbedTargetName = block.getField('LOCATION').variable_.name; //get the unscrubbed variable name for replacing of the key in the unscrubbed robot target object
+
+  //match the scrubbed variable name with the unscrubbed one and then add robtarget position to the scrubbed variable name for code generation
+  if(block.workspace.id == leftWorkspace.id){    
+    target = `L_${target}_L`;  //in left workspace so append L_ and _L to target for move instruction
+    Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed[target] = leftArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
+  } 
+  else if(block.workspace.id == rightWorkspace.id){
+    target = `R_${target}_R`;  //in right workspace so append R_ and _R to target for move instruction
+    Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed[target] = rightArmRobTargets[unscrubbedTargetName];  //reassign object key so target definitions match with move instruction targets
+  } 
+
+  var code = "";
+
+  var move_speed = block.getFieldValue('SPEED');
+  var speed = "v100";
+  switch (move_speed) {
+    case "QUICK":
+      speed = "v1000";
+      break;
+    case "MODERATE":
+      speed = "v500";
+      break;
+    case "SLOW":
+      speed = "v100";
+      break;
+    default:
+      break;
+  }  
+ 
+  code = `MoveL ${target}, ${speed}, fine, Servo;\n`;
+  return code;
+};
