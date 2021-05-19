@@ -351,10 +351,12 @@
         if (leftHandButton.value == "open-hand") {
         //logic to open left hand gripper
         /* Submit the code for the left hand */
-        window.chrome.webview.postMessage('T_ROB_L');
+        //window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage('T_ROB_R'); //inverted due to workspace/arm inversion
         window.chrome.webview.postMessage(leftHandOpen);
         /* Submit the code for the right hand */
-        window.chrome.webview.postMessage('T_ROB_R');
+        //window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage('T_ROB_L'); //inverted due to workspace/arm inversion
         window.chrome.webview.postMessage(rightHandNoOp);
 
         $("#left-hand-switch-button").text("Close Left");
@@ -368,12 +370,14 @@
       else if(leftHandButton.value == "close-hand"){
         //logic to close left hand gripper
         /* Submit the code for the left hand */
-        window.chrome.webview.postMessage('T_ROB_L');
+        //window.chrome.webview.postMessage('T_ROB_L');
+        window.chrome.webview.postMessage('T_ROB_R'); //inverted due to workspace/arm inversion
         //change left hand open logic so that gripper is closed
         var leftHandClose = leftHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");
         window.chrome.webview.postMessage(leftHandClose);
         /* Submit the code for the right hand */
-        window.chrome.webview.postMessage('T_ROB_R');
+        //window.chrome.webview.postMessage('T_ROB_R');
+        window.chrome.webview.postMessage('T_ROB_L'); //inverted due to workspace/arm inversion
         window.chrome.webview.postMessage(rightHandNoOp);
 
         $("#left-hand-switch-button").text("Open Left");
@@ -416,10 +420,12 @@
           if (rightHandButton.value == "open-hand") {        
           //logic to open right hand gripper
           /* Submit the code for the left hand */
-          window.chrome.webview.postMessage('T_ROB_L');
+          //window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage('T_ROB_R'); //inverted due to arm/workspace inversion
           window.chrome.webview.postMessage(leftHandNoOp);
           /* Submit the code for the right hand */
-          window.chrome.webview.postMessage('T_ROB_R');
+          //window.chrome.webview.postMessage('T_ROB_R');
+          window.chrome.webview.postMessage('T_ROB_L'); //inverted due to arm/workspace inversion
           window.chrome.webview.postMessage(rightHandOpen);
 
           $("#right-hand-switch-button").text("Close Right");
@@ -432,10 +438,12 @@
         } else if(rightHandButton.value == "close-hand"){        
           //logic to close right hand gripper
           /* Submit the code for the left hand */
-          window.chrome.webview.postMessage('T_ROB_L');
+          //window.chrome.webview.postMessage('T_ROB_L');
+          window.chrome.webview.postMessage('T_ROB_R'); //inverted due to arm/workspace inversion
           window.chrome.webview.postMessage(leftHandNoOp);
           /* Submit the code for the right hand */
-          window.chrome.webview.postMessage('T_ROB_R');
+          //window.chrome.webview.postMessage('T_ROB_R');
+          window.chrome.webview.postMessage('T_ROB_L'); //inverted due to arm/workspace inversion
           //change right hand open logic so that gripper is closed
           var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
           window.chrome.webview.postMessage(rightHandClose);
