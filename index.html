@@ -135,6 +135,7 @@
   <script src="js/mirror.js"></script>
   <script src="js/robtarget.js"></script>
   <script src="js/controllerState.js"></script>
+  <script src="js/toolConstants.js"></script>
   <script src="js/scrolling.js"></script>
   <script src="js/variablePrompt.js"></script>
   <script src="js/resolve.js"></script>
@@ -158,9 +159,7 @@
     var executionButton = document.getElementById('execution-button');
 
     executionButton.onclick = function() {
-      if (executionButton.value == "start-execution") {
-        //definition for the servo gripper on the YUMI
-        const ServoGripper = "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      if (executionButton.value == "start-execution") {        
         //this task list needs to be defined for sync instructions
         const task_list = "PERS tasks task_list{2} := [ [\"T_ROB_L\"], [\"T_ROB_R\"] ];\n";
         var leftTargets = "";
@@ -193,7 +192,7 @@
           rightTargets += `PERS robtarget ${key}:=${value};\n`;
         }
         
-        var right_arm_code = "MODULE MainModule\n" + rightTargets + ServoGripper + task_list + leftAndRightSyncVars + rightCode + "ENDPROC\nENDMODULE";
+        var right_arm_code = "MODULE MainModule\n" + rightTargets + CameraServoGripper + task_list + leftAndRightSyncVars + rightCode + "ENDPROC\nENDMODULE";
 
         /**
          * We have to clear the sync variable array. Because the array gets rebuilt
@@ -333,7 +332,7 @@
       const rightHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
 
       var leftHandOpen = "MODULE MainModule\n";
-      leftHandOpen += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      leftHandOpen += ServoGripper;
       leftHandOpen += "PROC main()\n";
       leftHandOpen += "Var bool isCalibrated := FALSE;\n";
       leftHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
@@ -402,7 +401,7 @@
       const leftHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
 
       var rightHandOpen = "MODULE MainModule\n";
-      rightHandOpen += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      rightHandOpen += CameraServoGripper;
       rightHandOpen += "PROC main()\n";
       rightHandOpen += "Var bool isCalibrated := FALSE;\n";
       rightHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
@@ -469,7 +468,7 @@
     bothHandsButton.onclick = function(event) {
 
       var openHand = "MODULE MainModule\n";
-      openHand += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      openHand += ServoGripper;
       openHand += "PROC main()\n";
       openHand += "Var bool isCalibrated := FALSE;\n";
       openHand += "SetLeadThrough \\On \\NoStopMove;\n";
@@ -489,7 +488,7 @@
           //logic to open grippers
           /* Submit the code for the left hand */
           window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage(openHand);
+          window.chrome.webview.postMessage(openHand.replace(ServoGripper, CameraServoGripper));  //left arm has camera gripper
           /* Submit the code for the right hand */
           window.chrome.webview.postMessage('T_ROB_R');
           window.chrome.webview.postMessage(openHand);
@@ -505,7 +504,7 @@
           //logic to close grippers
           /* Submit the code for the left hand */
           window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage(closeHand);
+          window.chrome.webview.postMessage(closeHand.replace(ServoGripper, CameraServoGripper)); //left arm has camera gripper
           /* Submit the code for the right hand */
           window.chrome.webview.postMessage('T_ROB_R');        
           window.chrome.webview.postMessage(closeHand);
@@ -533,7 +532,7 @@
 
       var leftArmReset = "MODULE MainModule\n";
       leftArmReset += `CONST robtarget home:=${leftHome};\n`;
-      leftArmReset += "PERS tooldata Servo:=[TRUE,[[0,0,114.2],[1,0,0,0]],[0.215,[8.7,12.3,49.2],[1,0,0,0],0.00021,0.00024,0.00009]];\n";
+      leftArmReset += ServoGripper;
       leftArmReset += "PROC main()\n";
       leftArmReset += "Var bool isCalibrated := FALSE;\n";
       leftArmReset += "SetLeadThrough \\On \\NoStopMove;\n";
@@ -551,7 +550,7 @@
       if(controllerState != controllerExecutionState.RUNNING){
         /* Submit the code for the left hand */
         window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage(leftArmReset);
+        window.chrome.webview.postMessage(leftArmReset.replace(ServoGripper, CameraServoGripper));  //left arm has camera gripper
         /* Submit the code for the right hand */
         var rightArmReset = leftArmReset.replace(leftHome, rightHome);
         window.chrome.webview.postMessage('T_ROB_R');
