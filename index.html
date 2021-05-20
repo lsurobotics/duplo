@@ -527,8 +527,9 @@
 
     resetButton.onclick = function() {
       
-      var leftHome = leftHomePosition;  //home position defined in robtarget.js
-      var rightHome = rightHomePosition;  //defined in robtarget.js
+      //rightHome and leftHome are inverted to account for inverted workspace
+      var rightHome = leftHomePosition;  //home position defined in robtarget.js
+      var leftHome = rightHomePosition;  //defined in robtarget.js
 
       var leftArmReset = "MODULE MainModule\n";
       leftArmReset += `CONST robtarget home:=${leftHome};\n`;
