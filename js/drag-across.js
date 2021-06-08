@@ -25,10 +25,9 @@ function listenForDragging(event) {
 }
 
 // Enable transferring block from one side to another
-Blockly.bindEvent_(leftDiv, "touchenter", null, (evt) => transferBlock_(evt, false));
-Blockly.bindEvent_(leftDiv, "mouseenter", null, (evt) => transferBlock_(evt, false)); //simulate for computer mice
-Blockly.bindEvent_(rightDiv, "touchenter", null, (evt) => transferBlock_(evt, true));
-Blockly.bindEvent_(rightDiv, "mouseenter", null, (evt) => transferBlock_(evt, true));
+Blockly.bindEvent_(leftDiv, "pointerenter", null, (evt) => transferBlock_(evt, false), true);
+Blockly.bindEvent_(rightDiv, "pointerenter", null, (evt) => transferBlock_(evt, true), true);
+Blockly.bindEvent_(leftDiv, "touchmove", null, (evt) => manualCheckEnter(evt), true); //Workaround for pointerenter not triggering in certain touch conditions
 
 var dragger;            // The object managing a manually manipulated drag.
 var startX, startY;     // The coordinates of the block before it's dragged (the old pageX/pageY coords)
@@ -56,12 +55,19 @@ function transferBlock_(event, fromLeft) {
   var metrics = toWorkspace.getMetrics(); //check if workspace has been scrolled
 
   offsetX = fromLeft ? 0 : -leftWorkspace.getToolbox().width - widest;
-  offsetY = -17;  
+  offsetY = -17;
+
+  var touchEnded = {x: event.offsetX, y: event.offsetY};
+  if (!touchEnded.x || !touchEnded.y) {
+    var rect = (fromLeft ? rightDiv : leftDiv).getBoundingClientRect();
+    if (!touchEnded.x) touchEnded.x = event.targetTouches[0].clientX - rect.left;
+    if (!touchEnded.y) touchEnded.y = event.targetTouches[0].clientY - rect.top;
+  }
 
   //basically Blockly.BlockSvg.prototype.toCopyData() except it copies all connected blocks
   var xml = Blockly.Xml.blockToDom(blocks[0], true);
-  xml.setAttribute('x', event.offsetX + metrics.viewLeft);  //account for scrolling
-  xml.setAttribute('y', event.offsetY + metrics.viewTop);   //account for scrolling
+  xml.setAttribute('x', touchEnded.x + metrics.viewLeft);  //account for scrolling
+  xml.setAttribute('y', touchEnded.y + metrics.viewTop);   //account for scrolling
   xml.setAttribute("id", blocks[0].id);
 
   //paste & start dragging
@@ -76,6 +82,21 @@ function transferBlock_(event, fromLeft) {
   dragger.startBlockDrag(new Blockly.utils.Coordinate(0, 0), false);
   startX = event.pageX;
   startY = event.pageY;
+  if (!startX) startX = event.targetTouches[0].pageX;
+  if (!startY) startY = event.targetTouches[0].pageY;
+}
+
+function pointInRect(rect, x, y) {
+  return (x > rect.left && x < rect.left + rect.width) && (y > rect.top && y < rect.top + rect.height);
+}
+
+function manualCheckEnter(event) {
+  if (!draggingId) return;
+  var fromLeft = !!workspace(true).getBlockById(draggingId);
+  var toDiv = fromLeft ? rightDiv : leftDiv;
+  if (!workspace(!fromLeft).getBlockById(draggingId) && pointInRect(toDiv.getBoundingClientRect(), event.touches[0].clientX, event.touches[0].clientY)) {
+    transferBlock_(event, fromLeft);
+  }
 }
 
 /**
@@ -89,8 +110,7 @@ function getAllFamily(block) {
   return blocks;
 }
 
-Blockly.bindEvent_(document.body, "touchmove", null, (evt) => updateCoordinates_(evt));
-Blockly.bindEvent_(document.body, "mousemove", null, (evt) => updateCoordinates_(evt));
+Blockly.bindEvent_(document.body, "pointermove", null, (evt) => updateCoordinates_(evt));
 
 var pageX, pageY;
 function updateCoordinates_(event) {
@@ -100,8 +120,7 @@ function updateCoordinates_(event) {
   if (dragger) dragger.dragBlock(event, new Blockly.utils.Coordinate(pageX - startX + offsetX, pageY - startY + offsetY));
 }
 
-Blockly.bindEvent_(document.body, "touchup", null, (evt) => stopDragging_(evt));
-Blockly.bindEvent_(document.body, "mouseup", null, (evt) => stopDragging_(evt));
+Blockly.bindEvent_(document.body, "pointerup", null, (evt) => stopDragging_(evt));
 
 function stopDragging_(event) {
   if (dragger) {
