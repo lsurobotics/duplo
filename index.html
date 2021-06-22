@@ -2,40 +2,51 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Duplo</title>
+  <title>Two-Armed Prototype</title>
   <!-- CSS -->
   <!-- Bootstrap -->
   <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
-  <!-- Duplo CSS -->
+  <!-- Prototype CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <!-- HTML elements -->
   <div class="container-fluid">
-
+    
+    <!-- Toolbar (Top) -->
     <div class="row" id="toolbar">
-      <div class="col-3">
-        <span id="filename-display" style="font-size:20px;"></span>
+      <div class="col-6" id="workspace-options">
+        <div class="row">
+          <!-- Workspace button -->
+          <div class="dropdown">
+            <button id="workspace-button" class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Workspace
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" id="reload-button">New Workspace</a>
+              <a class="dropdown-item" value="save-by-name" id="save-button">Save Current Workspace</a>
+              <a class="dropdown-item" id="open-file-button">Open Another Workspace</a>
+            </div>
+          </div>
+          <!-- Workspace filename -->
+          <span id="workspace-filename">Example.json</span>
+        </div>
       </div>
-      <div class="col-9" id="actions-menu">
-        <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="Toolbar with action button groups">
-          <div class="btn-group mr-2" role="group" aria-label="Workspace Options">
-            <button type="button" value="save-by-name" class="btn btn-primary" id="save-button">Save As</button>
-            <button type="button" class="btn btn-primary" id="open-file-button">Open File</button>
-            <button type="button" class="btn btn-primary" id="reload-button">Reload</button>
-          </div>
-          <div class="btn-group mr-2" role="group" aria-label="Robot Options">
-            <button type="button" class="btn btn-secondary" id="reset-button">Home Position</button>
-          </div>
+
+      <div class="col-6" id="robot-options">
+        <div class="row justify-content-end">
+          <!-- Robot buttons -->
+          <button type="button" class="btn" id="home-button">Move to Home</button>
           <div class="btn-group" role="group" aria-label="Gripper Options">
-            <button type="button" class="btn btn-info" id="left-hand-switch-button" value="open-hand">Open Left</button>
-            <button type="button" class="btn btn-info" id="left-right-hand-switch-button" value="open-hand">Open Both</button>
-            <button type="button" class="btn btn-info" id="right-hand-switch-button" value="open-hand">Open Right</button>
-          </div>
+            <button type="button" class="btn" id="left-hand-switch-button" value="open-hand">Open Left</button>
+            <button type="button" class="btn" id="left-right-hand-switch-button" value="open-hand">Open Both</button>
+            <button type="button" class="btn" id="right-hand-switch-button" value="open-hand">Open Right</button>
+          </div>  
         </div>
       </div>
     </div>
 
+    <!-- Blockly workspace -->
     <div class="row" id="workspace">
       <div class="col-6">
         <span id="workspace-identifier">Left Arm</span>
@@ -46,16 +57,16 @@
         <div id="right-workspace"><!-- Blockly will use this div --></div>
       </div>
     </div>
-
-    <div class="row" id="below-workspace">
+    
+    <!-- Taskbar (Bottom) -->
+    <div class="row" id="taskbar">
       <div class="col text-center">
-        <!-- Execution button -->
-        <button id="execution-button" value="start-execution" type="button" class="btn btn-success">Start</button>
+        <!-- Start button -->
+        <button id="start-button" value="start-execution" type="button" class="btn">Start</button>
       </div>
     </div>
-
   </div>
-
+  
   <div id="position-modal" class="modal" data-value="new-position" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -67,7 +78,6 @@
         </div>
         <div class="modal-body">
           <span id="position-modal-warning" style="font-size:20px;"></span>
-          <!-- <img src="img/RightArm-LeftArm.gif" class="img-fluid" /> -->
         </div>
         <div class="modal-footer justify-content-center">
           <button id="position-modal-confirm-button" type="button" class="btn btn-success">Teach Position</button>
@@ -75,7 +85,7 @@
       </div>
     </div>
   </div>
-
+  
   <div id="variable-prompt-modal" class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -95,7 +105,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Blockly -->
   <!-- Starting configuration -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="workspaceBlocks" style="display: none">
@@ -129,7 +139,7 @@
   <script src="blockly/blockly_uncompressed.js"></script>
   <script src="blockly/blocks_compressed.js"></script>
   <script src="blockly/msg/js/en.js"></script>
-  <!-- Duplo Code -->
+  <!-- Prototype Blockly -->
   <script src="js/blocks.js"></script>
   <script src="js/drag-across.js"></script>
   <script src="js/mirror.js"></script>
@@ -143,7 +153,7 @@
   <script src="js/split-stacks.js"></script>
   <script src="js/index.js"></script>
   <script src="js/rapid.js"></script>
-  <!-- RAPID Code Generation -->
+  <!-- Prototype RAPID -->
   <script src="js/rapid/logic.js"></script>
   <script src="js/rapid/loops.js"></script>
   <script src="js/rapid/math.js"></script>
@@ -153,422 +163,14 @@
   <script src="js/rapid/run.js"></script>
   <script src="js/rapid/sync.js"></script>
   <script src="js/rapid/variables.js"></script>
-
-  <!-- Javascript -->
-  <script>    
-    var executionButton = document.getElementById('execution-button');
-
-    executionButton.onclick = function() {
-      if (executionButton.value == "start-execution") {        
-        //this task list needs to be defined for sync instructions
-        const task_list = "PERS tasks task_list{2} := [ [\"T_ROB_L\"], [\"T_ROB_R\"] ];\n";
-        var leftTargets = "";
-        var rightTargets = "";
-        /**
-         * Pull code together for left arm
-        */
-        Blockly.Rapid.init(leftWorkspace);  //have to initialize both workspaces
-        var leftCode = Blockly.Rapid.blockToCode(leftWorkspace.getBlockById("START"));  //compile blocks to Rapid
-        
-        //pulls the robtargets for the left arm out and add it's targets to the rightArm list
-        for (const [key, value] of Object.entries(Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed)) {
-          leftTargets += `PERS robtarget ${key}:=${value};\n`;
-          rightTargets += `PERS robtarget ${key};\n`;
-        }       
-        
-        var leftAndRightSyncVars = Blockly.Rapid.sync.syncArray.join(''); //join syncArray variable string definitions together for code insertion (MUST BE DONE AFTER BLOCKS ARE COMPILED)
-        /* Prepare the "body" of the module */
-        var left_arm_code = "MODULE MainModule\n" + leftTargets + ServoGripper + task_list + leftAndRightSyncVars + leftCode + "ENDPROC\nENDMODULE";
-
-        /**
-         * Pull code together for the right arm
-        */
-        //have to initialize both workspaces
-        Blockly.Rapid.init(rightWorkspace);
-        var rightCode = Blockly.Rapid.blockToCode(rightWorkspace.getBlockById("START"));  //compile blocks to Rapid
-        
-        //pulls the robtargets for the right arm out
-        for (const [key, value] of Object.entries(Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed)) {
-          rightTargets += `PERS robtarget ${key}:=${value};\n`;
-        }
-        
-        var right_arm_code = "MODULE MainModule\n" + rightTargets + CameraServoGripper + task_list + leftAndRightSyncVars + rightCode + "ENDPROC\nENDMODULE";
-
-        /**
-         * We have to clear the sync variable array. Because the array gets rebuilt
-         * each time the blocks are recompiled, this ensures that only the blocks within
-         * the current workspace are included.
-        */
-        Blockly.Rapid.sync.syncArray.length = 0;  //clear but keep original array reference
-        Blockly.Rapid.robotArm.leftArmRobTargetsScrubbed = {};
-        Blockly.Rapid.robotArm.rightArmRobTargetsScrubbed = {};
-
-        /* Submit the code for the left arm */
-        window.chrome.webview.postMessage('T_ROB_L');
-        //window.chrome.webview.postMessage(left_arm_code);
-        window.chrome.webview.postMessage(right_arm_code);  //right arm code sent to left to account for switched workspace/arm perspectives
-        
-        /* Submit the code for the right arm */
-        window.chrome.webview.postMessage('T_ROB_R');
-        //window.chrome.webview.postMessage(right_arm_code);
-        window.chrome.webview.postMessage(left_arm_code); //left arm code sent to right to account for switched workspace/arm perspectives
-
-        /* Start execution */
-        window.chrome.webview.postMessage('START_EXEC');
-      } else if(executionButton.value == "stop-execution") {
-        window.chrome.webview.postMessage('STOP_EXEC');
-      }
-    };
-  </script>
-
-  <script>
-    var saveButton = document.getElementById('save-button');
-
-    saveButton.onclick = function() {
-      var leftWorkspace_xml = Blockly.Xml.workspaceToDom(leftWorkspace);
-      var leftWorkspace_xml_text = Blockly.Xml.domToPrettyText(leftWorkspace_xml);
-
-      var rightWorkspace_xml = Blockly.Xml.workspaceToDom(rightWorkspace);
-      var rightWorkspace_xml_text = Blockly.Xml.domToPrettyText(rightWorkspace_xml);
-                
-      //compile all relevant info into a json object and send to cs
-      var file = {
-        "leftWorkspace_xml_text" : leftWorkspace_xml_text,
-        "rightWorkspace_xml_text" : rightWorkspace_xml_text,
-        "leftArmRobTargets" : leftArmRobTargets,
-        "rightArmRobTargets" : rightArmRobTargets
-      }
-
-      //means this is a user desired save
-      if($('#save-button').val() == "save-by-name"){
-        file = JSON.stringify(file, undefined, 4); 
-       
-        window.chrome.webview.postMessage('SAVE_FILE');
-        window.chrome.webview.postMessage(file);
-        window.chrome.webview.postMessage('END_SAVE');
-          
-        const options = {once : true};
-        window.chrome.webview.addEventListener('message', saveFilenameReceivedEvent, options);
-      //means this is an autosave  
-      }else if($('#save-button').val() == "autosave"){
-        file["autosave"] = true;  //set autosave key to true so that wpf knows this is an autosave by searching for it on wpf side
-        file = JSON.stringify(file, undefined, 4);
-
-        window.chrome.webview.postMessage('SAVE_FILE');
-        window.chrome.webview.postMessage(file);
-        window.chrome.webview.postMessage('END_SAVE');
-
-        $('#save-button').val("save-by-name"); //change button value back to save-by-name
-      }   
-    }
-
-    function saveFilenameReceivedEvent(event){
-      if(event.data != "SAVE_FILE_ERROR" && event.data != "SAVE_CANCELLED"){
-        var filename_display = document.getElementById("filename-display");
-        filename_display.innerHTML = `${event.data}`;
-      }
-    }
-  </script>
-
-  <script>
-    var openFileButton = document.getElementById('open-file-button');
-
-    openFileButton.onclick = function() {
-      window.chrome.webview.postMessage('OPEN_FILE');
-      window.chrome.webview.addEventListener('message', openFileReceivedEvent);
-    }
-    
-    function openFileReceivedEvent(event){
-      //filename is being sent so add to workspace bar
-      //(this is sent from webview first)
-      if(event.data.includes(".json")){
-        var filename_display = document.getElementById("filename-display");
-        filename_display.innerHTML = `${event.data}`;
-      }
-      //there was an error so remove the event listener
-      else if(event.data == "OPEN_FILE_ERROR"){
-        window.chrome.webview.removeEventListener('message', openFileReceivedEvent);
-      }
-      //file contents are now being sent
-      //remove event listener at end
-      else{
-        var file = JSON.parse(event.data);
-        leftArmRobTargets = file.leftArmRobTargets;
-        leftArmRobTargets["Home Position"] = leftHomePosition;  //home position defined in robtargets.js
-
-        rightArmRobTargets = file.rightArmRobTargets;
-        rightArmRobTargets["Home Position"] = rightHomePosition;  //home position defined in robtargets.js
-
-        /*This loads the xml back into the workspace*/
-        var leftWorkspace_xml = Blockly.Xml.textToDom(file.leftWorkspace_xml_text);
-        Blockly.Xml.clearWorkspaceAndLoadFromXml(leftWorkspace_xml, leftWorkspace);
-        var rightWorkspace_xml = Blockly.Xml.textToDom(file.rightWorkspace_xml_text);
-        Blockly.Xml.clearWorkspaceAndLoadFromXml(rightWorkspace_xml, rightWorkspace);
-
-        //get all variables within the workspaces to see if "Home Position" is there
-        var leftWorkspaceVariables = leftWorkspace.getAllVariables();
-        if(leftWorkspaceVariables.find(o => o.name.toLowerCase() === "Home Position") === undefined) leftWorkspace.createVariable("Home Position");
-
-        var rightWorkspaceVariables = rightWorkspace.getAllVariables();
-        if(rightWorkspaceVariables.find(o => o.name.toLowerCase() === "Home Position") === undefined) rightWorkspace.createVariable("Home Position");
-
-        window.chrome.webview.removeEventListener('message', openFileReceivedEvent);
-      }
-    }
-  </script>
-
-  <script>
-    var resetButton = document.getElementById('reload-button');
-
-    resetButton.onclick = function() {
-      location.reload();
-    }
-  </script>
-
-  <script>
-    var leftHandButton = document.getElementById('left-hand-switch-button');
-
-    leftHandButton.onclick = function(event) {
-      const rightHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
-
-      var leftHandOpen = "MODULE MainModule\n";
-      leftHandOpen += ServoGripper;
-      leftHandOpen += "PROC main()\n";
-      leftHandOpen += "Var bool isCalibrated := FALSE;\n";
-      leftHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
-      leftHandOpen += "isCalibrated := g_IsCalibrated();\n";
-      leftHandOpen += "IF isCalibrated = FALSE THEN\n";
-      leftHandOpen += "g_Init \\Calibrate;\n";
-      leftHandOpen += "ENDIF\n";
-      leftHandOpen += "g_GripOut;\n";
-      leftHandOpen += "g_Stop;\n";
-      leftHandOpen += "ENDPROC\n";
-      leftHandOpen += "ENDMODULE\n";
-
-      //if robot is not already moving
-      if(controllerState != controllerExecutionState.RUNNING){
-
-        if (leftHandButton.value == "open-hand") {
-        //logic to open left hand gripper
-        /* Submit the code for the left hand */
-        //window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage('T_ROB_R'); //inverted due to workspace/arm inversion
-        window.chrome.webview.postMessage(leftHandOpen);
-        /* Submit the code for the right hand */
-        //window.chrome.webview.postMessage('T_ROB_R');
-        window.chrome.webview.postMessage('T_ROB_L'); //inverted due to workspace/arm inversion
-        window.chrome.webview.postMessage(rightHandNoOp);
-
-        $("#left-hand-switch-button").text("Close Left");
-        leftHandButton.value = "close-hand";
-        //if both the same value then set both gripper button to match
-        if(rightHandButton.value == "close-hand"){
-          $("#left-right-hand-switch-button").text("Close Both");
-          bothHandsButton.value = "close-hand";
-        }
-      }
-      else if(leftHandButton.value == "close-hand"){
-        //logic to close left hand gripper
-        /* Submit the code for the left hand */
-        //window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage('T_ROB_R'); //inverted due to workspace/arm inversion
-        //change left hand open logic so that gripper is closed
-        var leftHandClose = leftHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");
-        window.chrome.webview.postMessage(leftHandClose);
-        /* Submit the code for the right hand */
-        //window.chrome.webview.postMessage('T_ROB_R');
-        window.chrome.webview.postMessage('T_ROB_L'); //inverted due to workspace/arm inversion
-        window.chrome.webview.postMessage(rightHandNoOp);
-
-        $("#left-hand-switch-button").text("Open Left");
-        leftHandButton.value = "open-hand";
-        //if both the same value then set both gripper button to match
-        if(rightHandButton.value == "open-hand"){
-          $("#left-right-hand-switch-button").text("Open Both");
-          bothHandsButton.value = "open-hand";
-        }
-      }
-      /* Start execution */
-      window.chrome.webview.postMessage('START_EXEC');
-      }      
-    }
-  </script>
-
-  <script>
-    var rightHandButton = document.getElementById('right-hand-switch-button');
-
-    rightHandButton.onclick = function(event) {
-      const leftHandNoOp = "MODULE MainModule\nPROC main()\nSetLeadThrough \\On \\NoStopMove;\nENDPROC\nENDMODULE";
-
-      var rightHandOpen = "MODULE MainModule\n";
-      rightHandOpen += CameraServoGripper;
-      rightHandOpen += "PROC main()\n";
-      rightHandOpen += "Var bool isCalibrated := FALSE;\n";
-      rightHandOpen += "SetLeadThrough \\On \\NoStopMove;\n";
-      rightHandOpen += "isCalibrated := g_IsCalibrated();\n";
-      rightHandOpen += "IF isCalibrated = FALSE THEN\n";
-      rightHandOpen += "g_Init \\Calibrate;\n";
-      rightHandOpen += "ENDIF\n";
-      rightHandOpen += "g_GripOut;\n";
-      rightHandOpen += "g_Stop;\n";
-      rightHandOpen += "ENDPROC\n";
-      rightHandOpen += "ENDMODULE\n";
-
-      //if robot is not already moving
-      if(controllerState != controllerExecutionState.RUNNING){
-
-          if (rightHandButton.value == "open-hand") {        
-          //logic to open right hand gripper
-          /* Submit the code for the left hand */
-          //window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage('T_ROB_R'); //inverted due to arm/workspace inversion
-          window.chrome.webview.postMessage(leftHandNoOp);
-          /* Submit the code for the right hand */
-          //window.chrome.webview.postMessage('T_ROB_R');
-          window.chrome.webview.postMessage('T_ROB_L'); //inverted due to arm/workspace inversion
-          window.chrome.webview.postMessage(rightHandOpen);
-
-          $("#right-hand-switch-button").text("Close Right");
-          rightHandButton.value = "close-hand";
-          //if both the same value then set both gripper button to match
-          if(leftHandButton.value == "close-hand"){
-              $("#left-right-hand-switch-button").text("Close Both");
-              bothHandsButton.value = "close-hand";
-          }
-        } else if(rightHandButton.value == "close-hand"){        
-          //logic to close right hand gripper
-          /* Submit the code for the left hand */
-          //window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage('T_ROB_R'); //inverted due to arm/workspace inversion
-          window.chrome.webview.postMessage(leftHandNoOp);
-          /* Submit the code for the right hand */
-          //window.chrome.webview.postMessage('T_ROB_R');
-          window.chrome.webview.postMessage('T_ROB_L'); //inverted due to arm/workspace inversion
-          //change right hand open logic so that gripper is closed
-          var rightHandClose = rightHandOpen.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");;
-          window.chrome.webview.postMessage(rightHandClose);
-
-          $("#right-hand-switch-button").text("Open Right");
-          rightHandButton.value = "open-hand";
-          //if both the same value then set both gripper button to match
-          if(leftHandButton.value == "open-hand"){
-              $("#left-right-hand-switch-button").text("Open Both");
-              bothHandsButton.value = "open-hand";
-          }
-        }
-        /* Start execution */
-        window.chrome.webview.postMessage('START_EXEC');
-      }      
-    }
-  </script>
-
-  <script>
-    var bothHandsButton = document.getElementById('left-right-hand-switch-button');
-
-    bothHandsButton.onclick = function(event) {
-
-      var openHand = "MODULE MainModule\n";
-      openHand += ServoGripper;
-      openHand += "PROC main()\n";
-      openHand += "Var bool isCalibrated := FALSE;\n";
-      openHand += "SetLeadThrough \\On \\NoStopMove;\n";
-      openHand += "isCalibrated := g_IsCalibrated();\n";
-      openHand += "IF isCalibrated = FALSE THEN\n";
-      openHand += "g_Init \\Calibrate;\n";
-      openHand += "ENDIF\n";
-      openHand += "g_GripOut;\n";
-      openHand += "g_Stop;\n";
-      openHand += "ENDPROC\n";
-      openHand += "ENDMODULE\n";
-
-      //if robot is not already moving
-      if(controllerState != controllerExecutionState.RUNNING){      
-
-        if (bothHandsButton.value == "open-hand") {        
-          //logic to open grippers
-          /* Submit the code for the left hand */
-          window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage(openHand.replace(ServoGripper, CameraServoGripper));  //left arm has camera gripper
-          /* Submit the code for the right hand */
-          window.chrome.webview.postMessage('T_ROB_R');
-          window.chrome.webview.postMessage(openHand);
-
-          $("#left-right-hand-switch-button").text("Close Both");
-          bothHandsButton.value = "close-hand";
-          $("#left-hand-switch-button").text("Close Left");
-          leftHandButton.value = "close-hand";
-          $("#right-hand-switch-button").text("Close Right");
-          rightHandButton.value = "close-hand";          
-      } else if(bothHandsButton.value == "close-hand"){
-          var closeHand = openHand.replace("g_GripOut;\ng_Stop;\n", "g_GripIn;\n");       
-          //logic to close grippers
-          /* Submit the code for the left hand */
-          window.chrome.webview.postMessage('T_ROB_L');
-          window.chrome.webview.postMessage(closeHand.replace(ServoGripper, CameraServoGripper)); //left arm has camera gripper
-          /* Submit the code for the right hand */
-          window.chrome.webview.postMessage('T_ROB_R');        
-          window.chrome.webview.postMessage(closeHand);
-
-          $("#left-right-hand-switch-button").text("Open Both");
-          bothHandsButton.value = "open-hand";
-          $("#left-hand-switch-button").text("Open Left");
-          leftHandButton.value = "open-hand";
-          $("#right-hand-switch-button").text("Open Right");
-          rightHandButton.value = "open-hand";          
-      }
-      /* Start execution */
-      window.chrome.webview.postMessage('START_EXEC');
-      }      
-    }
-  </script>
-
-  <script>
-    var resetButton = document.getElementById('reset-button');    
-
-    resetButton.onclick = function() {
-      
-      //rightHome and leftHome are inverted to account for inverted workspace
-      var rightHome = leftHomePosition;  //home position defined in robtarget.js
-      var leftHome = rightHomePosition;  //defined in robtarget.js
-
-      var leftArmReset = "MODULE MainModule\n";
-      leftArmReset += `CONST robtarget home:=${leftHome};\n`;
-      leftArmReset += ServoGripper;
-      leftArmReset += "PROC main()\n";
-      leftArmReset += "Var bool isCalibrated := FALSE;\n";
-      leftArmReset += "SetLeadThrough \\On \\NoStopMove;\n";
-      leftArmReset += "isCalibrated := g_IsCalibrated();\n";
-      leftArmReset += "IF isCalibrated = FALSE THEN\n";
-      leftArmReset += "g_Init \\Calibrate;\n";
-      leftArmReset += "ENDIF\n";      
-      leftArmReset += "g_GripOut;\n";
-      leftArmReset += "g_Stop;\n";
-      leftArmReset += "MoveJ home, v100, fine, Servo;\n"
-      leftArmReset += "ENDPROC\n";
-      leftArmReset += "ENDMODULE\n";
-
-      //if robot is not already moving
-      if(controllerState != controllerExecutionState.RUNNING){
-        /* Submit the code for the left hand */
-        window.chrome.webview.postMessage('T_ROB_L');
-        window.chrome.webview.postMessage(leftArmReset.replace(ServoGripper, CameraServoGripper));  //left arm has camera gripper
-        /* Submit the code for the right hand */
-        var rightArmReset = leftArmReset.replace(leftHome, rightHome);
-        window.chrome.webview.postMessage('T_ROB_R');
-        window.chrome.webview.postMessage(rightArmReset);
-        
-        /* Start execution */
-        window.chrome.webview.postMessage('START_EXEC');
-
-        //set both gripper buttons to close since the grippers are opened on reset
-        $("#left-hand-switch-button").text("Close Left");
-        leftHandButton.value = "close-hand";
-        $("#right-hand-switch-button").text("Close Right");
-        rightHandButton.value = "close-hand";
-        $("#left-right-hand-switch-button").text("Close Both");
-        bothHandsButton.value = "close-hand";
-      }      
-    }
-  </script>
+  <!-- Prototype UI -->
+  <script src="js/startCode.js"></script>
+  <script src="js/newWorkspace.js"></script>
+  <script src="js/saveWorkspace.js"></script>
+  <script src="js/openWorkspace.js"></script>
+  <script src="js/resetWorkspace.js"></script>
+  <script src="js/leftHandSwitch.js"></script>
+  <script src="js/rightHandSwitch.js"></script>
+  <script src="js/bothHandsSwitch.js"></script>
 </body>
 </html>

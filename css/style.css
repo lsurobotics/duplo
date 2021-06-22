@@ -4,7 +4,8 @@ html {
 }
 
 #workspace {
-    padding-bottom: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 #left-workspace, #right-workspace {
@@ -14,18 +15,82 @@ html {
 #workspace-identifier {
     color: black;
     font-weight: bold;
-    font-size: 25px;
-}
-
-#execution-button {
-    border-radius: 2px;
-    padding-top: 2px;
     font-size: 22px;
-    width: 175px;
-    margin: 15px;
 }
 
 #toolbar {
-    padding: 5px;
+    padding: 15px;
     background-color: #d1d1d1;
+}
+
+#toolbar button {
+    border-radius: 4px;
+    font-size: 20px;
+    width: 175px;
+}
+
+#workspace-button {
+    background-color: #ebebeb;
+}
+
+#workspace-button:hover {
+    background-color: #f5f5f5;
+}
+
+#home-button {
+    margin-right: 10px;
+    color: white;
+    background-color: #3891d1;
+}
+
+#home-button:hover {
+    color: white;
+    background-color: #2f7cb3;
+}
+
+#workspace-filename {
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+    padding-left: 15px;
+}
+
+#taskbar {
+    padding-bottom: 15px;
+}
+
+#taskbar button {
+    border-radius: 4px;
+    font-size: 22px;
+    width: 200px;
+}
+
+#start-button {
+    color: white;
+    background-color: #57c259;
+}
+
+#start-button:hover {
+    color: white;
+    background-color: #479e49;
+}
+
+#left-hand-switch-button, #right-hand-switch-button, #left-right-hand-switch-button {
+    color: white;
+    background-color: #e07f4f;
+}
+
+#left-hand-switch-button:hover, #right-hand-switch-button:hover, #left-right-hand-switch-button:hover {
+    color: white;
+    background-color: #bb6940;
+}
+
+#left-hand-switch-button, #left-right-hand-switch-button {
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+#right-hand-switch-button, #left-right-hand-switch-button {
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
 }

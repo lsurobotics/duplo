@@ -20,21 +20,21 @@ function executionStatusChangedEvent(event){
     if(event.data == controllerExecutionState.RUNNING){
         controllerState = controllerExecutionState.RUNNING;
         //if start button is visible then change to stop
-        executionButton = document.getElementById('execution-button');
+        executionButton = document.getElementById('start-button');
         if(executionButton.value == "start-execution"){
             executionButton.value = "stop-execution";
-            $("#execution-button").removeClass("btn-success").addClass("btn-danger");
-            $("#execution-button").text("Stop");
+            $("#start-button").removeClass("btn-success").addClass("btn-danger");
+            $("#start-button").text("Stop");
         } 
     } 
     else if(event.data == controllerExecutionState.STOPPED){
         controllerState = controllerExecutionState.STOPPED;
         //if stop button is visible then change to start
-        executionButton = document.getElementById('execution-button');
+        executionButton = document.getElementById('start-button');
         if(executionButton.value == "stop-execution"){
             executionButton.value = "start-execution";
-            $("#execution-button").removeClass("btn-danger").addClass("btn-success");
-            $("#execution-button").text("Start"); 
+            $("#start-button").removeClass("btn-danger").addClass("btn-success");
+            $("#start-button").text("Start"); 
         }
     }
     else if(event.data == controllerExecutionState.UNKNOWN){

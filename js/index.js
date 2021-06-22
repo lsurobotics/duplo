@@ -1,24 +1,39 @@
 // Injects Blockly into the html page and adds event handlers.
 
 const toolbox = document.getElementById("toolbox");
+
+const fontStyle = {
+  "size": 14
+}
+
+goog.require('Blockly.Theme');
+const prototypeTheme = Blockly.Theme.defineTheme('prototype-theme', {
+  'base': Blockly.Themes.Classic,
+  'fontStyle': fontStyle,
+});
+
 const leftWorkspace = Blockly.inject('left-workspace',
   { media: 'blockly/media/',
     toolbox: toolbox,
     trashcan: false,
+    theme: prototypeTheme,
     toolboxPosition: "start",
     move:{
-      scrollbars: true,
-      drag: false,
+      scrollbars: false,
+      drag: true,
       wheel: false}
 });
+
 const rightWorkspace = Blockly.inject('right-workspace',
   { media: 'blockly/media/',
     trashcan: true,
+    theme: prototypeTheme,
     move:{
-      scrollbars: true,
-      drag: false,
+      scrollbars: false,
+      drag: true,
       wheel: false}
 });
+
 
 /**
  * Generally, `workspace(fromLeft)` chooses the workspace that the event originated from, while `workspace(!fromLeft)` chooses the workspace on the other side.
