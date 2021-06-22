@@ -4,11 +4,12 @@ html {
 }
 
 #workspace {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 15px;
 }
 
 #left-workspace, #right-workspace {
+    padding-top: 2.5px;
     height: 900px;
 }
 
