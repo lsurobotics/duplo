@@ -19,8 +19,8 @@ const leftWorkspace = Blockly.inject('left-workspace',
     theme: prototypeTheme,
     toolboxPosition: "start",
     move:{
-      scrollbars: false,
-      drag: true,
+      scrollbars: true,
+      drag: false,
       wheel: false}
 });
 
@@ -29,8 +29,8 @@ const rightWorkspace = Blockly.inject('right-workspace',
     trashcan: true,
     theme: prototypeTheme,
     move:{
-      scrollbars: false,
-      drag: true,
+      scrollbars: true,
+      drag: false,
       wheel: false}
 });
 
