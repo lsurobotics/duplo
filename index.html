@@ -11,10 +11,9 @@
 </head>
 <body>
   <!-- HTML elements -->
-  <div class="container-fluid">
-    
+  <div class="container-fluid fill">
     <!-- Toolbar (Top) -->
-    <div class="row" id="toolbar">
+    <div class="row" id="toolbar-top">
       <div class="col-6" id="workspace-options">
         <div class="row">
           <!-- Workspace button -->
@@ -33,10 +32,12 @@
         </div>
       </div>
 
+      <!-- Robot control buttons -->
       <div class="col-6" id="robot-options">
         <div class="row justify-content-end">
-          <!-- Robot buttons -->
+          <!-- Move to home button -->
           <button type="button" class="btn" id="home-button">Move to Home</button>
+          <!-- Open/closed grippers buttons -->
           <div class="btn-group" role="group" aria-label="Gripper Options">
             <button type="button" class="btn" id="left-hand-switch-button" value="open-hand">Open Left</button>
             <button type="button" class="btn" id="left-right-hand-switch-button" value="open-hand">Open Both</button>
@@ -48,18 +49,22 @@
 
     <!-- Blockly workspace -->
     <div class="row" id="workspace">
-      <div class="col-6">
-        <span id="workspace-identifier">Left Arm</span>
-        <div id="left-workspace"><!-- Blockly will use this div --></div>
+      <div class="workspace-area col-6">
+        <div id="left-workspace">
+          <span id="workspace-identifier">Left Arm</span>
+          <!-- Blockly will use this div -->
+        </div>
       </div>
-      <div class="col-6">
-        <span id="workspace-identifier">Right Arm</span>
-        <div id="right-workspace"><!-- Blockly will use this div --></div>
+      <div class="workspace-area col-6">
+        <div id="right-workspace">
+          <span id="workspace-identifier">Right Arm</span>
+          <!-- Blockly will use this div -->
+        </div>
       </div>
     </div>
     
-    <!-- Taskbar (Bottom) -->
-    <div class="row" id="taskbar">
+    <!-- Toolbar (Bottom) -->
+    <div class="row" id="toolbar-bottom">
       <div class="col text-center">
         <!-- Start button -->
         <button id="start-button" value="start-execution" type="button" class="btn">Start</button>

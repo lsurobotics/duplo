@@ -3,14 +3,34 @@ html {
     font-family: sans-serif;
 }
 
+html, body, .container-fluid {
+    height: 100%;
+    min-height: 100%;
+}
+
 #workspace {
-    padding-top: 5px;
-    padding-bottom: 15px;
+    height: 80%;
+}
+
+#toolbar-top {
+    padding: 10px;
+    min-height: 5%;
+    background-color: #d1d1d1;
+}
+
+#toolbar-bottom {
+    background-color: white;
+    min-height: 5%;
+    padding: 5px;
 }
 
 #left-workspace, #right-workspace {
-    padding-top: 2.5px;
-    height: 820px;
+    height: 95%;
+    padding: 5px;
+}
+
+#workspace-area {
+    height: 100%;
 }
 
 #workspace-identifier {
@@ -19,12 +39,7 @@ html {
     font-size: 22px;
 }
 
-#toolbar {
-    padding: 15px;
-    background-color: #d1d1d1;
-}
-
-#toolbar button {
+#toolbar-top button {
     border-radius: 4px;
     font-size: 20px;
     width: 175px;
@@ -56,11 +71,7 @@ html {
     padding-left: 15px;
 }
 
-#taskbar {
-    padding-bottom: 15px;
-}
-
-#taskbar button {
+#toolbar-bottom button {
     border-radius: 4px;
     font-size: 22px;
     width: 200px;
