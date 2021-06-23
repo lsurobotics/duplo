@@ -189,8 +189,10 @@ Blockly.FieldVariable.prototype.onItemSelected_ = function(menu, menuItem) {
       if (renameVariableWorkspace == leftWorkspace.id) arm = "LEFT";
       else if (renameVariableWorkspace == rightWorkspace.id) arm = "RIGHT";
       $('#position-modal').modal('show'); //show teach position modal
+      console.log(this.sourceBlock_);
       $('#position-modal').attr('data-value', 'reteach-position');  //set data attribute of position modal to reteach-position (Used in confirm button)
       $("#position-modal-warning").html(`To reteach <b>${selectedVariable}</b> position, please move <b>${arm}</b> arm to the desired position.`);
+
       return;
     }
   }

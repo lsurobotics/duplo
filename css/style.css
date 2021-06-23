@@ -39,12 +39,6 @@ html, body, .container-fluid {
     font-size: 22px;
 }
 
-#toolbar-top button {
-    border-radius: 4px;
-    font-size: 20px;
-    width: 175px;
-}
-
 #workspace-button {
     background-color: #ebebeb;
 }
@@ -71,13 +65,10 @@ html, body, .container-fluid {
     padding-left: 15px;
 }
 
-#toolbar-bottom button {
+#start-button {
     border-radius: 4px;
     font-size: 22px;
     width: 200px;
-}
-
-#start-button {
     color: white;
     background-color: #57c259;
 }
@@ -105,4 +96,17 @@ html, body, .container-fluid {
 #right-hand-switch-button, #left-right-hand-switch-button {
     border-top-left-radius: 0px !important;
     border-bottom-left-radius: 0px !important;
+}
+
+.modal-confirm-button {
+    border-radius: 4px;
+    font-size: 20px;
+    width: 175px;
+    color: white;
+    background-color: #e07f4f;
+}
+
+.modal-confirm-button:hover {
+    color: white;
+    background-color: #bb6940;
 }

@@ -2,14 +2,11 @@
 
 goog.provide('robtarget');
 
-//const leftHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
-//const rightHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
-
 /**
  * These are inverted due to workspace/arm reversal
  */
-const rightHomePosition = "[[420.32,227.3,254.83],[0.182073,0.917623,0.347217,0.0652473],[0,-2,0,5],[-121.253,9E9,9E9,9E9,9E9,9E9]]";
-const leftHomePosition = "[[430.31,-234.88,249.53],[0.0681575,0.324735,0.925899,0.180592],[0,0,0,4],[121.995,9E9,9E9,9E9,9E9,9E9]]";
+const rightHomePosition = "[[-9.58,182.61,198.63],[0.0660107,0.842421,-0.111215,0.523069],[0,0,0,4],[101.964,9E+9,9E+9,9E+9,9E+9,9E+9]]";
+const leftHomePosition = "[[-9.58,-182.61,198.63],[0.0660107,-0.842421,-0.111215,-0.523069],[0,0,0,4],[-101.964,9E+9,9E+9,9E+9,9E+9,9E+9]]";
 
 var leftArmRobTargets = {"Home Position" : leftHomePosition};
 var rightArmRobTargets = {"Home Position" : rightHomePosition};
