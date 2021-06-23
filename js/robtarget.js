@@ -60,7 +60,7 @@ function variableRenameEvent_(event) {
       newVariableName = event.newName;  //so get position function knows which variable to put target to
       $('#position-modal').modal('show'); //show teach position modal
       $('#position-modal').attr('data-value', 'new-position');
-      $("#position-modal-warning").html(`Please move arm(s) to the desired position(s).`)
+      $("#position-modal-warning").html(`Please move <b>${arm}</b> arm to the desired position.`)
 
     }else{  //adjust key to new variable name
       if (event.workspaceId == leftWorkspace.id){
