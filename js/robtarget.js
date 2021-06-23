@@ -20,7 +20,7 @@ var newVariableName = "";
 function listenForVariable(event) {  
     //redirect
     if (event.type == Blockly.Events.VAR_DELETE) variableDeleteEvent_(event);
-    else if (event.type == Blockly.Events.VAR_RENAME) variableRenameEvent_(event);        
+    else if (event.type == Blockly.Events.VAR_RENAME) variableRenameEvent_(event); 
   }
  
 /**
@@ -43,8 +43,11 @@ function variableRenameEvent_(event) {
      */
     if(event.oldName == "<somewhere>"){      
       var arm = "";
+      var currentWorkspace;
+      var sourceBlock;
 
       if (event.workspaceId == leftWorkspace.id){
+
         leftArmVariableRenamed = true; //true if triggered from the left workspace
         arm = "LEFT";
         delete leftArmRobTargets[event.oldName];  //delete old variable name from rob targets object
@@ -57,7 +60,8 @@ function variableRenameEvent_(event) {
       newVariableName = event.newName;  //so get position function knows which variable to put target to
       $('#position-modal').modal('show'); //show teach position modal
       $('#position-modal').attr('data-value', 'new-position');
-      $("#position-modal-warning").html(`Please move <b>${arm}</b> arm to the desired position.`)
+      $("#position-modal-warning").html(`Please move arm(s) to the desired position(s).`)
+
     }else{  //adjust key to new variable name
       if (event.workspaceId == leftWorkspace.id){
         leftArmRobTargets[event.newName] = leftArmRobTargets[event.oldName];

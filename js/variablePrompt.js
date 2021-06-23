@@ -189,10 +189,18 @@ Blockly.FieldVariable.prototype.onItemSelected_ = function(menu, menuItem) {
       if (renameVariableWorkspace == leftWorkspace.id) arm = "LEFT";
       else if (renameVariableWorkspace == rightWorkspace.id) arm = "RIGHT";
       $('#position-modal').modal('show'); //show teach position modal
-      console.log(this.sourceBlock_);
       $('#position-modal').attr('data-value', 'reteach-position');  //set data attribute of position modal to reteach-position (Used in confirm button)
-      $("#position-modal-warning").html(`To reteach <b>${selectedVariable}</b> position, please move <b>${arm}</b> arm to the desired position.`);
 
+      var mirrorBlock = getMirror(this.sourceBlock_)
+
+      if (mirrorBlock != null) {
+        if (mirrorBlock.type == "custom_follow") {
+          $("#position-modal-warning").html(`To teach <b>${selectedVariable}</b> position again, please move <b>BOTH</b> arms to the desired positions.`);
+          return;
+        }
+      }
+
+      $("#position-modal-warning").html(`To teach <b>${selectedVariable}</b> position again, please move <b>${arm}</b> arm to the desired position.`);
       return;
     }
   }
