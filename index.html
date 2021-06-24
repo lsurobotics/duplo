@@ -15,21 +15,21 @@
     <!-- Toolbar (Top) -->
     <div class="row" id="toolbar-top">
       <div class="col-6" id="workspace-options">
-        <div class="row">
-          <div class="col-2">
+        <div class="row align-items-center">
+          <div class="col-2 col-sm-4" style="width: 180px;">
           <!-- Workspace button -->
           <div class="dropdown">
             <button id="workspace-button" class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Workspace
             </button>
             <div class="dropdown-menu">
-              <a class="dropdown-item" id="reload-button">New Workspace</a>
-              <a class="dropdown-item" value="save-by-name" id="save-button">Save Current Workspace</a>
-              <a class="dropdown-item" id="open-file-button">Open Another Workspace</a>
+              <button class="dropdown-item" id="reload-button">New workspace</button>
+              <button class="dropdown-item" value="save-by-name" id="save-button">Save current workspace</button>
+              <button class="dropdown-item" id="open-file-button">Open another workspace</button>
             </div>
           </div>
           </div>
-          <div class="col-10">
+          <div class="col-10 col-sm-6">
             <!-- Workspace filename -->
             <span id="workspace-filename">Example.json</span>
           </div>
@@ -110,18 +110,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <img src="..." class="rounded me-2" alt="...">
-      <strong class="me-auto">Bootstrap</strong>
-      <small>11 mins ago</small>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      Hello, world! This is a toast message.
     </div>
   </div>
   

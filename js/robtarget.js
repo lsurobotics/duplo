@@ -5,8 +5,8 @@ goog.provide('robtarget');
 /**
  * These are inverted due to workspace/arm reversal
  */
-const rightHomePosition = "[[361.85,76.58,127.72],[0.278162,-0.0566151,0.866902,-0.409759],[-1,1,0,4],[106.891,9E+09,9E+09,9E+09,9E+09,9E+09]]";
-const leftHomePosition = "[[357.32,-68.52,131.37],[0.277901,0.0345393,0.864416,0.417569],[1,-1,0,4],[-107.112,9E+09,9E+09,9E+09,9E+09,9E+09]]";
+const rightHomePosition = "[[378.83,101.39,347.88],[0.0489036,-0.695635,0.716079,-0.030535],[-1,1,-2,4],[172.358,9E+09,9E+09,9E+09,9E+09,9E+09]]";
+const leftHomePosition = "[[382.55,-120.49,336.78],[0.0279592,-0.688057,0.724281,-0.0348248],[1,-1,0,4],[-155.726,9E+09,9E+09,9E+09,9E+09,9E+09]]";
 
 var leftArmRobTargets = {"Home Position" : leftHomePosition};
 var rightArmRobTargets = {"Home Position" : rightHomePosition};
@@ -43,8 +43,6 @@ function variableRenameEvent_(event) {
      */
     if(event.oldName == "<somewhere>"){      
       var arm = "";
-      var currentWorkspace;
-      var sourceBlock;
 
       if (event.workspaceId == leftWorkspace.id){
 

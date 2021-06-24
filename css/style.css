@@ -59,10 +59,7 @@ html, body, .container-fluid {
 }
 
 #workspace-filename {
-    display: flex;
-    align-items: center;
     font-size: 22px;
-    padding-left: 15px;
 }
 
 #start-button {
