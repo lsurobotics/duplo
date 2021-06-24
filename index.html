@@ -16,6 +16,7 @@
     <div class="row" id="toolbar-top">
       <div class="col-6" id="workspace-options">
         <div class="row">
+          <div class="col-2">
           <!-- Workspace button -->
           <div class="dropdown">
             <button id="workspace-button" class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -27,14 +28,18 @@
               <a class="dropdown-item" id="open-file-button">Open Another Workspace</a>
             </div>
           </div>
-          <!-- Workspace filename -->
-          <span id="workspace-filename">Example.json</span>
+          </div>
+          <div class="col-10">
+            <!-- Workspace filename -->
+            <span id="workspace-filename">Example.json</span>
+          </div>
         </div>
       </div>
 
       <!-- Robot control buttons -->
       <div class="col-6" id="robot-options">
-        <div class="row justify-content-end">
+        <div class="row float-end">
+          <div class="col-12">
           <!-- Move to home button -->
           <button type="button" class="btn" id="home-button">Move to Home</button>
           <!-- Open/closed grippers buttons -->
@@ -42,7 +47,8 @@
             <button type="button" class="btn" id="left-hand-switch-button" value="open-hand">Open Left</button>
             <button type="button" class="btn" id="left-right-hand-switch-button" value="open-hand">Open Both</button>
             <button type="button" class="btn" id="right-hand-switch-button" value="open-hand">Open Right</button>
-          </div>  
+          </div> 
+        </div>
         </div>
       </div>
     </div>
@@ -77,9 +83,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Teach Position</h5>
-          <button id = "position-modal-cancel-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button id="position-modal-cancel-button" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <span id="position-modal-warning"></span>
@@ -96,9 +100,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Define Location</h5>
-          <button id = "variable-prompt-modal-cancel-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button id="variable-prompt-modal-cancel-button" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <span id="variable-prompt-modal-warning"></span>
@@ -108,6 +110,18 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <img src="..." class="rounded me-2" alt="...">
+      <strong class="me-auto">Bootstrap</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Hello, world! This is a toast message.
     </div>
   </div>
   
