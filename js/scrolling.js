@@ -73,10 +73,10 @@ function scrollTogether(thisWorkspace) {
   var yourMetrics = thisWorkspace.getMetrics();
   var otherMetrics = otherWorkspace.getMetrics();
 
-  var currentScrollX = (otherMetrics.viewLeft - otherMetrics.contentLeft); //don't change x scroll
-  var newScrollY = (yourMetrics.viewTop - otherMetrics.contentTop);        //adjust y scroll to match
+  var newScrollX = (yourMetrics.viewLeft - otherMetrics.contentLeft); //adjust x scroll to match
+  var newScrollY = (yourMetrics.viewTop - otherMetrics.contentTop);   //adjust y scroll to match
 
-  otherWorkspace.scrollbar.set(currentScrollX, newScrollY);
+  otherWorkspace.scrollbar.set(newScrollX, newScrollY);
 }
 
 // Scroll along with a touch.
@@ -92,14 +92,10 @@ function setupScrollingTouchHandlers() {
   Blockly.bindEvent_(rightDiv.querySelector(".blocklyMainBackground"), "touchend", null, () => { lastTouch = null; });
   Blockly.bindEvent_(rightDiv.querySelector(".blocklyMainBackground"), "touchmove", null, (evt) => { scrollWithTouch(rightWorkspace, evt.targetTouches[0]); });
 
-  try {
-    document.createEvent("TouchEvent");
-
-    //Doesn't error -> this device can use touch events! Hide the scrollbars.
-    document.body.querySelectorAll(".blocklyMainWorkspaceScrollbar").forEach((elem) => {
-      elem.style.visibility = "hidden";
-    });
-  } catch (e) {};
+  //Hide the scrollbars
+  document.body.querySelectorAll(".blocklyMainWorkspaceScrollbar").forEach((elem) => {
+    elem.style.visibility = "hidden";
+  });
 }
 
 function scrollWithTouch(workspace, touch) {
