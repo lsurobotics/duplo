@@ -58,5 +58,7 @@ leftWorkspace.addChangeListener(listenForDragging);
 rightWorkspace.addChangeListener(listenForDragging);
 leftWorkspace.addChangeListener(listenForVariable); //listener for variable changes
 rightWorkspace.addChangeListener(listenForVariable); //listener for variable changes
+leftWorkspace.addChangeListener(monitorLeftWorkspace);
+rightWorkspace.addChangeListener(monitorRightWorkspace);
 
 setupScrollingTouchHandlers();

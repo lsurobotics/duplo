@@ -61,20 +61,6 @@ Blockly.Rapid.init = function(workspace) {
   var variables = Blockly.Variables.allUsedVarModels(workspace);
   // Now custom variables for now
 
-  /*for (var i = 0; i < variables.length; i++) {
-    if (variables[i].type === Blockly.Locations.VARIABLE_TYPE) {
-      //don't include Locations in the variable declaration block.
-      //these will be handled by the Coblox app
-      continue;
-    }
-
-    var varName = Blockly.Rapid.variableDB_.getName(variables[i].getId(),
-        Blockly.Variables.NAME_TYPE);
-    defvars.push("LOCAL VAR num " + varName + " := 0;");
-  }
-
-  Blockly.Rapid.definitions_['variables'] = defvars.join('\n');
-  */
 }
 
 Blockly.Rapid.finish = function(code) {
