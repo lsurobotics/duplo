@@ -113,7 +113,7 @@ namespace VCUProject
             {
                 if(next_message == next_message_type.RAPID) CreateModuleLocally(messageFromWeb);
                 else if (next_message == next_message_type.FILE) SaveBlocklyWorkspaceLocally(messageFromWeb);
-                else if (messageFromWeb.StartsWith("<Prototype Log>")) SaveLogMessage(messageFromWeb);
+                else if (messageFromWeb.Contains("<Prototype Log>")) SaveLogMessage(messageFromWeb);
             }
         }
 
