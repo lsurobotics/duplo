@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using ABB.Robotics.Controllers.FileSystemDomain;
+using System.Collections.Generic;
 
 namespace VCUProject
 {
@@ -22,6 +23,7 @@ namespace VCUProject
         /* ABB SDK variables */
         private Controller _controller;
         private Task armTask;
+        private List<string> logMessages = new List<string>();
 
         //states for saving of a file or submitting RAPID code
         private enum next_message_type
@@ -119,6 +121,7 @@ namespace VCUProject
         {
             string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string logsFolder = Path.Combine(documentFolder, "Duplo/Logs");
+            logMessages.Add(message);
 
             try
             {
@@ -127,7 +130,7 @@ namespace VCUProject
                     Directory.CreateDirectory(logsFolder);
                 }
 
-                string filename = "LogsBackup" + ".txt";
+                string filename = "logsBackup" + ".txt";
                 string logFilepath = Path.Combine(logsFolder, filename);
 
                 using (StreamWriter writer = File.AppendText(logFilepath))
@@ -298,6 +301,9 @@ namespace VCUProject
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         File.WriteAllText(saveFileDialog.FileName, file);
+                        string logMessagesCombined = string.Join("\n", logMessages);
+                        File.WriteAllText(saveFileDialog.FileName + ".log", logMessagesCombined);
+                        logMessages.Clear();
                         webView.CoreWebView2.PostWebMessageAsString(saveFileDialog.SafeFileName);
                     }
                     else webView.CoreWebView2.PostWebMessageAsString("SAVE_CANCELLED");

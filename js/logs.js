@@ -113,8 +113,8 @@ leftRightHandSwitchButton.addEventListener("click", function() {
 });
 
 function submitLogMessage(logMessage) {
-    datetime = new Date().toLocaleString();
+    datetime = new Date().toLocaleString()
     logMessage = logMessage + ', Date: ' + datetime.toString()
-
     console.log(logMessage)
+    window.chrome.webview.postMessage(logMessage);
 }
