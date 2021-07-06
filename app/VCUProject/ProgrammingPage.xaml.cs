@@ -108,6 +108,9 @@ namespace VCUProject
                 OpenFile();
             }
             else if (messageFromWeb.StartsWith("<Prototype Log>"))
+            {
+                SaveLogMessage(messageFromWeb);
+            }
             /* If it is not one of the options above, we check the next_message state to determine if we are submitting RAPID code,
              *or saving the message as a json file*/
             else
