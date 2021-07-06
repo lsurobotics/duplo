@@ -107,13 +107,13 @@ namespace VCUProject
             {
                 OpenFile();
             }
+            else if (messageFromWeb.StartsWith("<Prototype Log>"))
             /* If it is not one of the options above, we check the next_message state to determine if we are submitting RAPID code,
              *or saving the message as a json file*/
             else
             {
                 if(next_message == next_message_type.RAPID) CreateModuleLocally(messageFromWeb);
                 else if (next_message == next_message_type.FILE) SaveBlocklyWorkspaceLocally(messageFromWeb);
-                else if (messageFromWeb.Contains("<Prototype Log>")) SaveLogMessage(messageFromWeb);
             }
         }
 
