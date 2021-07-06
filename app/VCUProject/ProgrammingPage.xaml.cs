@@ -111,6 +111,33 @@ namespace VCUProject
             {
                 if(next_message == next_message_type.RAPID) CreateModuleLocally(messageFromWeb);
                 else if (next_message == next_message_type.FILE) SaveBlocklyWorkspaceLocally(messageFromWeb);
+                else if (messageFromWeb.StartsWith("<Prototype Log>")) SaveLogMessage(messageFromWeb);
+            }
+        }
+
+        private void SaveLogMessage(string message)
+        {
+            string documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string logsFolder = Path.Combine(documentFolder, "Duplo/Logs");
+
+            try
+            {
+                if (!Directory.Exists(logsFolder))
+                {
+                    Directory.CreateDirectory(logsFolder);
+                }
+
+                string filename = "LogsBackup" + ".txt";
+                string logFilepath = Path.Combine(logsFolder, filename);
+
+                using (StreamWriter writer = File.AppendText(logFilepath))
+                {
+                    writer.WriteLine(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception while autosaving log message: " + ex);
             }
         }
 
