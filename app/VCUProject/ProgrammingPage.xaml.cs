@@ -107,6 +107,12 @@ namespace VCUProject
             {
                 OpenFile();
             }
+            /* If the message received is CLEAR_LOGS, clear the list of logs */
+            else if (messageFromWeb == "CLEAR_LOGS")
+            {
+                logMessages.Clear();
+            }
+            /* If the message received starts with <Prototype Log>, save request as log message */
             else if (messageFromWeb.StartsWith("<Prototype Log>"))
             {
                 SaveLogMessage(messageFromWeb);
