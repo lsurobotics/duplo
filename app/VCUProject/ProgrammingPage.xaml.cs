@@ -257,8 +257,8 @@ namespace VCUProject
             }
         }
 
-        //Saves the blockly workspace either as an autosave or a save by name. Autosaved workspace is overwritten each time.
-        //The goal of the autosave is to be able to recover your workspace in case of a crash. Otherwise use save as.
+        // Saves the blockly workspace either as an autosave or a save by name. Autosaved workspace is overwritten each time.
+        // The goal of the autosave is to be able to recover your workspace in case of a crash. Otherwise use save as.
         private void SaveBlocklyWorkspaceLocally(string file)
         {
             if (file.Contains("\"autosave\": true")) //this is an autosave
@@ -304,14 +304,13 @@ namespace VCUProject
                         Filter = "json files (*.json)|*.json",
                         FilterIndex = 2,
                         RestoreDirectory = true,
-
                     };
 
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         File.WriteAllText(saveFileDialog.FileName, file);
                         string logMessagesCombined = string.Join("\n", logMessages);
-                        File.WriteAllText(saveFileDialog.FileName + ".log", logMessagesCombined);
+                        File.AppendAllText(saveFileDialog.FileName + ".log", logMessagesCombined);
                         logMessages.Clear();
                         webView.CoreWebView2.PostWebMessageAsString(saveFileDialog.SafeFileName);
                     }
