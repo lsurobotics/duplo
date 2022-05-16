@@ -1,6 +1,19 @@
 # Duplo :mechanical_arm:
 A prototype of a programming language for two-armed robots.
 
+## About the programming language
+Duplo is a block-based programming language created to introduce non-experts to two-armed robots programming. The language is composed by two side by side canvases, used to accommodate instruction blocks from both robotic arms. A toolbox on the left side of the two canvases displays the instruction blocks available for use, and an execution button at the bottom runs the instructions from both canvases at the same time. In Duplo, the left canvas represents the instructions of the left arm in a two-armed robot, while the right canvas the instructions of the right arm. At the top of the page, a toolbar gives access to features that do not generate code, including buttons to run workspace commands (e.g., save the current workspace) and manual robot commands (e.g., move arms to home position). 
+
+Each canvas starts with a green initialization block, where new blocks that should be executed can be attached. A new robot instruction is created when the user drags an instruction block from the toolbox and connects it to the existing blocks on one of the canvases. The order in which blocks are attached in a canvas defines the sequence in which instructions will be performed by the respective arm. If the user decides to delete a block, a trash can is available at the bottom right side of the two canvases where the instruction blocks can be disposed.
+
+The toolbox provides instruction blocks for the two canvases in three different categories: one category to move the arms (in red), one to move the grippers (in blue), and another to synchronize the movements between arms (in yellow). In the arm movement category, all instruction blocks contain two input variables: arm movement speed and arm position. The arm movement speed is defined by three pre-defined options: quickly, moderately and slowly. Arm positions are taught by the user by manually moving a robotic arm to a new location. When a new arm position is created by the user, it stores the joints configuration of that respective arm.
+
+Three types of blocks are available for use in the arm movement category. The first block, "Move arm to", moves an arm using a certain speed to a given location. The second block, "Move arm in a straight line to", can execute the same movement, but using linear movements. The third and last block, "Move and follow on the other side", moves both arms at the same time in a given direction. This direction is defined by the left arm position. For example, if a position moves the left arm three centimeters down from its current configuration, the right arm will also move three centimeters down.
+
+In the gripper movement category, only two blocks with no input values are available for use. One block is used to open a gripper, and the other to close it. The canvas in which a block of is placed defines what gripper will be opened or closed. If an instruction block "Open gripper" is placed on the left canvas, for example, the gripper of the left arm will be opened. The same behavior applies for blocks in the arm movement category.
+
+The last category in the toolbox is used to provide synchronization of instructions between the two canvases. The only block available in this category is the "Wait for each other". This is a two-canvases block, which means that when such block is placed, the user can see it in both canvases at the same time. This block doesn't contain any input value and it is used to synchronize the instructions of both arms. It can be understood as a traffic light in the execution order, that only allow blocks attached below it to be executed when all the blocks above it in both canvases were executed.
+
 ## :card_index_dividers:	Files
 - index.html: The HTML file where the programming language is loaded.
 - css: Folder containing the stylesheets of index.html.
