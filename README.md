@@ -1,8 +1,8 @@
 # Duplo :mechanical_arm:
 A prototype of a programming language for two-armed robots.
 
-## Warning
-The organization and authors of this repository are not liable for any consequential damage or injury that any code or information available in this repository may produce to you or others. The code available in this repository should be used only for reading purposes as different robots may act different during execution. Use the code and information available here at your own risk, and always make sure you are following all the safety procedures recommended by your robot manufacturer.
+### :warning: Warning 
+The organization and authors of this repository are not liable for any consequential damage or injury that any code or information available in this repository may produce to you or others. The code available in this repository should be used only for reading purposes as different robots and settings may act different during  program execution. Use the code and information available here at your own risk, and always make sure you are following all the safety procedures recommended by your robot manufacturer. Robots can be dangerous if used inappropriately, be careful!
 
 ## 📘 About the language
 Duplo is a block-based programming language created to introduce non-experts to two-armed robots programming. The language is composed by two side by side canvases, used to accommodate instruction blocks from both robotic arms. A toolbox on the left side of the two canvases displays the instruction blocks available for use, and an execution button at the bottom runs the instructions from both canvases at the same time. In Duplo, the left canvas represents the instructions of the left arm in a two-armed robot, while the right canvas the instructions of the right arm. At the top of the page, a toolbar gives access to features that do not generate code, including buttons to run workspace commands (e.g., save the current workspace) and manual robot commands (e.g., move arms to home position). 
