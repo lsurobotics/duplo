@@ -51,6 +51,4 @@ First, download our repository using Git or use the "Code ↓" button at the top
 ## :speech_balloon:	Contact the community
 
 If you need our help or are interested in being part of our community, do not hesitate to send us a message:
-- Discord: https://discord.gg/qcPey2jp2M
 - Felipe Fronchetti: fronchettl@vcu.edu
-- David Shepherd: shepherdd@vcu.edu
